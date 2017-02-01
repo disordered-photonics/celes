@@ -1,0 +1,13 @@
+*.mat
+*.asv
+*.mexa64
+*~
+*.bak
+tmp/
+temp/
+%HOMEDRIVE%*
+documentation/html/*
+projects/
+not_released/
+data/*
+!data/example_project

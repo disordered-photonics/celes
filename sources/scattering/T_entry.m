@@ -1,0 +1,60 @@
+%======================================================================
+%> @brief Evaluate the Mie coefficients, see Bohren and Huffman:
+%> "Absorption and Scattering of Light by Small Particles", equations
+%> (4.52) and (4.53).
+%>
+%> @param       tau (int): SVWF polarization (1=TE, 2=TM)
+%>
+%> @param       l (int): SVWF degree (polar quantum number)
+%>
+%> @param       km (float): wavenumber in surrounding medium
+%>
+%> @param       kS (float): wavenumber inside particle
+%>
+%> @param       R (float): radius of sphere
+%>
+%> @retval      Q(float): Mie coefficient
+%======================================================================
+function Q = T_entry(tau,l,kM,kS,R,varargin)
+
+% The conventions are according to Bohren and Huffman's textbook.
+% There is a twist: for tau=1 we have Q=-b and for tau=2 we have Q=-a in
+% the case of scattered field Mie coefficients.
+% This has to do with the definition of a and b in BH, see also
+% Mishchenko: "Scattering, Absorption and Emission of Light by Small
+% Paritcles", equations (5.42) and (5.43).
+
+m=kS/kM;
+x = kM*R;
+mx = kS*R;
+
+jx = sph_bessel(1,l,x);
+jmx = sph_bessel(1,l,mx);
+hx = sph_bessel(3,l,x);
+djx = dx_xz(1,l,x);
+djmx = dx_xz(1,l,mx);
+dhx = dx_xz(3,l,x);
+
+a = (m^2*jmx*djx-jx*djmx)/(m^2*jmx*dhx-hx*djmx);
+b = (jmx*djx-jx*djmx)/(jmx*dhx-hx*djmx);
+c = (jx*dhx-hx*djx)/(jmx*dhx-hx*djmx);
+d = (m*jx*dhx-m*hx*djx)/(m^2*jmx*dhx-hx*djmx);
+
+if(isempty(varargin))
+    varargin={'scattered'};
+end
+
+switch varargin{1}
+    case 'scattered'
+        if tau==1
+            Q = -b;
+        else
+            Q = -a;
+        end
+    case 'internal'
+        if tau==1
+            Q = c;
+        else
+            Q = d;
+        end
+end

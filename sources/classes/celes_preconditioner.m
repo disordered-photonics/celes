@@ -1,0 +1,151 @@
+%> @file celes_preconditioner.m
+% ======================================================================
+%> @brief Preconditioner for the use in iterative celes_solver objects
+% ======================================================================
+
+classdef celes_preconditioner
+    
+    properties
+        %> what kind of preconditioner?
+        %> at the moment, only 'none' and 'blockdiagonal' implemented
+        type = 'none'
+        
+        %> for type blockdiagonal: edge sizes of the cuboids that define
+        %> the partition of the particles (i.e. the blocks)
+        %> format: [dx,dy,dz]
+        partitionEdgeSizes
+        
+        %> for type blockdiagonal: cell array of particle indices that are
+        %> grouped into the same partition
+        partitioning
+        
+        %> for type blockdiagonal: cell array of SVWF coefficient indices
+        %> that belong to the corresponding partitioning
+        partitioningIdcs
+        
+        %> for type blockdiagonal: cell array of blocks of master matrix
+        %> M=1-TW that correspond to one partitioning
+        masterMatrices
+        
+        %> for type blockdiagonal: cell array of LU decompositions of
+        %> masterMatrices
+        factorizedMasterMatrices
+    end
+    
+    properties (Dependent)
+    end
+    
+    methods
+        % ======================================================================
+        %> @brief Run the preconditioner.
+        %>
+        %> @param Coefficient vector x
+        %> @return y = M'\x
+        %> where M' is a blockdiagonal approximation to the linear system M
+        % ======================================================================
+        function simul = prepare(obj,simul)
+            switch obj.type
+                case 'blockdiagonal'
+                    fprintf(1,'prepare blockdiagonal preconditioner ...\n');
+                    msg = '';
+                    lmax=simul.numerics.lmax;
+                    nmax=simul.numerics.nmax;
+                    k = simul.input.k_medium;
+                    
+                    for jp=1:length(obj.partitioning)
+                        spherArr=obj.partitioning{jp};
+                        NSi = length(spherArr);
+                        
+                        Idcs= [];
+                        for n=1:nmax
+                            Idcs = [Idcs;spherArr+simul.input.particles.number*(n-1)];
+                        end
+                        simul.numerics.solver.preconditioner.partitioningIdcs{jp} = Idcs;
+                        
+                        fprintf(1,repmat('\b',[1,length(msg)]));
+                        msg = sprintf('partition %i of %i: %i particles -- compute master matrix ...',jp,length(obj.partitioning),length(spherArr));
+                        fprintf(1,msg);
+                        
+                        M = eye(NSi*simul.numerics.nmax,'single');
+                        
+                        [x2,x1]=meshgrid(simul.input.particles.positionArray(spherArr,1));
+                        [y2,y1]=meshgrid(simul.input.particles.positionArray(spherArr,2));
+                        [z2,z1]=meshgrid(simul.input.particles.positionArray(spherArr,3));
+                        x1mnx2 = x1-x2;
+                        y1mny2 = y1-y2;
+                        z1mnz2 = z1-z2;
+                        dTab = sqrt(x1mnx2.^2+y1mny2.^2+z1mnz2.^2);
+                        ctTab = z1mnz2./dTab;
+                        stTab = sqrt(1-ctTab.^2);
+                        phiTab = atan2(y1mny2,x1mnx2);
+                        Plm = legendre_normalized_trigon(ctTab,stTab,2*lmax);
+                        
+                        for p=0:2*lmax
+                            sphHank = sph_bessel(3,p,k*dTab);
+                            for tau1=1:2
+                                for l1=1:lmax
+                                    for m1=-l1:l1
+                                        n1=multi2single_index(1,tau1,l1,m1,lmax);
+                                        n1S1Arr=(1:NSi)+(n1-1)*NSi;
+                                        for tau2=1:2
+                                            for l2=1:lmax
+                                                for m2=-l2:l2
+                                                    if abs(m1-m2)<=p
+                                                        n2=multi2single_index(1,tau2,l2,m2,lmax);
+                                                        n2S2Arr=(1:NSi)+(n2-1)*NSi;
+                                                        TWn1n2 = simul.tables.mieCoefficients(n1)*simul.tables.translationTable.ab5(n2,n1,p+1) * Plm{p+1,abs(m1-m2)+1} .* sphHank .* exp(1i*(m2-m1)*phiTab) ;
+                                                        s1eqs2=logical(eye(NSi));
+                                                        TWn1n2(s1eqs2(:))=0; % jS1=jS2
+                                                        M(n1S1Arr,n2S2Arr) = M(n1S1Arr,n2S2Arr) - TWn1n2;
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        
+                        fprintf(1,repmat('\b',[1,length(msg)]));
+                        msg = sprintf('partition %i of %i: %i particles -- factorize master matrix ...',jp,length(obj.partitioning),length(spherArr));
+                        fprintf(1,msg);
+                        
+                        [Y,U,P] = lu(simul.numerics.deviceArray(M),'vector');
+                        Y(U~=0) = U(U~=0);
+                        simul.numerics.solver.preconditioner.masterMatrices{jp}=M;
+                        simul.numerics.solver.preconditioner.factorizedMasterMatrices{jp}.Y=gather(Y);
+                        simul.numerics.solver.preconditioner.factorizedMasterMatrices{jp}.P=gather(P);
+                    end
+                    fprintf(' done\n')
+                case 'none'
+            end
+        end
+        
+        % ======================================================================
+        %> @brief Run the preconditioner.
+        %>
+        %> @param Coefficient vector x
+        %> @return y = M'\x
+        %> where M' is a blockdiagonal approximation to the linear system M
+        % ======================================================================
+        function value = run(obj,rhs)
+            switch obj.type
+                case 'blockdiagonal'
+                    optL.LT = true; % settings for linsolve
+                    optU.UT = true;
+                    rhs = gather(rhs(:));
+                    value = rhs-rhs;
+                    for jp=1:length(obj.partitioning)
+                        p = obj.factorizedMasterMatrices{jp}.P;
+                        U = triu(obj.factorizedMasterMatrices{jp}.Y);
+                        L = tril(obj.factorizedMasterMatrices{jp}.Y,-1)+eye(length(p),'single');
+                        value(obj.partitioningIdcs{jp}) = linsolve (U, linsolve (L, rhs(obj.partitioningIdcs{jp}(p)), optL), optU);
+                    end
+                    value = gpuArray(value(:));
+                case 'none'
+                    value=rhs;
+            end
+        end
+    end
+end
+

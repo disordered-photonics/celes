@@ -1,0 +1,222 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>polarplot3d_demo</title><meta name="generator" content="MATLAB 7.13"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2011-10-12"><meta name="DC.source" content="polarplot3d_demo.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Test the polarplot3d function</a></li><li><a href="#2">Plot using default arguments</a></li><li><a href="#3">Plot of an incomplete polar annulus, color is azimuthal gradient</a></li><li><a href="#4">Surface plot with contours</a></li><li><a href="#5">Surface plot with unequally spaced polar grid lines</a></li><li><a href="#6">Surface plot, compass convention, color is radial direction gradient</a></li><li><a href="#7">Mesh plot with polar axis at mean value, reversed angular sense</a></li><li><a href="#8">Mesh plot with polar axis along edge of surface</a></li><li><a href="#9">Mesh plot with contours, overlay 8 by 8 polar grid</a></li><li><a href="#10">Wireframe plot</a></li><li><a href="#11">Surface and contour plot, reversed radial sense</a></li></ul></div><h2>Test the polarplot3d function<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Ken Garrard</span>
+<span class="comment">% North Carolina State University</span>
+<span class="comment">% October 2011</span>
+
+<span class="comment">% The peaks function on a polar grid</span>
+[t,r] = meshgrid(linspace(0,2*pi,361),linspace(-4,4,101));
+[x,y] = pol2cart(t,r);
+P = peaks(x,y);
+
+<span class="comment">% Define some angular and radial range vectors for example plots</span>
+t1 = 2*pi;
+t2 = [30 270]*pi/180;
+r1 = 4;
+r2 = [.8 4];
+t3 = fliplr(t2);
+r3 = fliplr(r2);
+t4 = [30 35 45 60 90 135 200 270]*pi/180;
+r4 = [0.8:0.4:2.8 3:0.2:4];
+
+<span class="comment">% Axis property cell array</span>
+axprop = {<span class="string">'DataAspectRatio'</span>,[1 1 8],<span class="string">'View'</span>, [-12 38],<span class="keyword">...</span>
+          <span class="string">'Xlim'</span>, [-4.5 4.5],       <span class="string">'Ylim'</span>, [-4.5 4.5],<span class="keyword">...</span>
+          <span class="string">'XTick'</span>,[-4 -2 0 2 4],    <span class="string">'YTick'</span>,[-4 -2 0 2 4]};
+</pre><h2>Plot using default arguments<a name="2"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P);
+view([-18 76]);
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_01.png" alt=""> <h2>Plot of an incomplete polar annulus, color is azimuthal gradient<a name="3"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'surf'</span>,<span class="string">'angularrange'</span>,t2,<span class="string">'radialrange'</span>,r2,<span class="keyword">...</span>
+              <span class="string">'polargrid'</span>,{1 16},<span class="string">'tickspacing'</span>,8,<span class="string">'colordata'</span>,gradient(P),<span class="keyword">...</span>
+              <span class="string">'plotprops'</span>,{<span class="string">'Linestyle'</span>,<span class="string">'none'</span>});
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_02.png" alt=""> <h2>Surface plot with contours<a name="4"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'surfcn'</span>,<span class="string">'angularrange'</span>,t2,<span class="string">'radialrange'</span>,r2,<span class="keyword">...</span>
+              <span class="string">'polargrid'</span>,{10 24},<span class="string">'tickspacing'</span>,15);
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_03.png" alt=""> <h2>Surface plot with unequally spaced polar grid lines<a name="5"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'surfn'</span>,<span class="string">'radialrange'</span>,[min(r4) max(r4)],<span class="keyword">...</span>
+              <span class="string">'angularrange'</span>,[min(t4) max(t4)],<span class="string">'polargrid'</span>,{r4 t4},<span class="string">'tickspacing'</span>,15);
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_04.png" alt=""> <h2>Surface plot, compass convention, color is radial direction gradient<a name="6"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'surfn'</span>,<span class="string">'angularrange'</span>,t2,<span class="keyword">...</span>
+              <span class="string">'radialrange'</span>,r2,<span class="string">'tickspacing'</span>,15,<span class="keyword">...</span>
+              <span class="string">'polardirection'</span>,<span class="string">'cw'</span>,<span class="string">'colordata'</span>,gradient(P.').');
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_05.png" alt=""> <h2>Mesh plot with polar axis at mean value, reversed angular sense<a name="7"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'mesh'</span>,<span class="string">'angularrange'</span>,t3,<span class="string">'radialrange'</span>,r2,<span class="keyword">...</span>
+              <span class="string">'meshscale'</span>,2,<span class="string">'polargrid'</span>,{1 1},<span class="string">'axislocation'</span>,<span class="string">'mean'</span>);
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_06.png" alt=""> <h2>Mesh plot with polar axis along edge of surface<a name="8"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'mesh'</span>,<span class="string">'angularrange'</span>,t2,<span class="string">'radialrange'</span>,r2,<span class="keyword">...</span>
+              <span class="string">'polargrid'</span>,{10 24},<span class="string">'tickspacing'</span>,8,<span class="keyword">...</span>
+              <span class="string">'plotprops'</span>,{<span class="string">'Linestyle'</span>,<span class="string">'none'</span>});
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_07.png" alt=""> <h2>Mesh plot with contours, overlay 8 by 8 polar grid<a name="9"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'meshc'</span>,<span class="string">'angularrange'</span>,t2,<span class="string">'radialrange'</span>,r3,<span class="keyword">...</span>
+              <span class="string">'meshscale'</span>,2,<span class="string">'polargrid'</span>,{8 8});
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_08.png" alt=""> <h2>Wireframe plot<a name="10"></a></h2><pre class="codeinput">figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'wire'</span>,<span class="string">'angularrange'</span>,t2,<span class="string">'radialrange'</span>,r2,<span class="keyword">...</span>
+              <span class="string">'polargrid'</span>,{12 24});
+set(gca,axprop{:});
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_09.png" alt=""> <h2>Surface and contour plot, reversed radial sense<a name="11"></a></h2><pre class="codeinput">cl = round(min(P(:))-1):0.4:round(max(P(:))+1);
+figure(<span class="string">'color'</span>,<span class="string">'white'</span>);
+polarplot3d(P,<span class="string">'plottype'</span>,<span class="string">'contour'</span>,<span class="string">'polargrid'</span>,{6 4},<span class="string">'contourlines'</span>,cl);
+set(gca,<span class="string">'dataaspectratio'</span>,[1 1 1],<span class="string">'view'</span>,[0 90]);
+</pre><img vspace="5" hspace="5" src="polarplot3d_demo_10.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.13<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Test the polarplot3d function
+
+% Ken Garrard
+% North Carolina State University
+% October 2011
+
+% The peaks function on a polar grid
+[t,r] = meshgrid(linspace(0,2*pi,361),linspace(-4,4,101));
+[x,y] = pol2cart(t,r);
+P = peaks(x,y);
+
+% Define some angular and radial range vectors for example plots
+t1 = 2*pi;
+t2 = [30 270]*pi/180;
+r1 = 4;
+r2 = [.8 4];
+t3 = fliplr(t2);
+r3 = fliplr(r2);
+t4 = [30 35 45 60 90 135 200 270]*pi/180;
+r4 = [0.8:0.4:2.8 3:0.2:4];
+
+% Axis property cell array
+axprop = {'DataAspectRatio',[1 1 8],'View', [-12 38],...
+          'Xlim', [-4.5 4.5],       'Ylim', [-4.5 4.5],...
+          'XTick',[-4 -2 0 2 4],    'YTick',[-4 -2 0 2 4]};
+
+%% Plot using default arguments
+figure('color','white');
+polarplot3d(P);
+view([-18 76]);
+
+%% Plot of an incomplete polar annulus, color is azimuthal gradient
+figure('color','white');
+polarplot3d(P,'plottype','surf','angularrange',t2,'radialrange',r2,...
+              'polargrid',{1 16},'tickspacing',8,'colordata',gradient(P),...
+              'plotprops',{'Linestyle','none'});
+set(gca,axprop{:});
+
+%% Surface plot with contours
+figure('color','white');
+polarplot3d(P,'plottype','surfcn','angularrange',t2,'radialrange',r2,...
+              'polargrid',{10 24},'tickspacing',15);
+set(gca,axprop{:});
+
+%% Surface plot with unequally spaced polar grid lines
+figure('color','white');
+polarplot3d(P,'plottype','surfn','radialrange',[min(r4) max(r4)],...
+              'angularrange',[min(t4) max(t4)],'polargrid',{r4 t4},'tickspacing',15);
+set(gca,axprop{:});
+
+%% Surface plot, compass convention, color is radial direction gradient
+figure('color','white');
+polarplot3d(P,'plottype','surfn','angularrange',t2,...
+              'radialrange',r2,'tickspacing',15,...
+              'polardirection','cw','colordata',gradient(P.').');
+set(gca,axprop{:});
+
+%% Mesh plot with polar axis at mean value, reversed angular sense
+figure('color','white');
+polarplot3d(P,'plottype','mesh','angularrange',t3,'radialrange',r2,...
+              'meshscale',2,'polargrid',{1 1},'axislocation','mean');
+set(gca,axprop{:});
+
+%% Mesh plot with polar axis along edge of surface
+figure('color','white');
+polarplot3d(P,'plottype','mesh','angularrange',t2,'radialrange',r2,...
+              'polargrid',{10 24},'tickspacing',8,...
+              'plotprops',{'Linestyle','none'});
+set(gca,axprop{:});
+
+%% Mesh plot with contours, overlay 8 by 8 polar grid
+figure('color','white');
+polarplot3d(P,'plottype','meshc','angularrange',t2,'radialrange',r3,...
+              'meshscale',2,'polargrid',{8 8});
+set(gca,axprop{:});
+
+%% Wireframe plot
+figure('color','white');
+polarplot3d(P,'plottype','wire','angularrange',t2,'radialrange',r2,...
+              'polargrid',{12 24});
+set(gca,axprop{:});
+
+%% Surface and contour plot, reversed radial sense
+cl = round(min(P(:))-1):0.4:round(max(P(:))+1);
+figure('color','white');
+polarplot3d(P,'plottype','contour','polargrid',{6 4},'contourlines',cl);
+set(gca,'dataaspectratio',[1 1 1],'view',[0 90]);
+
+##### SOURCE END #####
+--></body></html>
