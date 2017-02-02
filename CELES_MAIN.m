@@ -47,7 +47,7 @@ initialField.polarization = 'TE';
 initialField.beamWidth = 4000;
 
 % focal point 
-initialField.focalPoint = [0,0,2500];
+initialField.focalPoint = [0,0,0];
 
 % vacuum wavelength (same unit as particle positions and radius)
 input.wavelength = 532;
