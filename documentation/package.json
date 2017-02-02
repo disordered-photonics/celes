@@ -1,0 +1,21 @@
+{
+  "name": "celes-documentation",
+  "version": "0.1.0",
+  "description": "CELES documentation",
+  "scripts": {
+    "deploy": "gh-pages -d html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/disordered-photonics/celes.git"
+  },
+  "author": "",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/disordered-photonics/celes/issues"
+  },
+  "homepage": "https://github.com/disordered-photonics/celes#readme",
+  "dependencies": {
+    "gh-pages": "^0.12.0"
+  }
+}

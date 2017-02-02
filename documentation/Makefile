@@ -1,6 +1,6 @@
 PROJECT_BASE_DIR = $(shell dirname `pwd`)
 
-.PHONY: all documentation clean
+.PHONY: all documentation clean push
 
 all: documentation
 
@@ -9,3 +9,6 @@ documentation:
 
 clean:
 	rm -rf html/
+
+push: documentation
+	npm run deploy

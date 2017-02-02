@@ -6,7 +6,6 @@
 tmp/
 temp/
 %HOMEDRIVE%*
-documentation/html/*
 projects/
 not_released/
 data/*
