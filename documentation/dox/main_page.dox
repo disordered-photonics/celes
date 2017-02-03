@@ -1,14 +1,17 @@
 /*!
-@mainpage Cuda accelerated simulation of electromagnetic scattering at multiple spherical objects
+@mainpage Cuda-accelerated Electromagnetic scattering solver for Large Ensembles of Spheres
 
-@section purpose Purpose of the software
 CELES is implemented in MATLAB and solves Maxwell's equations for a system of multiple spherical scattering objects. 
 The aim is to allow for the simulation of very large numbers of scattering objects.
 It shall enable to study the propagation of light in macroscopic statistical scattering aggregates in order to
 derive bulk properties of disordered photonic materials.
 
-@image html spheres_verysmall.png "" width=200
+@image html beam_on_2500_spheres.bmp "" width=1
 
+The scattered electric field is represented as a superposition of 
+spherical vector wave functions relative to the sphere's center coordinates. 
+The coefficients of this expansion are the unknowns of the problem. 
+To calculate them, a system of linear equations needs to be solved.
 
 @section why Why another software?
 There are already excellent codes for the simulation of electromagnetic particles at multiple spherical objects. For example, the 
@@ -16,26 +19,27 @@ There are already excellent codes for the simulation of electromagnetic particle
 Fortran code by Daniel Mackowski and Michael Mishchenko can run either on a single machine or on a cluster. 
 A collection of more light scattering codes can be found at Thomas
 Wriedt's <a href="http://www.scattport.org/index.php/light-scattering-software">scattport</a> homepage.
-
-@image html beam_on_100_spheres.png "" width=100
-
 With the CELES toolbox we want to add a software that runs with a very  good computational performance 
 on workstation computers with suitable graphics processing units. The key feature of the CELES software 
 is to run the costly matrix-vector multiplications in the iterative solving of the system of linear equations 
 in parallel on the GPU. In addition, the convergence is accelerated by means of a block-diagonal preconditioner.
 
-@section concept Concept
-The scattered electric field is represented as a superposition of 
-spherical vector wave functions relative to the sphere's center coordinates. 
-The coefficients of this expansion are the unknowns of the problem. 
-To calculate them, a system of linear equations needs to be solved.
 
 @section installation Installation
- The requirements are:
-- MATLAB with symbolic and parallel computing toolbox
-- A CUDA-enabled NVIDIA graphics card
-- NVIDIA's CUDA Toolkit (a version compatible with the MATLAB installation)
-- We recommend to use a workstation with sufficient RAM (~several 10GB) to benefit from preconditioned iterative solvers
+In order to execute the CELES code, it is necessary to have the following
+installed:
+
+1. The CUDA Toolkit. You can check the verison that you need by running the command `gpuDevice` in
+MATLAB and look for ToolkitVersion in the output.
+
+2. A C++ compiler which is supported by MATLAB in combination with the given
+CUDA Toolkit version.
+Linux users: the built-in gcc compiler works fine.
+Windows users: one combination that works is MATLAB 2016b, CUDA Toolkit 7.5 and
+MS Visual Studio 2013 (not 2015). With MATLAB 2017a: CUDA Toolkit 8 and MS
+Visual Studio 2013. MS Visual Studio 2013 can be downloaded from <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48138">here</a>.
+
+We recommend to use a workstation with sufficient RAM (~several 10GB) to benefit from preconditioned iterative solvers.
 
 
 @page theory Theory
