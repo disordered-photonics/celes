@@ -36,6 +36,8 @@
 %> @param       verbose (boolean): be verbose in compilation output? 
 %======================================================================
 function cuda_compile(lmax, verbose)
+    fprintf(1,'compiling CUDA-code.\n')
+
     SRC_FILE = 'coupling_matrix_multiply_CUDA.cu';
     script_dir = fileparts(mfilename('fullpath'));
     SRC_FILE = fullfile(script_dir, SRC_FILE);

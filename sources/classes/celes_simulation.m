@@ -216,9 +216,12 @@ classdef celes_simulation
         %> output.totalFieldForwardPower and output.totalFieldBackwardPower
         % ======================================================================
         function obj = evaluatePower(obj)
+            tpow = tic;
             obj = obj.computeScatteredFieldPWP;
             obj = obj.computeTotalFieldPWP;
             obj = obj.computeTotalFieldPower;
+            obj.output.powerEvaluationTime = toc(tpow);
+            fprintf(1,'power flux evaluated in %.1f seconds.\n',obj.output.powerEvaluationTime);
         end
         
         % ======================================================================
@@ -269,9 +272,12 @@ classdef celes_simulation
         %> output.initialField and output.scatteredField
         % ======================================================================
         function obj = evaluateFields(obj)
+            tfld = tic;
             obj = obj.evaluateInitialField;
             obj = obj.evaluateScatteredField;
             obj = obj.evaluateInternalField;
+            obj.output.fieldEvaluationTime = toc(tfld);
+            fprintf(1,'fields evaluated in %.1f seconds.\n',obj.output.fieldEvaluationTime);
         end
         
         % ======================================================================
@@ -307,11 +313,14 @@ classdef celes_simulation
         % ======================================================================
         function obj = run(obj,varargin)
             print_logo
+            print_parameters(obj)
             tcomp=tic;
             cuda_compile(obj.numerics.lmax);
+            fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
+            tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');
                 partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
@@ -321,9 +330,15 @@ classdef celes_simulation
                 fprintf(1,' done\n');
                 obj = obj.numerics.solver.preconditioner.prepare(obj);
             end
+            obj.output.preconiditionerPreparationTime = toc(tprec);
+            fprintf(1,'preconditioner prepared in %.1f seconds.\n',obj.output.preconiditionerPreparationTime);
+            tsolv=tic;
             obj = obj.computeInitialFieldCoefficients;
+            obj.output.solverTime = toc(tsolv);
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
-            obj.output.totalTime = toc(tcomp);
+            fprintf(1,'solver terminated in %.1f seconds.\n',obj.output.solverTime);
+            obj.output.runningTime = toc(tcomp);
+            fprintf(1,'simulation ran in %.1f seconds.\n',obj.output.runningTime);
         end
     end
 end

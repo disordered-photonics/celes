@@ -95,6 +95,16 @@ classdef celes_output
         
         %> time used for the preparation of the preconditioner
         preconiditionerPreparationTime
+        
+        %> time used for the simulation.run command
+        runningTime
+        
+        %> time used for the power evaluation
+        powerEvaluationTime
+        
+        %> time used for the field evaluation
+        fieldEvaluationTime
+        
     end
     
     properties (Dependent)
