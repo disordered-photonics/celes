@@ -26,6 +26,8 @@ in parallel on the GPU. In addition, the convergence is accelerated by means of 
 
 
 @section installation Installation
+We recommend to use a workstation with sufficient RAM (~several 10GB) to benefit from preconditioned iterative solvers.
+
 In order to execute the CELES code, it is necessary to have the following
 installed:
 
@@ -39,7 +41,16 @@ Windows users: one combination that works is MATLAB 2016b, CUDA Toolkit 7.5 and
 MS Visual Studio 2013 (not 2015). With MATLAB 2017a: CUDA Toolkit 8 and MS
 Visual Studio 2013. MS Visual Studio 2013 can be downloaded from <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48138">here</a>.
 
-We recommend to use a workstation with sufficient RAM (~several 10GB) to benefit from preconditioned iterative solvers.
+If these system requirements are met, you can run the CELES software by executing the script `CELES_MAIN.m`. 
+The comments in that script also explain how the simulation parameters are specified.
 
+@section acknowledgments Acknowledgments
+The CELES package includes the following sources from other programmers:
+
+ - The Wigner-3j symbols are computed using <a href="https://de.mathworks.com/matlabcentral/fileexchange/20619-wigner3j-symbol">Kobi Kraus' MATLAB routine</a>.
+ - For the display of the far field patterns, we use <a href="https://de.mathworks.com/matlabcentral/fileexchange/13200-3d-polar-plot/content/polarplot3d.m">Kenn Gerard's polarplot3d package</a>.
+ - The implementation of the iterative solvers are based on the <a href="http://it.mathworks.com/matlabcentral/fileexchange/2158-templates-for-the-solution-of-linear-systems">Templates for the Solution of Linear Systems</a>.
+ 
+ 
 
 */
