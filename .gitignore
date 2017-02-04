@@ -3,10 +3,4 @@
 *.mexa64
 *~
 *.bak
-tmp/
-temp/
-%HOMEDRIVE%*
-projects/
-not_released/
-data/*
-!data/example_project
+*.directory
