@@ -28,8 +28,12 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-fprintf(1,'\n**********************************');
-fprintf(1,'\n*      CELES  Version 1.0      *');
-fprintf(1,'\n**********************************');
-fprintf(1,'\n');                                      
-fprintf(1,'\n');                                      
+fprintf(1,'\n\t\t/-----------------------------------------------\\');
+fprintf(1,'\n\t\t|       ___^__          __| __| |    __|  __|   |');
+fprintf(1,'\n\t\t|      / / / /         (    _|  |    _| \\__ \\   |');
+fprintf(1,'\n\t\t|      \\_\\_\\_\\ <\\     \\___|___|____|___|____/   |');
+fprintf(1,'\n\t\t|   (\\____!_____))                              |');
+fprintf(1,'\n\t\t|    \\\\\\\\\\\\\\\\\\\\\\/            vers. 1.0          |');
+fprintf(1,'\n\t\t\\----^~^~^~^~^~^~^~~-~--(c)2017, KIT-LENS-------/');
+fprintf(1,'\n');
+fprintf(1,'\n');
