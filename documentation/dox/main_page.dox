@@ -6,7 +6,7 @@ The aim is to allow for the simulation of very large numbers of scattering objec
 It shall enable to study the propagation of light in macroscopic statistical scattering aggregates in order to
 derive bulk properties of disordered photonic materials.
 
-@image html beam_on_2500_spheres.bmp "" width=1
+@image html beam_on_2500_spheres.png ""
 
 The scattered electric field is represented as a superposition of 
 spherical vector wave functions relative to the sphere's center coordinates. 
