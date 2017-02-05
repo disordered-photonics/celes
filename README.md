@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://disordered-photonics.github.io/celes/readme_logo.svg", height="150">
+</p>
+
 # CELES
 > A CUDA-accelerated electromagnetic scattering solver for large ensembles of
 spheres
