@@ -25,7 +25,7 @@ is to run the costly matrix-vector multiplications in the iterative solving of t
 in parallel on the GPU. In addition, the convergence is accelerated by means of a block-diagonal preconditioner.
 
 
-@section installation Installation
+@section installation Getting started
 We recommend to use a workstation with sufficient RAM (~several 10GB) to benefit from preconditioned iterative solvers.
 
 In order to execute the CELES code, it is necessary to have the following
@@ -41,8 +41,11 @@ Windows users: one combination that works is MATLAB 2016b, CUDA Toolkit 7.5 and
 MS Visual Studio 2013 (not 2015). With MATLAB 2017a: CUDA Toolkit 8 and MS
 Visual Studio 2013. MS Visual Studio 2013 can be downloaded from <a href="https://www.microsoft.com/en-us/download/details.aspx?id=48138">here</a>.
 
-If these system requirements are met, you can run the CELES software by executing the script `CELES_MAIN.m`. 
-The comments in that script also explain how the simulation parameters are specified.
+If these system requirements are met, you can download the CELES toolbox from <a href="https://github.com/disordered-photonics/celes">GitHub</a> 
+and execute the script `CELES_MAIN.m`. If that script runs without error message, the installation has been successful.
+The comments in that script also explain how the simulation parameters are specified. Alternatively, you can use the `CELES_model_wizard` app, a GUI that helps in the specification of the simulation parameters.
+
+@image html screenshot_gui.png ""
 
 @section acknowledgments Acknowledgments
 The CELES package includes the following sources from other programmers:
