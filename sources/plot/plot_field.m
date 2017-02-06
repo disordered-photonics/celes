@@ -60,7 +60,7 @@ switch fieldType
     case 'Total field'
         E = simulation.output.totalField;
     case 'Scattered field'
-        E = simulation.output.scatteredField;
+        E = simulation.output.scatteredField + simulation.output.internalField;
     case 'Initial field'
         E = simulation.output.initialField;
 end
@@ -112,7 +112,7 @@ switch view
         [~,idx]=sort(positionArray(:,3));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),3)-z(1)>plotDepthInterval(1) && positionArray(idx(jS),3)-z(1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
             end
         end
     case 'xz'
@@ -122,7 +122,7 @@ switch view
         [~,idx]=sort(positionArray(:,2));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),2)>plotDepthInterval(1) && positionArray(idx(jS),2)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
             end
         end
     case 'yz'
@@ -132,7 +132,7 @@ switch view
         [~,idx]=sort(positionArray(:,1));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),1)>plotDepthInterval(1) && positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
             end
         end
 end
