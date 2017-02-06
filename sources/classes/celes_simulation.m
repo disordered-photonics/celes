@@ -337,6 +337,8 @@ classdef celes_simulation
             obj.output.solverTime = toc(tsolv);
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
             fprintf(1,'solver terminated in %.1f seconds.\n',obj.output.solverTime);
+            obj.numerics.solver.preconditioner.factorizedMasterMatrices = []; % clear memory intensive fields
+            obj.numerics.solver.preconditioner.masterMatrices = [];
             obj.output.runningTime = toc(tcomp);
             fprintf(1,'simulation ran in %.1f seconds.\n',obj.output.runningTime);
         end
