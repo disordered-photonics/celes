@@ -80,6 +80,4 @@ app.SolverToleranceEditField.Value = simulation.numerics.solver.tolerance;
 app.SolverMaxiterEditField.Value = simulation.numerics.solver.maxIter;
 app.SolverMonitorCheckBox.Value = simulation.numerics.solver.monitor;
 
-app.FieldEvaluationCheckBox.Value = true;
-app.FieldPlaneDropDown.Value = 'Custom';
-app.fieldPoints = simulation.output.fieldPoints;
+app.FieldEvaluationCheckBox.Value = false;
