@@ -334,8 +334,8 @@ classdef celes_simulation
             fprintf(1,'preconditioner prepared in %.1f seconds.\n',obj.output.preconiditionerPreparationTime);
             tsolv=tic;
             obj = obj.computeInitialFieldCoefficients;
-            obj.output.solverTime = toc(tsolv);
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
+            obj.output.solverTime = toc(tsolv);
             fprintf(1,'solver terminated in %.1f seconds.\n',obj.output.solverTime);
             obj.numerics.solver.preconditioner.factorizedMasterMatrices = []; % clear memory intensive fields
             obj.numerics.solver.preconditioner.masterMatrices = [];
