@@ -1,0 +1,4 @@
+\form#0:$a^S_{0,n}$
+\form#1:$\mathbf{E}_0=\sum_n a^S_{0,n}\mathbf{\Psi}^{(1)}_n$
+\form#2:$\sum_{i',n'}M^{ii'}_{nn'} b_{n'}^{i'} = \sum_{n'} T^i_{nn'} a_{\mathrm{in},n'}^i$
+\form#3:$ P = \frac{2\pi^2}{\omega k \mu_0}\sum_{j=1}^2 \int\dd{\alpha}\int\dd{\beta}\sin(\beta) \abs{g_j(\alpha,\beta)}^2 $
