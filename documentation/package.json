@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "CELES documentation",
   "scripts": {
-    "deploy": "gh-pages -d html"
+    "deploy": "gh-pages -d html --dotfiles"
   },
   "repository": {
     "type": "git",

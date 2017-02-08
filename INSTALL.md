@@ -3,10 +3,10 @@ installed:
 
 1. The CUDA Toolkit.
 
- You can check the verison that you need by running the command `gpuDevice` in
+ You can check the version that you need by running the command `gpuDevice` in
  MATLAB and look for ToolkitVersion in the output.
 
-2. A C++ compiler which is suppoerted by MATLAB in combination with the given
+2. A C++ compiler which is supported by MATLAB in combination with the given
 CUDA Toolkit version.
 
 Linux users: the built-in gcc compiler works fine.
