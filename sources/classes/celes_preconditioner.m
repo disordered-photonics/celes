@@ -142,7 +142,6 @@ classdef celes_preconditioner
                         
                         [Y,U,P] = lu(simul.numerics.deviceArray(M),'vector');
                         Y(U~=0) = U(U~=0);
-                        simul.numerics.solver.preconditioner.masterMatrices{jp}=M;
                         simul.numerics.solver.preconditioner.factorizedMasterMatrices{jp}.Y=gather(Y);
                         simul.numerics.solver.preconditioner.factorizedMasterMatrices{jp}.P=gather(P);
                     end

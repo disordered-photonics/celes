@@ -41,7 +41,7 @@
 %>              contains an array of inidices corresponding to spheres that
 %>              fall into the same partition cuboid
 %======================================================================
-function partitioning = make_particle_partion(positionArray,edgeSizes)
+function [partitioning,centerPositions,offsetIdcs] = make_particle_partion(positionArray,edgeSizes)
 
 xarray = [(min(positionArray(:,1))-1):edgeSizes(1):(max(positionArray(:,1))+1),(max(positionArray(:,1))+1)];
 yarray = [(min(positionArray(:,2))-1):edgeSizes(2):(max(positionArray(:,2))+1),(max(positionArray(:,2))+1)];
@@ -50,6 +50,8 @@ zarray = [(min(positionArray(:,3))-1):edgeSizes(3):(max(positionArray(:,3))+1),(
 [Ny,~,biny] = histcounts(positionArray(:,2),yarray);
 [Nz,~,binz] = histcounts(positionArray(:,3),zarray);
 partitioning = {};
+centerPositions = {};
+offsetIdcs = {};
 for jx=1:length(Nx)
     inx=find(binx==jx);
     for jy=1:length(Ny)
@@ -60,6 +62,8 @@ for jx=1:length(Nx)
             inxyz=intersect(inxy,inz);
             if ~isempty(inxyz)
                 partitioning{end+1}=inxyz;
+                centerPositions{end+1}=[(xarray(jx)+xarray(jx+1))/2,(yarray(jy)+yarray(jy+1))/2,(zarray(jz)+zarray(jz+1))/2];
+                offsetIdcs{end+1} = [jx,jy,jz]-[1,1,1];
             end
         end
     end
