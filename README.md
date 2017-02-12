@@ -19,7 +19,7 @@ CELES is written in MATLAB in order to provide a user-friendly, fully scriptable
 * massively parallel execution on CUDA-capable NVIDIA GPU hardware
 * block-diagonal preconditioning for faster convergence of iterative solvers
 * lookup-table approach to evaluate spherical Hankel functions
-* rich output (power flux, near- and far-field distributions)  
+* rich output (power flux, near- and far-field distributions)
 * Gaussian beam excitation
 * GUI (experimental)
 
@@ -58,7 +58,7 @@ If you add any improvement or implement new features to the software please cons
 1. Fork the project
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
+4. Push the branch: `git push origin my-new-feature`
 5. Submit a [Pull request](https://github.com/disordered-photonics/celes/pulls)
 
 If you have questions, bug reports or feature requests, please use the [Issues](https://github.com/disordered-photonics/celes/issues) section to report them.
