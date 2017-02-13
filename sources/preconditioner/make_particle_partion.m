@@ -43,15 +43,18 @@
 %======================================================================
 function [partitioning,centerPositions,offsetIdcs] = make_particle_partion(positionArray,edgeSizes)
 
-xarray = [(min(positionArray(:,1))-1):edgeSizes(1):(max(positionArray(:,1))+1),(max(positionArray(:,1))+1)];
-yarray = [(min(positionArray(:,2))-1):edgeSizes(2):(max(positionArray(:,2))+1),(max(positionArray(:,2))+1)];
-zarray = [(min(positionArray(:,3))-1):edgeSizes(3):(max(positionArray(:,3))+1),(max(positionArray(:,3))+1)];
+xarray = (min(positionArray(:,1))-1):edgeSizes(1):(max(positionArray(:,1))+edgeSizes(1)+1);
+yarray = (min(positionArray(:,2))-1):edgeSizes(2):(max(positionArray(:,2))+edgeSizes(2)+1);
+zarray = (min(positionArray(:,3))-1):edgeSizes(3):(max(positionArray(:,3))+edgeSizes(3)+1);
+
 [Nx,~,binx] = histcounts(positionArray(:,1),xarray);
 [Ny,~,biny] = histcounts(positionArray(:,2),yarray);
 [Nz,~,binz] = histcounts(positionArray(:,3),zarray);
+
 partitioning = {};
 centerPositions = {};
 offsetIdcs = {};
+
 for jx=1:length(Nx)
     inx=find(binx==jx);
     for jy=1:length(Ny)

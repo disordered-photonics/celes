@@ -36,17 +36,17 @@
 %> @retval translation (struct): structure containing the a5 and b5 
 %> coefficients for the SVWF addition theorem, see \ref theory.
 %======================================================================
-function translation = translation_table_ab_parallel(lmax)
+function out = translation_table_ab_parallel(lmax)
 
-jmax = jmult_max(1,lmax);
 
-translation.ab5 = zeros(jmax,jmax,2*lmax+1,'single');
-ab5 = cell(lmax,1);
+ab5 = cell(2*lmax+1,1);
+out.lmax = lmax;
 
-parfor l1=1:lmax
-    ab5{l1} = zeros(jmax,jmax,2*lmax+1,'single');
+
+parfor p=0:2*lmax
+    ab5{p+1}=zeros(jmult_max(1,lmax));
     for l2=1:lmax
-        for p=0:2*lmax
+        for l1=1:lmax
             W2 = Wigner3j([l1,l2,p],[0,0,0]);
             if p>0
                 W3 = Wigner3j([l1,l2,p-1],[0,0,0]);
@@ -55,15 +55,15 @@ parfor l1=1:lmax
                 for m2=-l2:l2
                     W1 = Wigner3j([l1,l2,p],[m1,-m2,-m1+m2]);
                     for tau1=1:2
-                        j1=multi2single_index(1,tau1,l1,m1,lmax);
                         for tau2=1:2
-                            j2=multi2single_index(1,tau2,l2,m2,lmax);
+                            n1 = multi2single_index(1,tau1,l1,m1,lmax);
+                            n2 = multi2single_index(1,tau2,l2,m2,lmax);
                             if tau1==tau2
-                                ab5{l1}(j1,j2,p+1) = (1i)^(abs(m1-m2)-abs(m1)-abs(m2)+l2-l1+p) * (-1)^(m1-m2) ...
+                                ab5{p+1}(n1,n2) = (1i)^(abs(m1-m2)-abs(m1)-abs(m2)+l2-l1+p) * (-1)^(m1-m2) ...
                                     * sqrt((2*l1+1)*(2*l2+1)/(2*l1*(l1+1)*l2*(l2+1))) * (l1*(l1+1)+l2*(l2+1)-p*(p+1)) * sqrt(2*p+1) ...
                                     * W1 * W2;
                             elseif p>0
-                                ab5{l1}(j1,j2,p+1) = (1i)^(abs(m1-m2)-abs(m1)-abs(m2)+l2-l1+p) * (-1)^(m1-m2) ...
+                                ab5{p+1}(n1,n2) = (1i)^(abs(m1-m2)-abs(m1)-abs(m2)+l2-l1+p) * (-1)^(m1-m2) ...
                                     * sqrt((2*l1+1)*(2*l2+1)/(2*l1*(l1+1)*l2*(l2+1))) * sqrt((l1+l2+1+p)*(l1+l2+1-p)*(p+l1-l2)*(p-l1+l2)*(2*p+1)) ...
                                     * W1 * W3;
                             end
@@ -75,24 +75,4 @@ parfor l1=1:lmax
     end
 end
 
-for l1=1:lmax
-    for l2=1:lmax
-        for p=0:2*lmax
-            for m1=-l1:l1
-                for m2=-l2:l2
-                    for tau1=1:2
-                        j1=multi2single_index(1,tau1,l1,m1,lmax);
-                        for tau2=1:2
-                            j2=multi2single_index(1,tau2,l2,m2,lmax);
-                            if tau1==tau2
-                                translation.ab5(j1,j2,p+1) = ab5{l1}(j1,j2,p+1);
-                            elseif p>0
-                                translation.ab5(j1,j2,p+1) = ab5{l1}(j1,j2,p+1);
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
+out.ab5=ab5;

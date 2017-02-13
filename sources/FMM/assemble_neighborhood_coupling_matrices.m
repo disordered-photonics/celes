@@ -28,19 +28,21 @@ for jbox1 = 1:fmm.numberOfBoxes  % box with receiving particles
                 for l1=1:particleLmax
                     for m1=-l1:l1
                         n1=multi2single_index(1,tau1,l1,m1,particleLmax);
+                        n1ab=multi2single_index(1,tau1,l1,m1,ab5_table.lmax);
                         n1S1Arr=(1:NS1)+(n1-1)*NS1;
                         for tau2=1:2
                             for l2=1:particleLmax
                                 for m2=-l2:l2
                                     if abs(m1-m2)<=p
                                         n2=multi2single_index(1,tau2,l2,m2,particleLmax);
+                                        n2ab=multi2single_index(1,tau2,l2,m2,ab5_table.lmax);
                                         n2S2Arr=(1:NS2)+(n2-1)*NS2;
-                                        W = ab5_table(n2,n1,p+1) * Plm{p+1,abs(m1-m2)+1} .* sphHank .* exp(1i*(m2-m1)*phiTab) ;
+                                        W = ab5_table.ab5{p+1}(n2ab,n1ab) * Plm{p+1,abs(m1-m2)+1} .* sphHank .* exp(1i*(m2-m1)*phiTab) ;
                                         if jbox1==jbox2
                                             s1eqs2=logical(eye(NS1));
                                             W(s1eqs2(:))=0; % jS1=jS2
                                         end
-                                        fmm.neighborhoodCouplingMatrices{jbox1}{jbox2}(n1S1Arr,n2S2Arr) = W;
+                                        fmm.neighborhoodCouplingMatrices{jbox1}{jbox2}(n1S1Arr,n2S2Arr) = fmm.neighborhoodCouplingMatrices{jbox1}{jbox2}(n1S1Arr,n2S2Arr) + W;
                                     end
                                 end
                             end

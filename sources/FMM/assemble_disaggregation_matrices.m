@@ -16,13 +16,15 @@ for jbox = 1:fmm.numberOfBoxes
             for l1=1:particleLmax
                 for m1=-l1:l1
                     n1=multi2single_index(1,tau1,l1,m1,particleLmax);
+                    n1ab=multi2single_index(1,tau1,l1,m1,ab5_table.lmax);
                     n1SArr=(1:NS)+(n1-1)*NS;
                     for tau2=1:2
                         for l2=1:fmm.lmax
                             for m2=-l2:l2
                                 if abs(m1-m2)<=p
                                     n2=multi2single_index(1,tau2,l2,m2,fmm.lmax);
-                                    fmm.particleDisaggregationMatrices{jbox}(n1SArr,n2) = ab5_table(n2,n1,p+1) * Plm{p+1,abs(m1-m2)+1} .* sphBess .* exp(1i*(m2-m1)*phi) ;
+                                    n2ab=multi2single_index(1,tau2,l2,m2,ab5_table.lmax);
+                                    fmm.particleDisaggregationMatrices{jbox}(n1SArr,n2) = fmm.particleDisaggregationMatrices{jbox}(n1SArr,n2) + ab5_table.ab5{p+1}(n2ab,n1ab) * Plm{p+1,abs(m1-m2)+1} .* sphBess .* exp(1i*(m2-m1)*phi) ;
                                 end
                             end
                         end
