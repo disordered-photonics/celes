@@ -88,17 +88,6 @@ imag_ab5Tab=gpuArray(single(imag_ab5Tab));
 		
 part_pos = gpuArray(single(transpose(simulation.input.particles.positionArray)));
 
-% tic
 [real_Wx,imag_Wx] = coupling_matrix_multiply_CUDA(real_x,imag_x,real_hTab,imag_hTab,PlmCoeffTable,real_ab5Tab,imag_ab5Tab,part_pos,int32(NS),rResol);
-% wait(gpuDevice)
-% toc
-
-% tic
-% [real_Wx,imag_Wx] = coupling_matrix_multiply_copy_of_CUDA_lmax3(gather(real_x),gather(imag_x),gather(real_hTab),gather(imag_hTab),gather(PlmCoeffTable),gather(real_ab5Tab),gather(imag_ab5Tab),gather(part_pos),gather(int32(NS)),gather(rResol));
-% toc
-% real_Wx(1)
-% imag_Wx(1)
 
 Wx = real_Wx + 1i*imag_Wx;
-% norm(Wx)
-
