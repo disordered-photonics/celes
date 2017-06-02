@@ -11,7 +11,9 @@ The main aim of the software is to rigorously solve electrodynamic problems comp
 
 If you use CELES, please cite it as follows:
 
-> reference placeholder [[link](doi)] [[bibtex](link/bibtex/file/here)]
+> Egel A, Pattelli L, Mazzamuto G, Wiersma DS, and Lemmer U.
+_CELES: CUDA-accelerated simulation of electromagnetic scattering by large ensembles of spheres_,
+Journal of Quantitative Spectroscopy and Radiative Transfer 199C (2017) pp. 103-110. [[link](https://doi.org/10.1016/j.jqsrt.2017.05.010)] [[bibtex](documentation/celes.bib)]
 
 ### Features
 CELES is written in MATLAB in order to provide a user-friendly, fully scriptable interface to configure and run simulations. Its prominent features are
