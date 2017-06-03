@@ -77,12 +77,21 @@ the simulation parameters.
 
 @image html screenshot_gui.png ""
 
+@section contact Contact
+For any questions regarding the software, please contact
+[Amos Egel](https://www.lti.kit.edu/mitarbeiter_5812.php),
+[Lorenzo Pattelli](http://www.lens.unifi.it/index.php?include=about_us/people&active=about_us&menu=about_us/people/people_menu&keyword=Pattelli&source=people&active_people=P)
+or [Giacomo Mazzamuto](http://www.lens.unifi.it/index.php?include=about_us/people&active=about_us&menu=about_us/people/people_menu&keyword=Giacomo+Mazzamuto&active_people=M)
+
 @section citing Citing
 If you use CELES, please cite it as follows:
 
-A. Egel, L. Pattelli, G. Mazzamuto, D.S. Wiersma, U. Lemmer. "CELES: a 
-CUDA-accelerated Electromagnetic scattering solver for Large Ensembles of 
-Spheres" - *in preparation*
+A. Egel, L. Pattelli, G. Mazzamuto, D. S. Wiersma, and U. Lemmer, 
+"CELES: CUDA-accelerated simulation of electromagnetic scattering by large ensembles of spheres," 
+J. Quant. Spectrosc. Radiat. Transf., vol. 199, pp. 103-110, 2017.
+
+[Link to article homepage.](https://doi.org/10.1016/j.jqsrt.2017.05.010)
+
 
 @section acknowledgments Credits
 CELES uses the following codes from other programmers:
