@@ -286,12 +286,30 @@ classdef celes_simulation
         %> @param Vector x of incoming field SVWF coefficients
         %> @return Vector M*x
         % ======================================================================
-        function Mx = masterMatrixMultiply(obj,value)
+        function Mx = masterMatrixMultiply(obj,value,varargin)
             value=value(:);
-            Wx=coupling_matrix_multiply(obj,value);
+            
+            if isempty(varargin)
+                verbose=true;
+            else
+                verbose=varargin{1};
+            end
+            
+            Wx=coupling_matrix_multiply(obj,value,varargin{:});
+            
+            if verbose
+                fprintf('apply T-matrix ... ')
+            end
+            t_matrix_timer = tic;
+            
             Wx=reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
             TWx = bsxfun(@times,Wx,obj.tables.mieCoefficients);
             Mx = value - TWx(:);
+            
+            t_matrix_time = toc(t_matrix_timer);
+            if verbose
+                fprintf(' done in %f seconds.\n', t_matrix_time)
+            end
         end
         
         % ======================================================================

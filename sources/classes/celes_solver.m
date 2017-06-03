@@ -76,12 +76,19 @@ classdef celes_solver
         %> an approximation to the solution of the linear system
         % ======================================================================
         function [value,convergenceHistory] = run(obj,mmm,rhs,varargin)
-            prh = @(x) obj.preconditioner.run(x);
             if isempty(varargin)
                 initial_guess=rhs;
             else
                 initial_guess=varargin{1};
             end
+            if length(varargin) > 1
+                verbose = varargin{2};
+            else
+                verbose = true;
+            end
+            
+            prh = @(x) obj.preconditioner.run(x,verbose);
+            
             switch obj.type
                 case 'BiCGStab'
                     if obj.monitor

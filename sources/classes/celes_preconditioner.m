@@ -158,9 +158,21 @@ classdef celes_preconditioner
         %> @return y = M'\x
         %> where M' is a blockdiagonal approximation to the linear system M
         % ======================================================================
-        function value = run(obj,rhs)
+        function value = run(obj,rhs,varargin)
+            
             switch obj.type
                 case 'blockdiagonal'
+                    
+                    if isempty(varargin)
+                        verbose = true;
+                    else
+                        verbose = varargin{1};
+                    end
+                    if verbose
+                        fprintf('apply preconditioner ... ')
+                    end
+                    prec_timer = tic;
+                    
                     optL.LT = true; % settings for linsolve
                     optU.UT = true;
                     rhs = gather(rhs(:));
@@ -172,6 +184,11 @@ classdef celes_preconditioner
                         value(obj.partitioningIdcs{jp}) = linsolve (U, linsolve (L, rhs(obj.partitioningIdcs{jp}(p)), optL), optU);
                     end
                     value = gpuArray(value(:));
+                    prec_time = toc(prec_timer);
+                    if verbose
+                        fprintf('done in %f seconds. \n', prec_time)
+                    end
+                    
                 case 'none'
                     value=rhs;
             end
