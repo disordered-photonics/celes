@@ -51,14 +51,14 @@ classdef celes_particles
         
         %> radius of the particles
         radius
+        
+        %> maximal distance between two particles
+        maxParticleDistance
     end
     
     properties (Dependent)
         %> number of particles
         number
-        
-        %> maximal distance between two particles
-        maxParticleDistance
     end
     
     methods
@@ -126,16 +126,16 @@ classdef celes_particles
         end
         
         % ======================================================================
-        %> @brief Get method for particle number
+        %> @brief Set the maximalParticleDistance attribute to the correct value
         % ======================================================================
-        function value=get.maxParticleDistance(obj)
+        function obj = compute_maximal_particle_distance(obj)
             %value=max(pdist(obj.positionArray));  pdist part of statistics and machine learning toolbox and might not be available
-            value=0;
+            obj.maxParticleDistance=0;
             for jp1=1:obj.number
                 diffs=bsxfun(@plus,obj.positionArray((jp1+1):end,:),-obj.positionArray(jp1,:));
                 dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
-                if max(dists2)>value^2
-                    value=sqrt(max(dists2));
+                if max(dists2)>obj.maxParticleDistance^2
+                    obj.maxParticleDistance=sqrt(max(dists2));
                 end
             end
         end

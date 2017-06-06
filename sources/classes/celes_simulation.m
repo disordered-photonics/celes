@@ -284,6 +284,7 @@ classdef celes_simulation
         %> @brief Multiply the master matrix M=1-T*W to some vector x
         %>
         %> @param Vector x of incoming field SVWF coefficients
+        %> @param verbose (logical, optional): If true (default), display detailed timing information
         %> @return Vector M*x
         % ======================================================================
         function Mx = masterMatrixMultiply(obj,value,varargin)
@@ -304,7 +305,7 @@ classdef celes_simulation
             
             Wx=reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
             TWx = bsxfun(@times,Wx,obj.tables.mieCoefficients);
-            Mx = value - TWx(:);
+            Mx = gather(value - TWx(:));
             
             t_matrix_time = toc(t_matrix_timer);
             if verbose
@@ -319,6 +320,7 @@ classdef celes_simulation
         %> - computation of initial field power
         %> - computation of Mie coefficients
         %> - computation of the translation table
+        %> - computation of the maximal distance between pairs of particles
         %> - preparation of the particle partitioning (if blockdiagonal
         %>   preconditioner is active)
         %> - preparation of the blockdiagonal preconditioner (if active)
@@ -338,6 +340,9 @@ classdef celes_simulation
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
+            fprintf(1,'compute maximal particle distance ...');
+            obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
+            fprintf(1,' done\n');
             tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');
