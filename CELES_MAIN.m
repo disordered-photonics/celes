@@ -73,7 +73,7 @@ numerics.polarAnglesArray = 0:1e-2:pi;
 numerics.azimuthalAnglesArray = 0:1e-2:2*pi;
 
 % specify solver type (currently 'BiCGStab' or 'GMRES')
-solver.type = 'BiCGStab';   
+solver.type = 'GMRES';
 
 % relative accuracy (solver stops when achieved)
 solver.tolerance=5e-4;
@@ -82,11 +82,7 @@ solver.tolerance=5e-4;
 solver.maxIter=1000;
 
 % restart parameter (only for GMRES)
-solver.restart=20;
-
-% monitor progress? in that case, a self-written script is used rather than
-% matlab's built-in bicgstab/gmres
-solver.monitor=true;
+solver.restart=1000;
 
 % type of preconditioner (currently only 'blockdiagonal' and 'none'
 % possible)

@@ -86,7 +86,6 @@ simulation.numerics.solver.preconditioner.partitionEdgeSizes = [app.Precondition
 % initialize fields of simulation.numerics.solver object
 simulation.numerics.solver.tolerance = app.SolverToleranceEditField.Value;
 simulation.numerics.solver.maxIter = app.SolverMaxiterEditField.Value;
-simulation.numerics.solver.monitor = app.SolverMonitorCheckBox.Value;
 
 % initialize fields of simulation.output object
 if app.FieldEvaluationCheckBox.Value
