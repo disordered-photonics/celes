@@ -67,9 +67,9 @@ __device__ float sphericalBesselLookup(int const p, float const r, float const *
 
 
 __global__ void translationMatrixProduct(int const s2, int const NS, float const *sPosArray,
-																				float const *sphericalBesselTable, float const *sphericalNeumannTable, float rResol,
-																				float const *plm_coeffs, float const *re_abTable, float const *im_abTable,
-																				float const *re_x, float const *im_x, float *re_Wx, float *im_Wx)
+										float const *sphericalBesselTable, float const *sphericalNeumannTable, float rResol,
+										float const *plm_coeffs, float const *re_abTable, float const *im_abTable,
+										float const *re_x, float const *im_x, float *re_Wx, float *im_Wx)
 {
   int const s1 = blockDim.x * blockIdx.x + threadIdx.x + 1; // receiving sphere number (1...NS)
   float x21, y21, z21;
@@ -254,9 +254,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, mxArray const *prhs[])
 	for (int s2=1; s2<=NS[0]; s2++)
 	{
 		translationMatrixProduct<<< blocksPerGrid,threadsPerBlock >>> (s2,NS[0],d_sPos,
-																																	d_real_h, d_imag_h, rResol[0],
-																																	d_PlmCoeff, d_real_ab5, d_imag_ab5,
-																																	d_real_x, d_imag_x, d_real_Wx, d_imag_Wx);
+																		d_real_h, d_imag_h, rResol[0],
+																		d_PlmCoeff, d_real_ab5, d_imag_ab5,
+																		d_real_x, d_imag_x, d_real_Wx, d_imag_Wx);
 		// cudaMemcpy(&check_re,d_real_Wx,sizeof(check_re),cudaMemcpyDeviceToHost);
 		// cudaMemcpy(&check_im,d_imag_Wx,sizeof(check_im),cudaMemcpyDeviceToHost);
 		// mexPrintf("%f %f\n",check_re,check_im);
