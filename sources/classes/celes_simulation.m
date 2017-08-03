@@ -320,7 +320,7 @@ classdef celes_simulation
             cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
-            obj = obj.computeMieCoefficients; %modify for radius
+            obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
             tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
