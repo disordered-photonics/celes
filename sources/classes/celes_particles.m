@@ -49,8 +49,8 @@ classdef celes_particles
         %> complex refractive indices of the particles, n+ik
         refractiveIndex
         
-        %> radius of the particles
-        radius
+        %> radii of the particles
+        radiusArray
     end
     
     properties (Dependent)
@@ -59,13 +59,23 @@ classdef celes_particles
         
         %> maximal distance between two particles
         maxParticleDistance
+
+        %> unique radii list
+        uniqueRadii
+
+        %> number of unique radii
+        numUniqueRadii
+
+        %> radiusArray in terms of indices given by uniqueRadii
+        radiusArrayIndex
+
     end
     
     methods
         % ======================================================================
         %> @brief Set method for type
         % ======================================================================
-        function obj = set.type(obj,value)
+        function obj=set.type(obj,value)
             switch value
                 case 'sphere'
                     obj.type = value;
@@ -77,7 +87,7 @@ classdef celes_particles
         % ======================================================================
         %> @brief Set method for disperse
         % ======================================================================
-        function obj = set.disperse(obj,value)
+        function obj=set.disperse(obj,value)
             switch value
                 case 'mono'
                     obj.disperse=value;
@@ -89,7 +99,7 @@ classdef celes_particles
         % ======================================================================
         %> @brief Set method for positionArray
         % ======================================================================
-        function obj = set.positionArray(obj,value)
+        function obj=set.positionArray(obj,value)
             if length(value(1,:))==3
                 obj.positionArray = single(value);
             else
@@ -100,17 +110,38 @@ classdef celes_particles
         % ======================================================================
         %> @brief Set method for refractive index
         % ======================================================================
-        function obj = set.refractiveIndex(obj,value)
+        function obj=set.refractiveIndex(obj,value)
             obj.refractiveIndex=single(value);
         end
         
         % ======================================================================
-        %> @brief Set method for radius
+        %> @brief Set method for radiusArray
         % ======================================================================
-        function obj=set.radius(obj,value)
-            obj.radius=single(value);
+        function obj=set.radiusArray(obj,value)
+            obj.radiusArray=single(value);
         end
-        
+
+        % ======================================================================
+        %> @brief Get method for unique radii values, returns ordered vector of unique radii
+        % ======================================================================
+        function value=get.uniqueRadii(obj)
+            value=unique(obj.radiusArray);
+        end
+
+        % ======================================================================
+        %> @brief Get method for the number of unique radii
+        % ======================================================================
+        function value=get.numUniqueRadii(obj)
+            value=length(unique(obj.radiusArray));
+        end
+
+        % ======================================================================
+        %> @brief Get method for radius array in terms of indices given by uniqueRadii, sorted smallest to largest
+        % ======================================================================
+        function value=get.radiusArrayIndex(obj)
+            value=dsearchn(obj.uniqueRadii',obj.radiusArray');
+        end
+
         % ======================================================================
         %> @brief Set method for particle number
         % ======================================================================
