@@ -35,7 +35,7 @@
 %>
 %> @param       positionArray (Nx3 float array): particle positions [x,y,z]
 %>
-%> @param       radius (float): particle radius
+%> @param       radiusArray (1xN float array): particle radius array
 %>
 %> @param       view (string): select 'view xy','view yz' or 'view xz'
 %>
@@ -48,7 +48,7 @@
 %>              will plot all spheres with a center z-coordinate in that
 %>              interval
 %======================================================================
-function plot_spheres(ax,positionArray,radius,view,varargin)
+function plot_spheres(ax,positionArray,radiusArray,view,varargin)
 
 if isempty(varargin)
     plotDepthInterval = [-Inf,Inf];
@@ -63,29 +63,29 @@ switch view
         [~,idx]=sort(positionArray(:,3));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),3)>plotDepthInterval(1) && positionArray(idx(jS),3)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
             end
         end
-        ax.XLim = [min(positionArray(:,1))-3*radius , max(positionArray(:,1))+3*radius];
-        ax.YLim = [min(positionArray(:,2))-3*radius , max(positionArray(:,2))+3*radius];
+        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,2))-3*max(radiusArray) , max(positionArray(:,2))+3*max(radiusArray)];
     case 'view xz'
         [~,idx]=sort(positionArray(:,2));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),2)>plotDepthInterval(1) && positionArray(idx(jS),2)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
             end
         end
-        ax.XLim = [min(positionArray(:,1))-3*radius , max(positionArray(:,1))+3*radius];
-        ax.YLim = [min(positionArray(:,3))-3*radius , max(positionArray(:,3))+3*radius];
+        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray) , max(positionArray(:,3))+3*max(radiusArray)];
     case 'view yz'
         [~,idx]=sort(positionArray(:,1));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),1)>plotDepthInterval(1) && positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radius,[2,2]*radius],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
             end
         end
-        ax.XLim = [min(positionArray(:,2))-3*radius , max(positionArray(:,2))+3*radius];
-        ax.YLim = [min(positionArray(:,3))-3*radius , max(positionArray(:,3))+3*radius];
+        ax.XLim = [min(positionArray(:,2))-3*max(radiusArray) , max(positionArray(:,2))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray) , max(positionArray(:,3))+3*max(radiusArray)];
 end
 ax.DataAspectRatio=[1,1,1];
 

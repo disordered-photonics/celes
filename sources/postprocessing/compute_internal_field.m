@@ -60,17 +60,17 @@ for jS=1:simulation.input.particles.number
     % relative positions
     R = bsxfun(@plus,simulation.output.fieldPoints,-simulation.input.particles.positionArray(jS,:));
     r = sqrt(R(:,1).^2+R(:,2).^2+R(:,3).^2);
-    Rint = R(r<simulation.input.particles.radius,:);
+    Rint = R(r<simulation.input.particles.radiusArray(jS),:);
     
     for l=1:simulation.numerics.lmax
         for m=-l:l
             for tau=1:2
                 n = multi2single_index(1,tau,l,m,simulation.numerics.lmax);
                 N = SVWF(kS,Rint,nu,tau,l,m);
-                b_to_c = T_entry(tau,l,kM,kS,simulation.input.particles.radius,'internal')/T_entry(tau,l,kM,kS,simulation.input.particles.radius,'scattered');
-                E(r<simulation.input.particles.radius,:) = E(r<simulation.input.particles.radius,:) + simulation.tables.scatteredFieldCoefficients(jS,n) * b_to_c * N;
+                b_to_c = T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'internal')/T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'scattered');
+                E(r<simulation.input.particles.radiusArray(jS),:) = E(r<simulation.input.particles.radiusArray(jS),:) + simulation.tables.scatteredFieldCoefficients(jS,n) * b_to_c * N;
             end
         end
     end
-    internal_indices = [internal_indices;find(r<simulation.input.particles.radius)];
+    internal_indices = [internal_indices;find(r<simulation.input.particles.radiusArray(jS))];
 end

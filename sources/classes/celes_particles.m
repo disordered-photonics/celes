@@ -49,8 +49,8 @@ classdef celes_particles
         %> complex refractive indices of the particles, n+ik
         refractiveIndex
         
-        %> radius of the particles
-        radius
+        %> radii of the particles
+        radiusArray
     end
     
     properties (Dependent)
@@ -59,6 +59,16 @@ classdef celes_particles
         
         %> maximal distance between two particles
         maxParticleDistance
+
+        %> unique radii list
+        uniqueRadii
+
+        %> number of unique radii
+        numUniqueRadii
+
+        %> radiusArray in terms of indices given by uniqueRadii
+        radiusArrayIndex
+
     end
     
     methods
@@ -105,30 +115,51 @@ classdef celes_particles
         end
         
         % ======================================================================
-        %> @brief Set method for radius
+        %> @brief Set method for radiusArray
         % ======================================================================
-        function obj=set.radius(obj,value)
-            obj.radius=single(value);
+        function obj = set.radiusArray(obj,value)
+            obj.radiusArray=single(value);
         end
-        
+
+        % ======================================================================
+        %> @brief Get method for unique radii values, returns ordered vector of unique radii
+        % ======================================================================
+        function value = get.uniqueRadii(obj)
+            value=unique(obj.radiusArray);
+        end
+
+        % ======================================================================
+        %> @brief Get method for the number of unique radii
+        % ======================================================================
+        function value = get.numUniqueRadii(obj)
+            value=length(unique(obj.radiusArray));
+        end
+
+        % ======================================================================
+        %> @brief Get method for radius array in terms of indices given by uniqueRadii, sorted smallest to largest
+        % ======================================================================
+        function value = get.radiusArrayIndex(obj)
+            value=dsearchn(obj.uniqueRadii',obj.radiusArray');
+        end
+
         % ======================================================================
         %> @brief Set method for particle number
         % ======================================================================
-        function obj=set.number(obj,value)
+        function obj = set.number(obj,value)
             obj.positionArray=obj.positionArray(1:int32(value),:);
         end
         
         % ======================================================================
         %> @brief Set method for particle number
         % ======================================================================
-        function value=get.number(obj)
+        function value = get.number(obj)
             value=length(obj.positionArray(:,1));
         end
         
         % ======================================================================
         %> @brief Get method for particle number
         % ======================================================================
-        function value=get.maxParticleDistance(obj)
+        function value = get.maxParticleDistance(obj)
             %value=max(pdist(obj.positionArray));  pdist part of statistics and machine learning toolbox and might not be available
             value=0;
             for jp1=1:obj.number
