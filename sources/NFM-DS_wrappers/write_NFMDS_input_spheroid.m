@@ -1,0 +1,230 @@
+function write_NFMDS_input_spheroid(wavelength,layerRefractiveIndex,particleRefractiveIndex,spheroidZhalfAxis,spheroidXYhalfAxis,nInt,useDS,namestring,Nrank)
+% write_NFMDS_input_cylinder_withDS(wavelength,layerRefractiveIndex,particleRefractiveIndex,cylinderHeight,cylinderRadius,nInt,useDS,namestring,Nrank)
+%
+% writes input file for the TAXSYM.f90 routine to computes the T-matrix 
+% for a cylinder as an axially symmetric particle
+
+fID = fopen('InputAXSYM.dat','w');
+
+fprintf(fID,'OptProp\n');
+fprintf(fID,'%f\n',wavelength);
+fprintf(fID,'%f\n',layerRefractiveIndex);
+fprintf(fID,'(%f,%f)\n',real(particleRefractiveIndex/layerRefractiveIndex),imag(particleRefractiveIndex/layerRefractiveIndex));
+
+fprintf(fID,'Variables:\n');
+fprintf(fID,' - wavelength - wavelength of the incident light in vacuo.\n');
+fprintf(fID,' - ind_refMed - refractive index of the ambient medium.\n');
+fprintf(fID,' - ind_refRel - relative refractive index of the particle.  \n');      
+
+fprintf(fID,'\n');
+fprintf(fID,'MatProp\n');
+fprintf(fID,'.false.\n');
+fprintf(fID,'.false.\n');
+fprintf(fID,'0.1\n');
+
+fprintf(fID,' Variables:\n');
+fprintf(fID,' - perfectcond - if perfectcond = t, the particle is perfectly conducting.\n');
+fprintf(fID,' - chiral      - if chiral = t, the particle is optical active (chiral).      \n');
+fprintf(fID,' - kb          - parameter of chirality.	                \n');
+
+% fprintf(fID,'\n');
+% fprintf(fID,'GeomProp\n');
+% fprintf(fID,'.false.\n');    
+% fprintf(fID,'''../GEOMFILES/prolate.fem''\n');    
+% fprintf(fID,'2\n'); % TypeGeom=2 for cylinder
+% fprintf(fID,'2\n'); % Nsurf=2 for cylinder
+% fprintf(fID,'%f\n',cylinderHeight/2); % half-height of cylinder
+% fprintf(fID,'%f\n',cylinderRadius); % radius of cylinder
+% fprintf(fID,'3\n'); % Nparam=3 for cylinder
+% fprintf(fID,'1.0\n');               
+% fprintf(fID,'1.0\n');               
+% fprintf(fID,'.false.\n');
+
+fprintf(fID,'\n');
+fprintf(fID,'GeomProp\n');
+fprintf(fID,'.false.\n');    
+fprintf(fID,'''../GEOMFILES/prolate.fem''\n');    
+fprintf(fID,'1\n'); % TypeGeom=1 for spheroid
+fprintf(fID,'2\n'); % Nsurf=2 for spheroid
+fprintf(fID,'%f\n',spheroidZhalfAxis); % half-height of spheroid
+fprintf(fID,'%f\n',spheroidXYhalfAxis); % half-width of spheroid
+fprintf(fID,'1\n'); % Nparam=1 for spheroid
+fprintf(fID,'1.0\n');               
+fprintf(fID,'1.0\n');               
+fprintf(fID,'.false.\n');
+
+fprintf(fID,' Variables:\n');
+fprintf(fID,' - FileGeom - if FileGeom = t, the particle geometry is supplied by the \n');
+fprintf(fID,'              input file FileFEM. \n');
+fprintf(fID,' - FileFEM  - name of the file containing the particle geometry. \n');
+fprintf(fID,' - TypeGeom - parameter specifying the type of the particle geometry.\n');
+fprintf(fID,' - Nsurf	   - number of surface parameters. \n');
+fprintf(fID,' - surf(1)  - surface parameter.\n');
+fprintf(fID,' - ...  \n');
+fprintf(fID,' - surf(Nsurf)  \n');
+fprintf(fID,' - Nparam   - number of smooth curves forming the generatrix curve.    \n');
+fprintf(fID,' - anorm    - characteristic length of the particle which is used to \n');
+fprintf(fID,'              normalize the differential scattering cross sections.	 \n');
+fprintf(fID,' - Rcirc    - characteristic length of the particle for computing Nrank. \n');
+fprintf(fID,' - miror    - if miror = t, the particle is mirror symmetric.	            \n');
+fprintf(fID,' NOTE: FOR CHIRAL PARTICLES AND DISTRIBUTED SOURCES SET miror = f.\n');
+
+fprintf(fID,'\n');
+fprintf(fID,'ConvTest\n');
+fprintf(fID,'.false.\n');  
+fprintf(fID,'.false.\n');
+
+fprintf(fID,' Variables:\n');
+fprintf(fID,' - DoConvTest   - if DoConvTest = t, the interactive convergence tests \n');
+fprintf(fID,'                  over Nint and Nrank are performed.   \n');
+fprintf(fID,' - MishConvTest - if MishConvTest = t, estimates of Nint and Nrank are  \n');
+fprintf(fID,'                  computed with the convergence criterion proposed by \n');
+fprintf(fID,'                  Mishchenko.        \n');
+fprintf(fID,' NOTE: IF THE PARTICLE IS OPTICAL ACTIVE (chiral = t) OR THE PARTICLE\n');
+fprintf(fID,' GEOMETRY IS SUPPLIED BY THE FILE FileFEM (FileGeom = t), THE CODE SETS\n');
+fprintf(fID,' MishConvTest = f. IN FACT, MISHCHENKO''S CONVERGENCE TEST WILL BE \n');
+fprintf(fID,' PERFORMED IF (DS = f AND DoConvTest = t AND chiral = f AND FileGeom = f), \n');
+fprintf(fID,' OR (DS = t AND autGenDS = t AND DoConvTest = t AND chiral = f AND \n');
+fprintf(fID,' FileGeom = f).   \n');
+         
+
+fprintf(fID,'\n');
+fprintf(fID,'Sources\n');
+if useDS
+    fprintf(fID,'.true.\n');
+else
+    fprintf(fID,'.false.\n');
+end
+fprintf(fID,'.true.\n');
+
+fprintf(fID,' Variables:\n');
+fprintf(fID,' - DS       - if DS = t, distributed sources are used for T-matrix \n');
+fprintf(fID,'              calculation. 	\n');
+fprintf(fID,' - autGenDS - if autGenDS = t, the coordinates of the distributed sources\n');
+fprintf(fID,'              are generated by the code.\n');
+fprintf(fID,' NOTE: IF THE PARTICLE GEOMETRY IS READ FROM FILE (FileGeom = t),\n');
+fprintf(fID,' THE CODE SETS autgenDS = f.                                 \n');
+
+
+fprintf(fID,'\n');
+fprintf(fID,'SourcePosAut\n');
+fprintf(fID,'.true.\n');
+fprintf(fID,'0.95\n');
+
+fprintf(fID,' Variables: \n');
+fprintf(fID,' - ComplexPlane - if ComplexPlane = t, the distributed sources are placed\n');
+fprintf(fID,'                  in the complex plane.\n');
+fprintf(fID,' - EpsZReIm     - parameter controlling the distribution of the discrete \n');
+fprintf(fID,'                  sources.\n');
+fprintf(fID,' NOTE: THESE VARIABLES MUST BE PROVIDED IF (DS = t AND autgenDS = t).\n');
+
+
+fprintf(fID,'\n');
+fprintf(fID,'NintNrank\n');
+fprintf(fID,'%i\n',nInt);
+fprintf(fID,'%i\n',Nrank);
+
+fprintf(fID,' Variables: \n');
+fprintf(fID,' - Nint  - number of integration points in computing integrals over the \n');
+fprintf(fID,'           generatrix curve.\n');
+fprintf(fID,' - Nrank - maximum expansion order.  \n');
+fprintf(fID,' NOTE: THESE VARIABLES MUST BE PROVIDED IF ((DoConvTest = f) OR \n');
+fprintf(fID,' (DS = t AND autgenDS = f)).                  \n');
+
+fprintf(fID,'\n');
+fprintf(fID,'SourcePosInp\n');
+fprintf(fID,' -0.9500  0.0\n');
+fprintf(fID,' -0.8444  0.0\n');
+fprintf(fID,' -0.7389  0.0\n');
+fprintf(fID,' -0.6333  0.0 \n');
+fprintf(fID,' -0.5278  0.0 \n');
+fprintf(fID,' -0.4222  0.0\n');
+fprintf(fID,' -0.3167  0.0\n');
+fprintf(fID,' -0.2111  0.0\n');
+fprintf(fID,' -0.1056  0.0\n');
+fprintf(fID,'  0.0000  0.0\n');
+fprintf(fID,'  0.1056  0.0\n');
+fprintf(fID,'  0.2111  0.0\n');
+fprintf(fID,'  0.3167  0.0\n');
+fprintf(fID,'  0.4222  0.0\n');
+fprintf(fID,'  0.5278  0.0\n');
+fprintf(fID,'  0.6333  0.0\n');
+fprintf(fID,'  0.7389  0.0\n');
+fprintf(fID,'  0.8444  0.0\n');
+fprintf(fID,'  0.9500  0.0\n');
+fprintf(fID,'    \n');
+fprintf(fID,' -0.9500  0.0 \n');
+fprintf(fID,' -0.8382  0.0\n');
+fprintf(fID,' -0.7265  0.0\n');
+fprintf(fID,' -0.6147  0.0\n');
+fprintf(fID,' -0.5029  0.0 \n');
+fprintf(fID,' -0.3912  0.0\n');
+fprintf(fID,' -0.2794  0.0\n');
+fprintf(fID,' -0.1676  0.0\n');
+fprintf(fID,' -0.0558  0.0\n');
+fprintf(fID,'  0.0558  0.0 \n');
+fprintf(fID,'  0.1676  0.0\n');
+fprintf(fID,'  0.2794  0.0\n');
+fprintf(fID,'  0.3912  0.0\n');
+fprintf(fID,'  0.5029  0.0\n');
+fprintf(fID,'  0.6147  0.0\n');
+fprintf(fID,'  0.7265  0.0\n');
+fprintf(fID,'  0.8382  0.0\n');
+fprintf(fID,'  0.9500  0.0\n');
+fprintf(fID,' Variables: \n');
+fprintf(fID,' - zRe(1), zIm(1)   - coordinates of the distributed sources for the \n');
+fprintf(fID,'                      expansion order Nrank.\n');
+fprintf(fID,' - ...\n');
+fprintf(fID,' - zRe(Nrank), zIm(Nrank)\n');
+fprintf(fID,' - \n');
+fprintf(fID,' - zRe1(1), zIm1(1) - coordinates of the distributed sources for the \n');
+fprintf(fID,'                      expansion order Nrank - 1.\n');
+fprintf(fID,' - ...\n');
+fprintf(fID,' - zRe1(Nrank-1), zIm1(Nrank-1)\n');
+fprintf(fID,' NOTE: THE INPUT ARRAYS zRe, zIm AND zRe1, zIm1 MUST BE SEPARATED BY A \n');
+fprintf(fID,' BLANK LINE, AND MUST BE SPECIFIED IF (DS = t AND autGenDS = f).\n');
+fprintf(fID,' SPECIFICALLY, THE INPUT ARRAYS zRe1 AND zIm1 MUST BE SPECIFIED AS \n');
+fprintf(fID,' VECTORS WITH Nrank - 1 COMPONENTS.                                                                    \n');
+                                                                
+fprintf(fID,'\n');
+fprintf(fID,'Errors\n');
+fprintf(fID,'5.e-2\n');           
+fprintf(fID,'5.e-2\n');           
+fprintf(fID,'1.e-2\n');           
+fprintf(fID,'4\n');               
+fprintf(fID,'50\n');
+fprintf(fID,' Variables:\n');
+fprintf(fID,' - epsNint    - error tolerance for the integration test.    \n');
+fprintf(fID,' - epsNrank   - error tolerance for the expansion order test.  \n');
+fprintf(fID,' - epsMrank   - error tolerance for the azimuthal order test.  \n');
+fprintf(fID,' - dNint	     - number of division points for the integration test \n');
+fprintf(fID,'                and Mishchenko''s convergence test.   \n');
+fprintf(fID,' - dNintMrank - number of division points for azimuthal mode \n');
+fprintf(fID,'                calculation.              \n');
+
+fprintf(fID,'\n');
+fprintf(fID,'Tmat\n');
+fprintf(fID,['''../TMATFILES/TmatForTSPL',namestring,'.dat''\n']);
+fprintf(fID,' Variable:\n');
+fprintf(fID,' - FileTmat - name of the file to which the T matrix is written.  \n');
+  
+fprintf(fID,'\n');
+fprintf(fID,'PrintProgress\n');
+fprintf(fID,'.true.\n');
+fprintf(fID,' Variable:\n');
+fprintf(fID,' - PrnProgress - if PrnProgress = t, the progress of calculation \n');
+fprintf(fID,'                 is printed. \n');
+
+fprintf(fID,' Comment\n');
+fprintf(fID,' As provided, the input file is setup to calculate scattering by a prolate \n');
+fprintf(fID,' spheroid with half-axes surf(1) = 1.0 micrometer and surf(2) = 0.5 micrometer, \n');
+fprintf(fID,' at a wavelength of 0.2 * Pi micrometer. Although, the particle is assumed \n');
+fprintf(fID,' to be dielectric, perfectly conducting and chiral particles can be computed\n');
+fprintf(fID,' with the same value of Nrank and the same distribution of sources. Convergence\n');
+fprintf(fID,' is achieved for Nrank = 19 and Nint = 100. For dielectric particles, the\n');
+fprintf(fID,' maximum expansion order can be chosen as Nrank = 17. If FileGeom = f, the \n');
+fprintf(fID,' particle geometry is generated by the routines contained in the file \n');
+fprintf(fID,' ''GeomLib.f90''. The option FileGeom = t, causes the code to read the particle \n');
+fprintf(fID,' geometry information from the file FileFEM = ''../GEOMFILES/prolate.fem''.                   \n');
+
+fclose(fID);
