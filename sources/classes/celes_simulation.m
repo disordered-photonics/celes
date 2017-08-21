@@ -52,13 +52,14 @@ classdef celes_simulation
         %> celes_output object which contains the results of the
         %> simulation
         output
-        
+
     end
     
     properties (Dependent)
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical hankel function in the particle coupling
         lookupParticleDistances
+       
     end
     
     methods
@@ -68,7 +69,7 @@ classdef celes_simulation
         function value = get.lookupParticleDistances(obj)
             value = [0,0:obj.numerics.particleDistanceResolution:(obj.input.particles.maxParticleDistance + 3*obj.numerics.particleDistanceResolution)];  % add two zeros at beginning to allow for interpolation also in first segment
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the Mie coefficients
         %>
@@ -320,14 +321,16 @@ classdef celes_simulation
             cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
-            obj = obj.computeMieCoefficients;
+            obj = obj.computeMieCoefficients; %modify for radius
             obj = obj.computeTranslationTable;
             tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');
                 partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
-                obj = sort_particles_by_partition(obj,partitioning);
-                partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
+                if obj.input.particles.numUniqueRadii == 1
+                    obj = sort_particles_by_partition(obj,partitioning);
+                    partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
+                end
                 obj.numerics.solver.preconditioner.partitioning = partitioning;
                 fprintf(1,' done\n');
                 obj = obj.numerics.solver.preconditioner.prepare(obj);
