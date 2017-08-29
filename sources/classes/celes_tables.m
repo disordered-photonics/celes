@@ -65,7 +65,7 @@ classdef celes_tables
         %> @brief Get method for rightHandSide
         % ======================================================================
         function TaI = get.rightHandSide(obj)
-            TaI = obj.mieCoefficients(obj.particles.radiusArrayIndex,:).*obj.initialFieldCoefficients;
+            TaI = obj.mieCoefficients(obj.particles.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
         end
     end
 end

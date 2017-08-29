@@ -25,30 +25,32 @@ output = celes_output;
 % -------------------------------------------------------------------------
 
 % complex refractive index of particles, n+ik
-particles.refractiveIndex = 2;
+particles.refractiveIndexArray = 2;
 
-radiusfile = load('ms_test/MS_radi_hole_15_um200step_mod1.mat');
-xposfile = load('ms_test/x_pos_pillar_15_um200step_mod1.mat');
-yposfile = load('ms_test/y_pos_pillar_15_um200step_mod1.mat');
+[xpos,ypos] = meshgrid(linspace(-2500,2500,5),linspace(-2500,2500,5)');
+xpos = xpos(:);
+ypos = ypos(:);
 
-radiusraw = radiusfile.MS_radi_hole_sample(:)';
-xposraw = xposfile.x_pos_m(:);
-yposraw = yposfile.y_pos_m(:);
+radius = 200*ones(1,5);
 
 % radii of particles
 % must be an array with same number of columns as the position matrix
 % e.g. particles.radiusArray = ones(1,100)*100;
 
-particles.radiusArray = radiusraw;
+particles.radiusArray = [radius,radius,radius,radius,radius];
+
+index2 = 2*ones(1,5);
+index4 = 4*ones(1,5);
+refractiveIndices = [index2,index4,index2,index4,index2];
+
+particles.refractiveIndexArray = refractiveIndices;
 
 % positions of particles (in three-column format: x,y,z)
-positions = zeros(length(xposraw),3);
-positions(:,1) = xposraw;
-positions(:,2) = yposraw;
-% [pos_x, pos_y] = meshgrid(linspace(-14000,14000,10)',linspace(-14000,14000,10));
-% positions(:,1) = pos_x(:);
-% positions(:,2) = pos_y(:);
-particles.positionArray = positions*1e9;
+positions = zeros(length(xpos),3);
+positions(:,1) = xpos;
+positions(:,2) = ypos;
+
+particles.positionArray = positions;
 
 % polar angle of incoming beam/wave, in radians (for Gaussian beams, 
 % only 0 and pi are currently possible)
@@ -93,7 +95,7 @@ numerics.azimuthalAnglesArray = 0:1e-2:2*pi;
 solver.type = 'BiCGStab';   
 
 % relative accuracy (solver stops when achieved)
-solver.tolerance=5e-4;
+solver.tolerance=1e-4;
 
 % maximal number of iterations (solver stops if exceeded)
 solver.maxIter=1000;
@@ -107,7 +109,6 @@ solver.monitor=true;
 
 % type of preconditioner (currently only 'blockdiagonal' and 'none'
 % possible)
-% Must be 'none' if particles have different radii
 preconditioner.type = 'blockdiagonal';
 
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
@@ -148,9 +149,10 @@ simulation=simulation.evaluateFields;
 
 % view output
 figure
-plot_field(gca,simulation,'abs E','Scattered field',simulation.input.particles.radiusArray)
+plot_field(gca,simulation,'abs E','Total field',simulation.input.particles.radiusArray)
 colormap(jet)
-caxis([0,15])
+colorbar
+%caxis([0,1])
 
 figure
 plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,'view xy')
