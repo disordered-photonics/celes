@@ -48,7 +48,7 @@
 %>              will plot all spheres with a center z-coordinate in that
 %>              interval
 %======================================================================
-function plot_spheres(ax,positionArray,radiusArray,view,varargin)
+function plot_spheres(ax,positionArray,radiusArray,refractiveIndexArray,view,varargin)
 
 if isempty(varargin)
     plotDepthInterval = [-Inf,Inf];
@@ -63,7 +63,7 @@ switch view
         [~,idx]=sort(positionArray(:,3));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),3)>plotDepthInterval(1) && positionArray(idx(jS),3)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
         ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
