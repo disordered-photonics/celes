@@ -52,13 +52,14 @@ classdef celes_simulation
         %> celes_output object which contains the results of the
         %> simulation
         output
-        
+
     end
     
     properties (Dependent)
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical hankel function in the particle coupling
         lookupParticleDistances
+       
     end
     
     methods
@@ -68,7 +69,7 @@ classdef celes_simulation
         function value = get.lookupParticleDistances(obj)
             value = [0,0:obj.numerics.particleDistanceResolution:(obj.input.particles.maxParticleDistance + 3*obj.numerics.particleDistanceResolution)];  % add two zeros at beginning to allow for interpolation also in first segment
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the Mie coefficients
         %>
@@ -78,17 +79,17 @@ classdef celes_simulation
             fprintf(1,'compute Mie coefficients ...');
             switch obj.input.particles.type
                 case 'sphere'
-                    obj.tables.mieCoefficients = zeros(obj.input.particles.numUniqueRadii,obj.numerics.nmax,'single');
-                for r_i=1:obj.input.particles.numUniqueRadii
-                    for tau=1:2
-                         for l=1:obj.numerics.lmax
-                             for m=-l:l
-                                jmult = multi2single_index(1,tau,l,m,obj.numerics.lmax);
-                   	            obj.tables.mieCoefficients(r_i,jmult) = T_entry(tau,l,obj.input.k_medium,obj.input.k_particle,obj.input.particles.uniqueRadii(r_i));
-                             end
-                         end
+                    obj.tables.mieCoefficients = zeros(obj.input.particles.numUniquePairs,obj.numerics.nmax,'single');
+                    for u_i=1:obj.input.particles.numUniquePairs
+                        for tau=1:2
+                            for l=1:obj.numerics.lmax
+                                for m=-l:l
+                                    jmult = multi2single_index(1,tau,l,m,obj.numerics.lmax);
+                                    obj.tables.mieCoefficients(u_i,jmult) = T_entry(tau,l,obj.input.k_medium,obj.input.omega*obj.input.particles.uniqueRadiusIndexPairs(u_i,2),obj.input.particles.uniqueRadiusIndexPairs(u_i,1));
+                                end
+                            end
+                        end
                     end
-                end
                 otherwise
                     error('particle type not implemented')
             end
@@ -292,7 +293,7 @@ classdef celes_simulation
             value=value(:);
             Wx=coupling_matrix_multiply(obj,value);
             Wx=reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
-            TWx = obj.tables.mieCoefficients(obj.input.particles.radiusArrayIndex,:).*Wx;
+            TWx = obj.tables.mieCoefficients(obj.input.particles.singleUniqueArrayIndex,:).*Wx;
             Mx = value - TWx(:);
         end
         
@@ -320,13 +321,11 @@ classdef celes_simulation
             cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
-            obj = obj.computeMieCoefficients;
+            obj = obj.computeMieCoefficients; %modify for radius
             obj = obj.computeTranslationTable;
             tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');
-                partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
-                obj = sort_particles_by_partition(obj,partitioning);
                 partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
                 obj.numerics.solver.preconditioner.partitioning = partitioning;
                 fprintf(1,' done\n');

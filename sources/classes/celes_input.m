@@ -83,7 +83,9 @@ classdef celes_input
         function value=get.k_particle(obj)
             switch obj.particles.disperse
                 case 'mono'
-                    value = obj.omega*obj.particles.refractiveIndex;
+                    value = obj.omega*obj.particles.refractiveIndexArray;
+                case 'poly'
+                    value = obj.omega.*obj.particles.refractiveIndexArray;
                 otherwise
                     error( 'action undefined' ) % to be implemented
             end

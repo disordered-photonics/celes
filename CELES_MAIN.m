@@ -25,18 +25,31 @@ output = celes_output;
 % -------------------------------------------------------------------------
 
 % complex refractive index of particles, n+ik
-particles.refractiveIndex = 2;
+particles.refractiveIndexArray = 2;
+
+[xpos,ypos] = meshgrid(linspace(-2500,2500,5),linspace(-2500,2500,5)');
+xpos = xpos(:);
+ypos = ypos(:);
+
+radius = 200*ones(1,5);
 
 % radii of particles
 % must be an array with same number of columns as the position matrix
 % e.g. particles.radiusArray = ones(1,100)*100;
-particles.radiusArray = rand(1,100)*181;
+
+particles.radiusArray = [radius,radius,radius,radius,radius];
+
+index2 = 2*ones(1,5);
+index4 = 4*ones(1,5);
+refractiveIndices = [index2,index4,index2,index4,index2];
+
+particles.refractiveIndexArray = refractiveIndices;
 
 % positions of particles (in three-column format: x,y,z)
-positions = zeros(100,3);
-[pos_x, pos_y] = meshgrid(linspace(-18000,18000,10)',linspace(-18000,18000,10));
-positions(:,1) = pos_x(:);
-positions(:,2) = pos_y(:);
+positions = zeros(length(xpos),3);
+positions(:,1) = xpos;
+positions(:,2) = ypos;
+
 particles.positionArray = positions;
 
 % polar angle of incoming beam/wave, in radians (for Gaussian beams, 
@@ -50,13 +63,13 @@ initialField.azimuthalAngle = 0;
 initialField.polarization = 'TE';
 
 % width of beam waist (use 0 or inf for plane wave)
-initialField.beamWidth = 20000;
+initialField.beamWidth = 0;
 
 % focal point 
 initialField.focalPoint = [0,0,0];
 
 % vacuum wavelength (same unit as particle positions and radius)
-input.wavelength = 1000;
+input.wavelength = 775;
 
 % complex refractive index of surrounding medium
 input.mediumRefractiveIndex = 1;
@@ -96,13 +109,12 @@ solver.monitor=true;
 
 % type of preconditioner (currently only 'blockdiagonal' and 'none'
 % possible)
-% Must be 'none' if particles have different radii
-preconditioner.type = 'none';
+preconditioner.type = 'blockdiagonal';
 
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
-preconditioner.partitionEdgeSizes = [1500,1500,1500];
+preconditioner.partitionEdgeSizes = [5000,5000,3000];
 
-[x,z] = meshgrid(-18000:10:18000,-3000:10:5000); y=x-x;
+[x,z] = meshgrid(-5000:50:5000,00000:50:17000); y=x-x;
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
 output.fieldPoints = [x(:),y(:),z(:)];
@@ -137,9 +149,10 @@ simulation=simulation.evaluateFields;
 
 % view output
 figure
-plot_field(gca,simulation,'abs E','Scattered field',simulation.input.particles.radiusArray)
+plot_field(gca,simulation,'abs E','Total field',simulation.input.particles.radiusArray)
 colormap(jet)
-caxis([0,1])
+colorbar
+%caxis([0,1])
 
 figure
 plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,'view xy')
