@@ -23,23 +23,30 @@ output = celes_output;
 % -------------------------------------------------------------------------
 % begin of user editable section - specify the simulation parameters here
 % -------------------------------------------------------------------------
-
-% complex refractive index of particles, n+ik
-particles.refractiveIndexArray = 2;
-
 a = dlmread('bidisp_test_0.dat',' ');
 
 xpos = a(1:4:end);
 ypos = a(2:4:end);
 zpos = a(3:4:end);
 radii = a(4:4:end)';
-particles.disperse = 'poly';
-refractiveIndices = 2*ones(1,length(radii));
 
 % radii of particles
 % must be an array with same number of columns as the position matrix
 % e.g. particles.radiusArray = ones(1,100)*100;
 particles.radiusArray = radii;
+
+% particle dispersion
+% mono: all same refractive index
+% poly: different refractive index allowed
+particles.disperse = 'poly';
+
+% complex refractive index of particles, n+ik
+%   for 'poly' disperse simulations, refractiveIndexArray must be same 
+%       dimension as radiusArray
+% e.g. particles.refractiveIndexArray = ones(1,100)*2;
+%   for 'mono' disperse simulations, refractiveIndexArray is just a number
+% e.g. particles.refractiveIndexArray = 2;
+refractiveIndices = 2*ones(1,length(radii));
 particles.refractiveIndexArray = refractiveIndices;
 
 % positions of particles (in three-column format: x,y,z)
