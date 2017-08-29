@@ -40,7 +40,8 @@ classdef celes_particles
         type  = 'sphere'  
         
         %> monodisperse or polydisperse? so far only 'mono' implemented. 
-        %> that means that all particles are the same.
+        %> that means that all particles are the same refractive index
+        %> poly allows for differing refractive indices
         disperse  = 'mono'
         
         %> positions of the particles in the format [x(:),y(:),z(:)]

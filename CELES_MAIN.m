@@ -27,28 +27,26 @@ output = celes_output;
 % complex refractive index of particles, n+ik
 particles.refractiveIndexArray = 2;
 
-[xpos,ypos] = meshgrid(linspace(-2500,2500,5),linspace(-2500,2500,5)');
-xpos = xpos(:);
-ypos = ypos(:);
+a = dlmread('bidisp_test_0.dat',' ');
 
-radius = 200*ones(1,5);
+xpos = a(1:4:end);
+ypos = a(2:4:end);
+zpos = a(3:4:end);
+radii = a(4:4:end)';
+particles.disperse = 'poly';
+refractiveIndices = 2*ones(1,length(radii));
 
 % radii of particles
 % must be an array with same number of columns as the position matrix
 % e.g. particles.radiusArray = ones(1,100)*100;
-
-particles.radiusArray = [radius,radius,radius,radius,radius];
-
-index2 = 2*ones(1,5);
-index4 = 4*ones(1,5);
-refractiveIndices = [index2,index4,index2,index4,index2];
-
+particles.radiusArray = radii;
 particles.refractiveIndexArray = refractiveIndices;
 
 % positions of particles (in three-column format: x,y,z)
 positions = zeros(length(xpos),3);
 positions(:,1) = xpos;
 positions(:,2) = ypos;
+positions(:,3) = zpos;
 
 particles.positionArray = positions;
 
@@ -69,7 +67,7 @@ initialField.beamWidth = 0;
 initialField.focalPoint = [0,0,0];
 
 % vacuum wavelength (same unit as particle positions and radius)
-input.wavelength = 775;
+input.wavelength = 1000;
 
 % complex refractive index of surrounding medium
 input.mediumRefractiveIndex = 1;
@@ -112,9 +110,9 @@ solver.monitor=true;
 preconditioner.type = 'blockdiagonal';
 
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
-preconditioner.partitionEdgeSizes = [5000,5000,3000];
+preconditioner.partitionEdgeSizes = [4000,4000,4000];
 
-[x,z] = meshgrid(-5000:50:5000,00000:50:17000); y=x-x;
+[x,z] = meshgrid(-30000:100:30000,-10000:100:30000); y=x-x;
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
 output.fieldPoints = [x(:),y(:),z(:)];
@@ -155,7 +153,7 @@ colorbar
 %caxis([0,1])
 
 figure
-plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,'view xy')
+plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,simulation.input.particles.refractiveIndexArray/max(simulation.input.particles.refractiveIndexArray),'view xy')
 colormap(jet)
 caxis([0,1])
 
