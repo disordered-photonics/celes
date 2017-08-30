@@ -40,14 +40,15 @@ classdef celes_particles
         type  = 'sphere'  
         
         %> monodisperse or polydisperse? so far only 'mono' implemented. 
-        %> that means that all particles are the same.
+        %> that means that all particles are the same refractive index
+        %> poly allows for differing refractive indices
         disperse  = 'mono'
         
         %> positions of the particles in the format [x(:),y(:),z(:)]
         positionArray
         
         %> complex refractive indices of the particles, n+ik
-        refractiveIndex
+        refractiveIndexArray
         
         %> radii of the particles
         radiusArray
@@ -68,7 +69,37 @@ classdef celes_particles
 
         %> radiusArray in terms of indices given by uniqueRadii
         radiusArrayIndex
-
+        
+        %> unique index list
+        uniqueRefractiveIndices
+        
+        %> number of unique refractive indices
+        numUniqueRefractiveIndices
+        
+        %> refractiveIndexArray in terms of indices given by
+        %  uniqueRefractiveIndices
+        refractiveIndexArrayIndex
+        
+        %> unique pairs of refractive indices and radii
+        %  for calculating mie coefficients
+        uniqueRadiusIndexPairs
+        
+        %> unique pairs of refractive indices and radii
+        %  for calculating mie coefficients
+        uniqueSingleRadiusIndexPairs
+        
+        %> number of unique pairs of refractive indices and radii
+        %  for calculating mie coefficients
+        numUniquePairs
+        
+        %> single index encompassing radius and refractive index
+        %  for indexing during matrix multiplication
+        singleUniqueIndex
+        
+        %> singleUniqueIndexMap in terms of indices given by
+        %  singleUniqueIndex
+        %  serves as a lookup table for matrix multiplication
+        singleUniqueArrayIndex
     end
     
     methods
@@ -91,6 +122,8 @@ classdef celes_particles
             switch value
                 case 'mono'
                     obj.disperse=value;
+                case 'poly'
+                    obj.disperse=value;
                 otherwise
                     error('this is at the moment not implemented')
             end
@@ -110,17 +143,41 @@ classdef celes_particles
         % ======================================================================
         %> @brief Set method for refractive index
         % ======================================================================
-        function obj = set.refractiveIndex(obj,value)
-            obj.refractiveIndex=single(value);
+        function obj = set.refractiveIndexArray(obj,value)
+            obj.refractiveIndexArray=single(value);
         end
         
         % ======================================================================
+        %> @brief Get method for unique refractive index values, returns ordered 
+        %         vector of unique refractive indices
+        % ======================================================================
+        function value = get.uniqueRefractiveIndices(obj)
+            value=unique(obj.refractiveIndexArray);
+        end
+        
+        % ======================================================================
+        %> @brief Get method for the number of unique refractive indices
+        % ======================================================================
+        function value = get.numUniqueRefractiveIndices(obj)
+            value=length(unique(obj.refractiveIndexArray));
+        end
+        
+        % ======================================================================
+        %> @brief Get method for refractive index array in terms of indices given by 
+        %        uniqueRefractiveIndices, sorted smallest to largest
+        % ======================================================================
+        function value = get.refractiveIndexArrayIndex(obj)
+            value=dsearchn(obj.uniqueRefractiveIndices',obj.refractiveIndexArray');
+        end        
+        
+        % ======================================================================
         %> @brief Set method for radiusArray
+        %         added floor to guarantee validity of pairing function
         % ======================================================================
         function obj = set.radiusArray(obj,value)
             obj.radiusArray=single(value);
         end
-
+        
         % ======================================================================
         %> @brief Get method for unique radii values, returns ordered vector of unique radii
         % ======================================================================
@@ -141,7 +198,54 @@ classdef celes_particles
         function value = get.radiusArrayIndex(obj)
             value=dsearchn(obj.uniqueRadii',obj.radiusArray');
         end
-
+        
+        % ======================================================================
+        %> @brief Get method to get unique pairs of radii and indices for
+        %         computation of mie coefficients
+        % ======================================================================
+        function value = get.uniqueRadiusIndexPairs(obj)
+            [radiiMap,indexMap] = meshgrid(obj.radiusArray,obj.refractiveIndexArray);
+            allPairs = [radiiMap(:) indexMap(:)];
+            value = unique(allPairs,'rows');
+        end
+        
+        % ======================================================================
+        %> @brief Get method to get unique pairs of radii and indices for
+        %         matrix multiplication. For calculation of singleUniqueIndex
+        % ======================================================================
+        function value = get.uniqueSingleRadiusIndexPairs(obj)
+            [radiiMap,indexMap] = meshgrid(obj.radiusArrayIndex,obj.refractiveIndexArrayIndex);
+            allPairs = [radiiMap(:) indexMap(:)];
+            value = unique(allPairs,'rows');
+        end
+        
+        % ======================================================================
+        %> @brief Get method for creating a single index encompassing unique pair 
+        %         indices combined by pairing function:
+        % p(rad,index) := 1/2(rad+index)(rad+index+1)+index
+        % ======================================================================
+        function value = get.singleUniqueIndex(obj)
+            value = 1/2*(obj.uniqueSingleRadiusIndexPairs(:,1)+obj.uniqueSingleRadiusIndexPairs(:,2)).*(obj.uniqueSingleRadiusIndexPairs(:,1)+obj.uniqueSingleRadiusIndexPairs(:,2)+1)+obj.uniqueSingleRadiusIndexPairs(:,2);
+        end
+        
+        % ======================================================================
+        %> @brief Get method for a map of particles indexed by singleUniqueIndex 
+        %         combined by pairing function:
+        % p(rad,index) := 1/2(rad+index)(rad+index+1)+index
+        % ======================================================================
+        function value = get.singleUniqueArrayIndex(obj)
+            pairedArray = 1/2*(obj.radiusArrayIndex+obj.refractiveIndexArrayIndex).*(obj.radiusArrayIndex+obj.refractiveIndexArrayIndex+1)+obj.refractiveIndexArrayIndex;
+            value = dsearchn(obj.singleUniqueIndex,pairedArray);
+        end
+        
+        % ======================================================================
+        %> @brief Get method for the number of unique pairs of indices and
+        %         radii
+        % ======================================================================
+        function value = get.numUniquePairs(obj)
+            value = length(obj.uniqueRadiusIndexPairs(:,1));
+        end
+        
         % ======================================================================
         %> @brief Set method for particle number
         % ======================================================================

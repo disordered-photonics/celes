@@ -54,7 +54,14 @@ for jS=1:simulation.input.particles.number
     msg = sprintf(' sphere %i of %i',jS,simulation.input.particles.number);
     fprintf(1,msg);
     
-    kS = simulation.input.k_particle;
+    switch simulation.input.particles.disperse
+        case 'poly'
+            kS = simulation.input.k_particle(jS);
+        case 'mono'
+            kS = simulation.input.k_particle;
+        otherwise
+            error('not poly or mono');
+    end
     nu = 1;
     
     % relative positions

@@ -111,7 +111,15 @@ classdef celes_preconditioner
                         stTab = sqrt(1-ctTab.^2);
                         phiTab = atan2(y1mny2,x1mnx2);
                         Plm = legendre_normalized_trigon(ctTab,stTab,2*lmax);
-                        radArrayInd = simul.tables.particles.radiusArrayIndex;
+                        
+                        switch simul.tables.particles.disperse
+                            case 'poly'
+                                particleArrayInd = simul.tables.particles.singleUniqueArrayIndex;
+                            case 'mono'
+                                particleArrayInd = simul.tables.particles.radiusArrayIndex;
+                            otherwise
+                                error('not poly or mono')
+                        end
                         
                         for p=0:2*lmax
                             sphHank = sph_bessel(3,p,k*dTab);
@@ -126,7 +134,7 @@ classdef celes_preconditioner
                                                     if abs(m1-m2)<=p
                                                         n2=multi2single_index(1,tau2,l2,m2,lmax);
                                                         n2S2Arr=(1:NSi)+(n2-1)*NSi;
-                                                        TWn1n2 = simul.tables.mieCoefficients(radArrayInd(spherArr(:)),n1)*simul.tables.translationTable.ab5(n2,n1,p+1) .* Plm{p+1,abs(m1-m2)+1} .* sphHank .* exp(1i*(m2-m1)*phiTab) ;
+                                                        TWn1n2 = simul.tables.mieCoefficients(particleArrayInd(spherArr(:)),n1)*simul.tables.translationTable.ab5(n2,n1,p+1) .* Plm{p+1,abs(m1-m2)+1} .* sphHank .* exp(1i*(m2-m1)*phiTab) ;
                                                         s1eqs2=logical(eye(NSi));
                                                         TWn1n2(s1eqs2(:))=0; % jS1=jS2
                                                         M(n1S1Arr,n2S2Arr) = M(n1S1Arr,n2S2Arr) - TWn1n2;
