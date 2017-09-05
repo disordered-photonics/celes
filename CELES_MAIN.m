@@ -23,39 +23,20 @@ output = celes_output;
 % -------------------------------------------------------------------------
 % begin of user editable section - specify the simulation parameters here
 % -------------------------------------------------------------------------
-a = dlmread('bidisp_test_0.dat',' ');
 
-xpos = a(1:4:end);
-ypos = a(2:4:end);
-zpos = a(3:4:end);
-radii = a(4:4:end)';
+% import example sphere positions, radii and refractive indices
+sphere_data = dlmread('data/example_project/sphere_parameters.txt');
 
 % radii of particles
-% must be an array with same number of columns as the position matrix
-% e.g. particles.radiusArray = ones(1,100)*100;
-particles.radiusArray = radii;
-
-% particle dispersion
-% mono: all same refractive index
-% poly: different refractive index allowed
-particles.disperse = 'poly';
+% must be an array with one element per sphere
+particles.radiusArray = sphere_data(:, 4);
 
 % complex refractive index of particles, n+ik
-%   for 'poly' disperse simulations, refractiveIndexArray must be same 
-%       dimension as radiusArray
-% e.g. particles.refractiveIndexArray = ones(1,100)*2;
-%   for 'mono' disperse simulations, refractiveIndexArray is just a number
-% e.g. particles.refractiveIndexArray = 2;
-refractiveIndices = 2*ones(1,length(radii));
-particles.refractiveIndexArray = refractiveIndices;
+% refractiveIndexArray must be same dimension as radiusArray
+particles.refractiveIndexArray = sphere_data(:,5) + 1i*sphere_data(:, 6);
 
 % positions of particles (in three-column format: x,y,z)
-positions = zeros(length(xpos),3);
-positions(:,1) = xpos;
-positions(:,2) = ypos;
-positions(:,3) = zpos;
-
-particles.positionArray = positions;
+particles.positionArray = sphere_data(:,1:3);
 
 % polar angle of incoming beam/wave, in radians (for Gaussian beams, 
 % only 0 and pi are currently possible)
@@ -68,13 +49,13 @@ initialField.azimuthalAngle = 0;
 initialField.polarization = 'TE';
 
 % width of beam waist (use 0 or inf for plane wave)
-initialField.beamWidth = 0;
+initialField.beamWidth = 2000;
 
 % focal point 
 initialField.focalPoint = [0,0,0];
 
 % vacuum wavelength (same unit as particle positions and radius)
-input.wavelength = 1000;
+input.wavelength = 550;
 
 % complex refractive index of surrounding medium
 input.mediumRefractiveIndex = 1;
@@ -91,16 +72,16 @@ numerics.particleDistanceResolution = 1;
 numerics.gpuFlag = true;
 
 % sampling of polar angles in the plane wave patterns (radians array)
-numerics.polarAnglesArray = 0:1e-2:pi;
+numerics.polarAnglesArray = 0:pi/1e3:pi;
 
 % sampling of azimuthal angles in the plane wave patterns (radians array)
-numerics.azimuthalAnglesArray = 0:1e-2:2*pi;
+numerics.azimuthalAnglesArray = 0:pi/1e3:2*pi;
 
 % specify solver type (currently 'BiCGStab' or 'GMRES')
-solver.type = 'BiCGStab';   
+solver.type = 'GMRES';
 
 % relative accuracy (solver stops when achieved)
-solver.tolerance=1e-4;
+solver.tolerance=5e-4;
 
 % maximal number of iterations (solver stops if exceeded)
 solver.maxIter=1000;
@@ -110,18 +91,18 @@ solver.restart=20;
 
 % monitor progress? in that case, a self-written script is used rather than
 % matlab's built-in bicgstab/gmres
-solver.monitor=true;
+solver.monitor=false;
 
 % type of preconditioner (currently only 'blockdiagonal' and 'none'
 % possible)
 preconditioner.type = 'blockdiagonal';
 
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
-preconditioner.partitionEdgeSizes = [4000,4000,4000];
+preconditioner.partitionEdgeSizes = [1200,1200,1200];
 
-[x,z] = meshgrid(-30000:100:30000,-10000:100:30000); y=x-x;
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
+[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=x-x;
 output.fieldPoints = [x(:),y(:),z(:)];
 
 % dimensions of the array used to restore the original shape of x,y,z 
@@ -152,17 +133,16 @@ simulation=simulation.run;
 simulation=simulation.evaluatePower;
 simulation=simulation.evaluateFields;
 
-% view output
+% display the particle positions
+figure
+plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,simulation.input.particles.refractiveIndexArray,'view xy')
+
+% view near field
 figure
 plot_field(gca,simulation,'abs E','Total field',simulation.input.particles.radiusArray)
 colormap(jet)
 colorbar
-%caxis([0,1])
-
-figure
-plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,simulation.input.particles.refractiveIndexArray/max(simulation.input.particles.refractiveIndexArray),'view xy')
-colormap(jet)
-caxis([0,1])
+caxis([0,1.2])
 
 fprintf('transmitted power: %f %%\n',simulation.output.totalFieldForwardPower/simulation.output.initialFieldPower*100)
 fprintf('reflected power: %f %%\n',simulation.output.totalFieldBackwardPower/simulation.output.initialFieldPower*100)

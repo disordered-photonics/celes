@@ -39,11 +39,6 @@ classdef celes_particles
         %> particle type, so far only 'sphere' implemented
         type  = 'sphere'  
         
-        %> monodisperse or polydisperse? so far only 'mono' implemented. 
-        %> that means that all particles are the same refractive index
-        %> poly allows for differing refractive indices
-        disperse  = 'mono'
-        
         %> positions of the particles in the format [x(:),y(:),z(:)]
         positionArray
         
@@ -116,20 +111,6 @@ classdef celes_particles
         end
         
         % ======================================================================
-        %> @brief Set method for disperse
-        % ======================================================================
-        function obj = set.disperse(obj,value)
-            switch value
-                case 'mono'
-                    obj.disperse=value;
-                case 'poly'
-                    obj.disperse=value;
-                otherwise
-                    error('this is at the moment not implemented')
-            end
-        end
-        
-        % ======================================================================
         %> @brief Set method for positionArray
         % ======================================================================
         function obj = set.positionArray(obj,value)
@@ -144,7 +125,7 @@ classdef celes_particles
         %> @brief Set method for refractive index
         % ======================================================================
         function obj = set.refractiveIndexArray(obj,value)
-            obj.refractiveIndexArray=single(value);
+            obj.refractiveIndexArray=single(value(:));
         end
         
         % ======================================================================
@@ -167,7 +148,7 @@ classdef celes_particles
         %        uniqueRefractiveIndices, sorted smallest to largest
         % ======================================================================
         function value = get.refractiveIndexArrayIndex(obj)
-            value=dsearchn(obj.uniqueRefractiveIndices',obj.refractiveIndexArray');
+            value=dsearchn(obj.uniqueRefractiveIndices,obj.refractiveIndexArray);
         end        
         
         % ======================================================================
@@ -175,7 +156,7 @@ classdef celes_particles
         %         added floor to guarantee validity of pairing function
         % ======================================================================
         function obj = set.radiusArray(obj,value)
-            obj.radiusArray=single(value);
+            obj.radiusArray=single(value(:));
         end
         
         % ======================================================================
@@ -196,7 +177,7 @@ classdef celes_particles
         %> @brief Get method for radius array in terms of indices given by uniqueRadii, sorted smallest to largest
         % ======================================================================
         function value = get.radiusArrayIndex(obj)
-            value=dsearchn(obj.uniqueRadii',obj.radiusArray');
+            value=dsearchn(obj.uniqueRadii,obj.radiusArray);
         end
         
         % ======================================================================

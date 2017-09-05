@@ -65,14 +65,7 @@ classdef celes_tables
         %> @brief Get method for rightHandSide
         % ======================================================================
         function TaI = get.rightHandSide(obj)
-            switch obj.particles.disperse
-                case 'poly'
-                    TaI = obj.mieCoefficients(obj.particles.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
-                case 'mono'
-                    TaI = obj.mieCoefficients(obj.particles.radiusArrayIndex,:).*obj.initialFieldCoefficients;
-                otherwise
-                    error('not poly or mono')
-            end
+            TaI = obj.mieCoefficients(obj.particles.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
         end
     end
 end

@@ -53,15 +53,7 @@ for jS=1:simulation.input.particles.number
     fprintf(1,repmat('\b',1,length(msg)));
     msg = sprintf(' sphere %i of %i',jS,simulation.input.particles.number);
     fprintf(1,msg);
-    
-    switch simulation.input.particles.disperse
-        case 'poly'
-            kS = simulation.input.k_particle(jS);
-        case 'mono'
-            kS = simulation.input.k_particle;
-        otherwise
-            error('not poly or mono');
-    end
+    kS = simulation.input.k_particle(jS);
     nu = 1;
     
     % relative positions

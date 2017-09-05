@@ -111,16 +111,7 @@ classdef celes_preconditioner
                         stTab = sqrt(1-ctTab.^2);
                         phiTab = atan2(y1mny2,x1mnx2);
                         Plm = legendre_normalized_trigon(ctTab,stTab,2*lmax);
-                        
-                        switch simul.tables.particles.disperse
-                            case 'poly'
-                                particleArrayInd = simul.tables.particles.singleUniqueArrayIndex;
-                            case 'mono'
-                                particleArrayInd = simul.tables.particles.radiusArrayIndex;
-                            otherwise
-                                error('not poly or mono')
-                        end
-                        
+                        particleArrayInd = simul.tables.particles.singleUniqueArrayIndex;
                         for p=0:2*lmax
                             sphHank = sph_bessel(3,p,k*dTab);
                             for tau1=1:2

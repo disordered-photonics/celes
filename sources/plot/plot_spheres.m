@@ -50,6 +50,9 @@
 %======================================================================
 function plot_spheres(ax,positionArray,radiusArray,refractiveIndexArray,view,varargin)
 
+% normalize to 1
+refractiveIndexArray = abs(refractiveIndexArray)/max(abs(refractiveIndexArray));
+
 if isempty(varargin)
     plotDepthInterval = [-Inf,Inf];
 else
@@ -72,7 +75,7 @@ switch view
         [~,idx]=sort(positionArray(:,2));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),2)>plotDepthInterval(1) && positionArray(idx(jS),2)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
         ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
@@ -81,7 +84,7 @@ switch view
         [~,idx]=sort(positionArray(:,1));
         for jS=1:length(positionArray(:,1))
             if positionArray(idx(jS),1)>plotDepthInterval(1) && positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,0.5])
+                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
         ax.XLim = [min(positionArray(:,2))-3*max(radiusArray) , max(positionArray(:,2))+3*max(radiusArray)];
