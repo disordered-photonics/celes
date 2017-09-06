@@ -96,7 +96,6 @@ preconditioner.type = 'blockdiagonal';
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
 preconditioner.partitionEdgeSizes = [1200,1200,1200];
 
-[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=x-x;
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
 [x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=x-x;
