@@ -52,14 +52,13 @@ classdef celes_simulation
         %> celes_output object which contains the results of the
         %> simulation
         output
-
+        
     end
     
     properties (Dependent)
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical hankel function in the particle coupling
         lookupParticleDistances
-       
     end
     
     methods
@@ -69,7 +68,7 @@ classdef celes_simulation
         function value = get.lookupParticleDistances(obj)
             value = [0,0:obj.numerics.particleDistanceResolution:(obj.input.particles.maxParticleDistance + 3*obj.numerics.particleDistanceResolution)];  % add two zeros at beginning to allow for interpolation also in first segment
         end
-
+        
         % ======================================================================
         %> @brief Evaluate the Mie coefficients
         %>
@@ -288,14 +287,33 @@ classdef celes_simulation
         %> @brief Multiply the master matrix M=1-T*W to some vector x
         %>
         %> @param Vector x of incoming field SVWF coefficients
+        %> @param verbose (logical, optional): If true (default), display detailed timing information
         %> @return Vector M*x
         % ======================================================================
-        function Mx = masterMatrixMultiply(obj,value)
+        function Mx = masterMatrixMultiply(obj,value,varargin)
             value=value(:);
-            Wx=coupling_matrix_multiply(obj,value);
+            
+            if isempty(varargin)
+                verbose=true;
+            else
+                verbose=varargin{1};
+            end
+            
+            Wx=coupling_matrix_multiply(obj,value,varargin{:});
+            
+            if verbose
+                fprintf('apply T-matrix ... ')
+            end
+            t_matrix_timer = tic;
+            
             Wx=reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
             TWx = obj.tables.mieCoefficients(obj.input.particles.singleUniqueArrayIndex,:).*Wx;
-            Mx = value - TWx(:);
+            Mx = gather(value - TWx(:));
+            
+            t_matrix_time = toc(t_matrix_timer);
+            if verbose
+                fprintf(' done in %f seconds.\n', t_matrix_time)
+            end
         end
         
         % ======================================================================
@@ -305,6 +323,7 @@ classdef celes_simulation
         %> - computation of initial field power
         %> - computation of Mie coefficients
         %> - computation of the translation table
+        %> - computation of the maximal distance between pairs of particles
         %> - preparation of the particle partitioning (if blockdiagonal
         %>   preconditioner is active)
         %> - preparation of the blockdiagonal preconditioner (if active)
@@ -322,8 +341,11 @@ classdef celes_simulation
             cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
-            obj = obj.computeMieCoefficients; %modify for radius
+            obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
+            fprintf(1,'compute maximal particle distance ...');
+            obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
+            fprintf(1,' done\n');
             tprec=tic;
             if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');

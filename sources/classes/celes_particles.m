@@ -39,6 +39,10 @@ classdef celes_particles
         %> particle type, so far only 'sphere' implemented
         type  = 'sphere'  
         
+        %> monodisperse or polydisperse? so far only 'mono' implemented. 
+        %> that means that all particles are the same.
+        disperse  = 'mono'
+        
         %> positions of the particles in the format [x(:),y(:),z(:)]
         positionArray
         
@@ -47,15 +51,15 @@ classdef celes_particles
         
         %> radii of the particles
         radiusArray
+
+	%> maximal distance between two particles
+        maxParticleDistance
     end
     
     properties (Dependent)
         %> number of particles
         number
         
-        %> maximal distance between two particles
-        maxParticleDistance
-
         %> unique radii list
         uniqueRadii
 
@@ -107,6 +111,18 @@ classdef celes_particles
                     obj.type = value;
                 otherwise
                     error('this particle type is at the moment not implemented')
+            end
+        end
+        
+        % ======================================================================
+        %> @brief Set method for disperse
+        % ======================================================================
+        function obj = set.disperse(obj,value)
+            switch value
+                case 'mono'
+                    obj.disperse=value;
+                otherwise
+                    error('this is at the moment not implemented')
             end
         end
         
@@ -242,16 +258,16 @@ classdef celes_particles
         end
         
         % ======================================================================
-        %> @brief Get method for particle number
+        %> @brief Set the maximalParticleDistance attribute to the correct value
         % ======================================================================
-        function value = get.maxParticleDistance(obj)
+        function obj = compute_maximal_particle_distance(obj)
             %value=max(pdist(obj.positionArray));  pdist part of statistics and machine learning toolbox and might not be available
-            value=0;
+            obj.maxParticleDistance=0;
             for jp1=1:obj.number
                 diffs=bsxfun(@plus,obj.positionArray((jp1+1):end,:),-obj.positionArray(jp1,:));
                 dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
-                if max(dists2)>value^2
-                    value=sqrt(max(dists2));
+                if max(dists2)>obj.maxParticleDistance^2
+                    obj.maxParticleDistance=sqrt(max(dists2));
                 end
             end
         end

@@ -77,6 +77,5 @@ app.PreconditionerPartitionZEditField.Value = edgsiz(3);
 
 app.SolverToleranceEditField.Value = simulation.numerics.solver.tolerance;
 app.SolverMaxiterEditField.Value = simulation.numerics.solver.maxIter;
-app.SolverMonitorCheckBox.Value = simulation.numerics.solver.monitor;
 
 app.FieldEvaluationCheckBox.Value = false;

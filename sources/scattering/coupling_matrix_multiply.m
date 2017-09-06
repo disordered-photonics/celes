@@ -43,7 +43,18 @@
 %> @retval      Wx (float gpuArray): W*x, where W is the SVWF translation
 %>              operator
 %======================================================================
-function [Wx] = coupling_matrix_multiply(simulation,x)
+function [Wx] = coupling_matrix_multiply(simulation,x,varargin)
+
+if isempty(varargin)
+    verbose=true;
+else
+    verbose=varargin{1};
+end
+
+if verbose
+    fprintf('prepare particle coupling ... ')
+end
+preparation_timer = tic;
 
 lmax=simulation.numerics.lmax;
 NS = simulation.input.particles.number;
@@ -88,6 +99,19 @@ imag_ab5Tab=gpuArray(single(imag_ab5Tab));
 		
 part_pos = gpuArray(single(transpose(simulation.input.particles.positionArray)));
 
+preparation_time = toc(preparation_timer);
+if verbose
+    fprintf('done in %f seconds.\n', preparation_time)
+    fprintf('compute particle coupling ... ')
+end
+
+coupling_timer = tic;
+
 [real_Wx,imag_Wx] = coupling_matrix_multiply_CUDA(real_x,imag_x,real_hTab,imag_hTab,PlmCoeffTable,real_ab5Tab,imag_ab5Tab,part_pos,int32(NS),rResol);
 
 Wx = real_Wx + 1i*imag_Wx;
+
+coupling_time = toc(coupling_timer);
+if verbose
+    fprintf('done in %f seconds.\n', coupling_time)
+end
