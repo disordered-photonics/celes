@@ -42,9 +42,8 @@ classdef celes_tables
         %> T-matrix of the spheres
         mieCoefficients
         
-        %> celes_particles object which contains the parameters that 
-        %> specify the particles sizes, positions and refractive indices
-        particles = celes_particles
+        %> index array to map T-matrices to particles
+        singleUniqueArrayIndex
         
         %> coefficients of the regular SVWF expansion of the initial
         %> excitation 
@@ -65,7 +64,7 @@ classdef celes_tables
         %> @brief Get method for rightHandSide
         % ======================================================================
         function TaI = get.rightHandSide(obj)
-            TaI = obj.mieCoefficients(obj.particles.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
+            TaI = obj.mieCoefficients(obj.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
         end
     end
 end

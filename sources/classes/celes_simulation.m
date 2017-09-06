@@ -90,6 +90,7 @@ classdef celes_simulation
                             end
                         end
                     end
+                    obj.tables.singleUniqueArrayIndex = obj.input.particles.singleUniqueArrayIndex;
                 otherwise
                     error('particle type not implemented')
             end

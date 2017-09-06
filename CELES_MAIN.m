@@ -126,7 +126,6 @@ simulation.input = input;
 simulation.numerics = numerics;
 simulation.tables = celes_tables;
 simulation.output = output;
-simulation.tables.particles = particles;
 
 % compute
 simulation=simulation.run;

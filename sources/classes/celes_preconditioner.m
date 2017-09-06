@@ -111,7 +111,7 @@ classdef celes_preconditioner
                         stTab = sqrt(1-ctTab.^2);
                         phiTab = atan2(y1mny2,x1mnx2);
                         Plm = legendre_normalized_trigon(ctTab,stTab,2*lmax);
-                        particleArrayInd = simul.tables.particles.singleUniqueArrayIndex;
+                        particleArrayInd = simul.input.particles.singleUniqueArrayIndex;
                         for p=0:2*lmax
                             sphHank = sph_bessel(3,p,k*dTab);
                             for tau1=1:2
