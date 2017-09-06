@@ -45,9 +45,8 @@ app.BackgroundRefractiveIndexEditField.Value = simulation.input.mediumRefractive
 
 % fields of simulation.input.particles object
 app.particlePositions = simulation.input.particles.positionArray;
-app.ParticleRefractiveIndexEditField.Value = real(simulation.input.particles.refractiveIndex);
-app.ParticleExtinctionCoefficientEditField.Value = imag(simulation.input.particles.refractiveIndex);
-app.ParticleRadiusEditField.Value = simulation.input.particles.radius;
+app.particleRefractiveIndices = simulation.input.particles.refractiveIndexArray;
+app.particleRadii = simulation.input.particles.radiusArray;
 
 % fields of simulation.input.initialField object
 app.AmplitudeEditField.Value = simulation.input.initialField.amplitude;

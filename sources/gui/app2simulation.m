@@ -52,8 +52,8 @@ simulation.input.particles = celes_particles;
 
 % initialize fields of simulation.input.particles object
 simulation.input.particles.positionArray = single(app.particlePositions);
-simulation.input.particles.refractiveIndex = single(app.ParticleRefractiveIndexEditField.Value)+1i*single(app.ParticleExtinctionCoefficientEditField.Value);
-simulation.input.particles.radius = single(app.ParticleRadiusEditField.Value);
+simulation.input.particles.refractiveIndexArray = app.particleRefractiveIndices;
+simulation.input.particles.radiusArray = app.particleRadii;
 
 % initialize fields of simulation.input.initialField object
 simulation.input.initialField.amplitude = single(app.AmplitudeEditField.Value);
@@ -86,7 +86,6 @@ simulation.numerics.solver.preconditioner.partitionEdgeSizes = [app.Precondition
 % initialize fields of simulation.numerics.solver object
 simulation.numerics.solver.tolerance = app.SolverToleranceEditField.Value;
 simulation.numerics.solver.maxIter = app.SolverMaxiterEditField.Value;
-simulation.numerics.solver.monitor = app.SolverMonitorCheckBox.Value;
 
 % initialize fields of simulation.output object
 if app.FieldEvaluationCheckBox.Value
