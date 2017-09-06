@@ -7,7 +7,7 @@
 % -------------------------------------------------------------------------
 
 % add all folders to the matlab search path
-addpath(genpath('.'))
+addpath(genpath('./src'))
 
 % initialize the celes class instances
 simulation = celes_simulation;
