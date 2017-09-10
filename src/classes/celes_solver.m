@@ -87,7 +87,14 @@ classdef celes_solver
                 case 'BiCGStab'
                     [value,~,~,~,convergenceHistory] = bicgstab_custom(mmm,rhs,obj.tolerance,obj.maxIter,prh,[],initial_guess);
                 case 'GMRES'
-                    [value,~,~,~,convergenceHistory] = gmres(mmm,rhs,obj.restart,obj.tolerance,obj.maxIter,prh,[],initial_guess);
+                    fh = str2func('gmres');
+                    try
+                        fetch_and_patch_gmres();
+                        fh = str2func('gmres_monitor');
+                    catch
+                        warning('using MATLAB default GMRES');
+                    end
+                    [value,~,~,~,convergenceHistory] = fh(mmm,rhs,obj.restart,obj.tolerance,obj.maxIter,prh,[],initial_guess);
             end
         end
     end
