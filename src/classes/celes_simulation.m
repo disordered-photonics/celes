@@ -155,7 +155,7 @@ classdef celes_simulation
         %> @return celes_simulation object with updated initialFieldPower
         % ======================================================================
         function obj = computeScatteredFieldCoefficients(obj,varargin)
-            fprintf(1,'compute scattered field coefficients ...');
+            fprintf(1,'compute scattered field coefficients ...\n');
             mmm = @(x) obj.masterMatrixMultiply(x);
             [b,convHist] = obj.numerics.solver.run(mmm,obj.tables.rightHandSide(:),varargin{:});
             obj.tables.scatteredFieldCoefficients = reshape(gather(b),size(obj.tables.rightHandSide));
@@ -294,7 +294,7 @@ classdef celes_simulation
             value=value(:);
             
             if isempty(varargin)
-                verbose=true;
+                verbose=false;
             else
                 verbose=varargin{1};
             end

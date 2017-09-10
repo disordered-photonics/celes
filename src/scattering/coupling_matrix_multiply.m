@@ -46,7 +46,7 @@
 function [Wx] = coupling_matrix_multiply(simulation,x,varargin)
 
 if isempty(varargin)
-    verbose=true;
+    verbose=false;
 else
     verbose=varargin{1};
 end

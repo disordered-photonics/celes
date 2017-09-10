@@ -166,7 +166,7 @@ classdef celes_preconditioner
                 case 'blockdiagonal'
                     
                     if isempty(varargin)
-                        verbose = true;
+                        verbose = false;
                     else
                         verbose = varargin{1};
                     end

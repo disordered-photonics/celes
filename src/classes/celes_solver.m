@@ -78,7 +78,7 @@ classdef celes_solver
             if length(varargin) > 1
                 verbose = varargin{2};
             else
-                verbose = true;
+                verbose = false;
             end
             
             prh = @(x) gather(obj.preconditioner.run(x,verbose));
