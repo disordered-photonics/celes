@@ -7,7 +7,7 @@
 % -------------------------------------------------------------------------
 
 % add all folders to the matlab search path
-addpath(genpath('.'))
+addpath(genpath('./src'))
 
 % initialize the celes class instances
 simulation = celes_simulation;
@@ -25,7 +25,7 @@ output = celes_output;
 % -------------------------------------------------------------------------
 
 % import example sphere positions, radii and refractive indices
-sphere_data = dlmread('data/example_project/sphere_parameters.txt');
+sphere_data = dlmread('examples/sphere_parameters.txt');
 
 % radii of particles
 % must be an array with one element per sphere
