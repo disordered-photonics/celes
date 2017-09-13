@@ -99,7 +99,6 @@ function [x, error, iter, flag, convhist] = bicgstab_custom(A, b, tol, max_it, M
 iter = 0;                   % initialization
 flag = 0;
 convhist = [];
-fprintf(1,'\n');
 msg='';
 bnrm2 = norm( b );
 if  ( bnrm2 == 0.0 ), bnrm2 = 1.0; end
@@ -123,13 +122,8 @@ for iter = 1:max_it
     s = r - alpha1*v;
     errhalf = norm(s)/bnrm2;
     
-    fprintf(1,repmat('\b',[1,length(msg)]));
-    msg1 = sprintf('iteration %0.1f',iter-0.5); 
-    gap1 = repmat(' ',[1,15-length(msg1)]);
-    msg2 = sprintf('relative residual %0.2e',errhalf);
-    gap2 = repmat(' ',[1,25-length(msg2)]);
-    msg = [msg1,gap1,'--',msg2,gap2];
-    fprintf(1,msg);
+    % status output
+    msg=convergence_message(msg,iter-0.5, errhalf);
     convhist(end+1)=gather(errhalf);
 
     if ( errhalf < tol ),                          % early convergence check
@@ -145,13 +139,8 @@ for iter = 1:max_it
     r = s - omega*t;
     error = norm( r ) / bnrm2;                     % check convergence
     
-    fprintf(1,repmat('\b',[1,length(msg)]));
-    msg1 = sprintf('iteration %0.1f',iter); 
-    gap1 = repmat(' ',[1,15-length(msg1)]);
-    msg2 = sprintf('relative residual %0.2e',error);
-    gap2 = repmat(' ',[1,25-length(msg2)]);
-    msg = [msg1,gap1,'--',msg2,gap2];
-    fprintf(1,msg);
+    % status output
+    msg=convergence_message(msg,iter, errhalf);
     convhist(end+1)=gather(error);
     
     if ( error <= tol ), break, end
@@ -171,4 +160,3 @@ elseif ( rho == 0.0 )
 else                                              % no convergence
     flag = 1;
 end
-fprintf(1,'\n');
