@@ -28,7 +28,6 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-function E = gaussian_beam_paraxial_approximation(simulation)
 %======================================================================
 %> @brief Evaluate the electrical field of a Gaussian beam in the paraxial
 %>        approximation. The expressions are taken from Wikipedia.
@@ -40,6 +39,7 @@ function E = gaussian_beam_paraxial_approximation(simulation)
 %>            Each column correspond to one field point specified in 
 %>            simulation.output.fieldPoints
 %======================================================================
+function E = gaussian_beam_paraxial_approximation(simulation)
 
 % relative coordinates
 xG = simulation.input.initialField.focalPoint(1);
@@ -68,5 +68,5 @@ wz = w0 * sqrt(1+(z/zR).^2); % spot size parameter
 Rz = z.*(1+(zR./z).^2); % radius of curvature
 psiz = atan(z/zR); % Gouy phase
 
-E = E0 * w0./wz .* exp(-rho.^2./wz.^2) .* ...
+E = sign(cos(simulation.input.initialField.polarAngle)) * E0 * w0./wz .* exp(-rho.^2./wz.^2) .* ...
     exp(1i*(k*z + k*rho.^2./(2*Rz) - psiz));

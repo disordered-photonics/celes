@@ -75,7 +75,7 @@ switch simulation.input.initialField.type
             end
 
             pwp{1}.expansionCoefficients = bsxfun(@times, cos(alphaArray(:)-alphaG), eikrgPrefacCosBetGaussfac);
-            pwp{2}.expansionCoefficients = bsxfun(@times, sin(alphaArray(:)-alphaG), eikrgPrefacCosBetGaussfac);
+            pwp{2}.expansionCoefficients = sign(cos(initF.polarAngle)) * bsxfun(@times, sin(alphaArray(:)-alphaG), eikrgPrefacCosBetGaussfac);
             
         else
             error('this is not implemented')
