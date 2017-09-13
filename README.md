@@ -27,6 +27,10 @@ CELES is written in MATLAB in order to provide a user-friendly, fully scriptable
 * Gaussian beam excitation
 * GUI (experimental)
 
+What's new in version 2.0:
+* support for polydisperse samples of spheres (thanks to Alan Zhan for his valuable contributions)
+* patching of Matlab's GMRES solver for a live convergence progress monitor
+
 ### Requirements
 In order to run CELES, the following software (in addition to MATLAB) should be installed on your system:
 * the [CUDA toolkit](https://developer.nvidia.com/cuda-downloads).
@@ -71,6 +75,8 @@ If you have questions, bug reports or feature requests, please use the [Issues](
 This software is published under the BSD 3-clause license, please read the [LICENCE](LICENCE) file for more information.
 
 ### Credits
+CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan has contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.
+
 CELES uses the following codes from other programmers:
 * [polarplot3d](https://it.mathworks.com/matlabcentral/fileexchange/13200-3d-polar-plot/content/polarplot3d.m) from Kenn Gerard
 * [wigner3j](https://it.mathworks.com/matlabcentral/fileexchange/20619-wigner3j-symbol) from Kobi Kraus
