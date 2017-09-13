@@ -94,6 +94,8 @@ J. Quant. Spectrosc. Radiat. Transf., vol. 199, pp. 103-110, 2017.
 
 
 @section acknowledgments Credits
+CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan has contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.
+
 CELES uses the following codes from other programmers:
 
  - 
