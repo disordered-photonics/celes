@@ -20,7 +20,7 @@ To calculate them, a system of linear equations needs to be solved.
 There are already excellent codes for the simulation of electromagnetic 
 particles at multiple spherical objects. For example, the 
 [MSTM](http://www.eng.auburn.edu/~dmckwski/scatcodes/)
-Fortran code by Daniel Mackowski and Michael Mishchenko can run either on a 
+Fortran code by Daniel Mackowski can run either on a 
 single machine or on a cluster. 
 A collection of more light scattering codes can be found at Thomas
 Wriedt's 
