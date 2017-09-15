@@ -51,7 +51,7 @@ $(function() {
 <p> The scattered electric field is represented as a superposition of spherical vector wave functions relative to the sphere's center coordinates. The coefficients of this expansion are the unknowns of the problem. To calculate them, a system of linear equations needs to be solved.</p>
 <h1><a class="anchor" id="why"></a>
 Why another software?</h1>
-<p>There are already excellent codes for the simulation of electromagnetic particles at multiple spherical objects. For example, the <a href="http://www.eng.auburn.edu/~dmckwski/scatcodes/">MSTM</a> Fortran code by Daniel Mackowski and Michael Mishchenko can run either on a single machine or on a cluster. A collection of more light scattering codes can be found at Thomas Wriedt's <a href="http://www.scattport.org/index.php/light-scattering-software">scattport</a> homepage. With the CELES toolbox we want to add a software that runs with high computational performance on workstation computers with suitable graphics processing units. The key feature of the CELES software is to run the costly matrix-vector multiplications in the iterative solving of the system of linear equations in parallel on the GPU. In addition, the convergence is accelerated by means of a block-diagonal preconditioner.</p>
+<p>There are already excellent codes for the simulation of electromagnetic particles at multiple spherical objects. For example, the <a href="http://www.eng.auburn.edu/~dmckwski/scatcodes/">MSTM</a> Fortran code by Daniel Mackowski can run either on a single machine or on a cluster. A collection of more light scattering codes can be found at Thomas Wriedt's <a href="http://www.scattport.org/index.php/light-scattering-software">scattport</a> homepage. With the CELES toolbox we want to add a software that runs with high computational performance on workstation computers with suitable graphics processing units. The key feature of the CELES software is to run the costly matrix-vector multiplications in the iterative solving of the system of linear equations in parallel on the GPU. In addition, the convergence is accelerated by means of a block-diagonal preconditioner.</p>
 <h1><a class="anchor" id="requirements"></a>
 Requirements</h1>
 <p>In order to run CELES, the following software (in addition to MATLAB) should be installed on your system:</p><ul>
@@ -78,6 +78,7 @@ Citing</h1>
 <p><a href="https://doi.org/10.1016/j.jqsrt.2017.05.010">Link to article homepage.</a></p>
 <h1><a class="anchor" id="acknowledgments"></a>
 Credits</h1>
+<p>CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan has contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.</p>
 <p>CELES uses the following codes from other programmers:</p>
 <ul>
 <li><a href="https://it.mathworks.com/matlabcentral/fileexchange/13200-3d-polar

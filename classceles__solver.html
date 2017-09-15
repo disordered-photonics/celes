@@ -72,9 +72,6 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a0cd090f4dbf8931d577a40bd3c47abfb"><td class="memItemLeft" align="right" valign="top">Property&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__solver.html#a0cd090f4dbf8931d577a40bd3c47abfb">restart</a></td></tr>
 <tr class="memdesc:a0cd090f4dbf8931d577a40bd3c47abfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">for type='GMRES': restart parameter  <a href="#a0cd090f4dbf8931d577a40bd3c47abfb">More...</a><br /></td></tr>
 <tr class="separator:a0cd090f4dbf8931d577a40bd3c47abfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24c8fe876b94d274e8b1e0c03b54bdd1"><td class="memItemLeft" align="right" valign="top">Property&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__solver.html#a24c8fe876b94d274e8b1e0c03b54bdd1">monitor</a></td></tr>
-<tr class="memdesc:a24c8fe876b94d274e8b1e0c03b54bdd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">for monitor=true, the progress of the solver can be seen in the terminal.  <a href="#a24c8fe876b94d274e8b1e0c03b54bdd1">More...</a><br /></td></tr>
-<tr class="separator:a24c8fe876b94d274e8b1e0c03b54bdd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6be26407c652fd71795c57e4cc9cfd86"><td class="memItemLeft" align="right" valign="top">Property&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__solver.html#a6be26407c652fd71795c57e4cc9cfd86">preconditioner</a></td></tr>
 <tr class="memdesc:a6be26407c652fd71795c57e4cc9cfd86"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classceles__preconditioner.html" title="Preconditioner for the use in iterative celes_solver objects. ">celes_preconditioner</a> object for faster convergency of solver  <a href="#a6be26407c652fd71795c57e4cc9cfd86">More...</a><br /></td></tr>
 <tr class="separator:a6be26407c652fd71795c57e4cc9cfd86"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,6 +123,7 @@ Public Attributes</h2></td></tr>
     <tr><td class="paramname">mmm</td><td>(function handle): master matrix multiply operator M* </td></tr>
     <tr><td class="paramname">rhs</td><td>(float array): right hand side of linear system </td></tr>
     <tr><td class="paramname">Optional</td><td>y0 (float array): initial guess for solution vector </td></tr>
+    <tr><td class="paramname">Optional</td><td>verbose (logical): If true (default), display detailed timing information </td></tr>
   </table>
   </dd>
 </dl>
@@ -147,23 +145,6 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>maximal number of iterations. solver stops if exceeded </p>
-
-</div>
-</div>
-<a id="a24c8fe876b94d274e8b1e0c03b54bdd1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24c8fe876b94d274e8b1e0c03b54bdd1">&#9670;&nbsp;</a></span>monitor</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Property monitor</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>for monitor=true, the progress of the solver can be seen in the terminal. </p>
-<p>For that case, a modified version of the solvers downlowaded from Matlab Stack Exchange will be employed instead of the matlab built-in algorithms </p>
 
 </div>
 </div>
@@ -232,7 +213,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>sources/classes/<a class="el" href="celes__solver_8m.html">celes_solver.m</a></li>
+<li>src/classes/<a class="el" href="celes__solver_8m.html">celes_solver.m</a></li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.13-->

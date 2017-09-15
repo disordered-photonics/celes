@@ -96,9 +96,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af76ffce7843e4f246b275dd644cf2b87"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__simulation.html#af76ffce7843e4f246b275dd644cf2b87">evaluateFields</a> (in obj)</td></tr>
 <tr class="memdesc:af76ffce7843e4f246b275dd644cf2b87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate both the initial and the scattered (near)field at the positions specified in the input.  <a href="#af76ffce7843e4f246b275dd644cf2b87">More...</a><br /></td></tr>
 <tr class="separator:af76ffce7843e4f246b275dd644cf2b87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a947dcd892b391ed726500396d8d6ceb9"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__simulation.html#a947dcd892b391ed726500396d8d6ceb9">masterMatrixMultiply</a> (in obj, in value)</td></tr>
-<tr class="memdesc:a947dcd892b391ed726500396d8d6ceb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the master matrix M=1-T*W to some vector x.  <a href="#a947dcd892b391ed726500396d8d6ceb9">More...</a><br /></td></tr>
-<tr class="separator:a947dcd892b391ed726500396d8d6ceb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad30199c1ffef1d4e5fc1c25f79755725"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__simulation.html#ad30199c1ffef1d4e5fc1c25f79755725">masterMatrixMultiply</a> (in obj, in value, in varargin)</td></tr>
+<tr class="memdesc:ad30199c1ffef1d4e5fc1c25f79755725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply the master matrix M=1-T*W to some vector x.  <a href="#ad30199c1ffef1d4e5fc1c25f79755725">More...</a><br /></td></tr>
+<tr class="separator:ad30199c1ffef1d4e5fc1c25f79755725"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9d946653e655e294b3dd02a4bce1735"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classceles__simulation.html#ad9d946653e655e294b3dd02a4bce1735">run</a> (in obj, in varargin)</td></tr>
 <tr class="memdesc:ad9d946653e655e294b3dd02a4bce1735"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the simulation.  <a href="#ad9d946653e655e294b3dd02a4bce1735">More...</a><br /></td></tr>
 <tr class="separator:ad9d946653e655e294b3dd02a4bce1735"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -438,8 +438,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a947dcd892b391ed726500396d8d6ceb9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a947dcd892b391ed726500396d8d6ceb9">&#9670;&nbsp;</a></span>masterMatrixMultiply()</h2>
+<a id="ad30199c1ffef1d4e5fc1c25f79755725"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad30199c1ffef1d4e5fc1c25f79755725">&#9670;&nbsp;</a></span>masterMatrixMultiply()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -454,7 +454,13 @@ Public Attributes</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">in&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">in&#160;</td>
+          <td class="paramname"><em>varargin</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -468,6 +474,7 @@ Public Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Vector</td><td>x of incoming field SVWF coefficients </td></tr>
+    <tr><td class="paramname">verbose</td><td>(logical, optional): If true (default), display detailed timing information </td></tr>
   </table>
   </dd>
 </dl>
@@ -506,6 +513,7 @@ Public Attributes</h2></td></tr>
 <li>computation of initial field power</li>
 <li>computation of Mie coefficients</li>
 <li>computation of the translation table</li>
+<li>computation of the maximal distance between pairs of particles</li>
 <li>preparation of the particle partitioning (if blockdiagonal preconditioner is active)</li>
 <li>preparation of the blockdiagonal preconditioner (if active)</li>
 <li>computation of initial field coefficients</li>
@@ -603,7 +611,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>sources/classes/<a class="el" href="celes__simulation_8m.html">celes_simulation.m</a></li>
+<li>src/classes/<a class="el" href="celes__simulation_8m.html">celes_simulation.m</a></li>
 </ul>
 </div><!-- contents -->
 <!-- HTML footer for doxygen 1.8.13-->

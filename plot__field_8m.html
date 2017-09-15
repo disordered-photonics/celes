@@ -7,7 +7,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>sources/plot/plot_field.m File Reference</title>
+<title>src/plot/plot_field.m File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="jquery.js"></script>
@@ -40,7 +40,7 @@ $(function() {
 <div id="main-nav"></div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="dir_a1be7306c70d5f58172874c2f305bad1.html">plot</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1385bd2483d1afdcde0dfa9aaedc2879.html">plot</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -53,13 +53,13 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae338dd06bb5fc1d1ebc1c9aab3b17885"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plot__field_8m.html#ae338dd06bb5fc1d1ebc1c9aab3b17885">plot_field</a> (in ax, in simulation, in component, in fieldType, in radius, in varargin)</td></tr>
-<tr class="memdesc:ae338dd06bb5fc1d1ebc1c9aab3b17885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show an image-plot of the near field.  <a href="#ae338dd06bb5fc1d1ebc1c9aab3b17885">More...</a><br /></td></tr>
-<tr class="separator:ae338dd06bb5fc1d1ebc1c9aab3b17885"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a84f8f88dcad33364ceeded57562f75e7"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plot__field_8m.html#a84f8f88dcad33364ceeded57562f75e7">plot_field</a> (in ax, in simulation, in component, in fieldType, in radiusArray, in varargin)</td></tr>
+<tr class="memdesc:a84f8f88dcad33364ceeded57562f75e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Show an image-plot of the near field.  <a href="#a84f8f88dcad33364ceeded57562f75e7">More...</a><br /></td></tr>
+<tr class="separator:a84f8f88dcad33364ceeded57562f75e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae338dd06bb5fc1d1ebc1c9aab3b17885"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae338dd06bb5fc1d1ebc1c9aab3b17885">&#9670;&nbsp;</a></span>plot_field()</h2>
+<a id="a84f8f88dcad33364ceeded57562f75e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a84f8f88dcad33364ceeded57562f75e7">&#9670;&nbsp;</a></span>plot_field()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -92,7 +92,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">in&#160;</td>
-          <td class="paramname"><em>radius</em>, </td>
+          <td class="paramname"><em>radiusArray</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -116,7 +116,7 @@ Functions</h2></td></tr>
     <tr><td class="paramname">simulation</td><td>(<a class="el" href="classceles__simulation.html" title="Central data structure of the celes software. ">celes_simulation</a>): simulation object containing the solution to plot</td></tr>
     <tr><td class="paramname">component</td><td>(string): select 'real Ex', 'real Ey', 'real Ez' or 'abs E'</td></tr>
     <tr><td class="paramname">fieldType</td><td>(string): select 'Total field', 'Scattered field' or 'Initial field'</td></tr>
-    <tr><td class="paramname">radius</td><td>(float): radius of the spheres</td></tr>
+    <tr><td class="paramname">radiusArray</td><td>(1xN float array): radius array of the spheres</td></tr>
     <tr><td class="paramname">Optional</td><td>plotDepthInterval (2x1 float array): from where to where include spheres in the plot? Example: if the field points are all located in the xy-plane, potDepthInterval=[-200,200] will plot all spheres with a center z-coordinate in that interval </td></tr>
   </table>
   </dd>

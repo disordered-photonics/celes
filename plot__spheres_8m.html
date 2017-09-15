@@ -7,7 +7,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>sources/plot/plot_spheres.m File Reference</title>
+<title>src/plot/plot_spheres.m File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="jquery.js"></script>
@@ -40,7 +40,7 @@ $(function() {
 <div id="main-nav"></div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="dir_a1be7306c70d5f58172874c2f305bad1.html">plot</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_1385bd2483d1afdcde0dfa9aaedc2879.html">plot</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -53,13 +53,13 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:af1b35a357aa662a2200ca3960714c66f"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plot__spheres_8m.html#af1b35a357aa662a2200ca3960714c66f">plot_spheres</a> (in ax, in positionArray, in radius, in view, in varargin)</td></tr>
-<tr class="memdesc:af1b35a357aa662a2200ca3960714c66f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add circles representing the sphere positions to some axes object.  <a href="#af1b35a357aa662a2200ca3960714c66f">More...</a><br /></td></tr>
-<tr class="separator:af1b35a357aa662a2200ca3960714c66f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9265f4fc774ded905895f4e97f46dba0"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="plot__spheres_8m.html#a9265f4fc774ded905895f4e97f46dba0">plot_spheres</a> (in ax, in positionArray, in radiusArray, in refractiveIndexArray, in view, in varargin)</td></tr>
+<tr class="memdesc:a9265f4fc774ded905895f4e97f46dba0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add circles representing the sphere positions to some axes object.  <a href="#a9265f4fc774ded905895f4e97f46dba0">More...</a><br /></td></tr>
+<tr class="separator:a9265f4fc774ded905895f4e97f46dba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="af1b35a357aa662a2200ca3960714c66f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1b35a357aa662a2200ca3960714c66f">&#9670;&nbsp;</a></span>plot_spheres()</h2>
+<a id="a9265f4fc774ded905895f4e97f46dba0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9265f4fc774ded905895f4e97f46dba0">&#9670;&nbsp;</a></span>plot_spheres()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -80,7 +80,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">in&#160;</td>
-          <td class="paramname"><em>radius</em>, </td>
+          <td class="paramname"><em>radiusArray</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">in&#160;</td>
+          <td class="paramname"><em>refractiveIndexArray</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -107,7 +113,7 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">ax</td><td>(axes object): axes to plot in</td></tr>
     <tr><td class="paramname">positionArray</td><td>(Nx3 float array): particle positions [x,y,z]</td></tr>
-    <tr><td class="paramname">radius</td><td>(float): particle radius</td></tr>
+    <tr><td class="paramname">radiusArray</td><td>(1xN float array): particle radius array</td></tr>
     <tr><td class="paramname">view</td><td>(string): select 'view xy','view yz' or 'view xz'</td></tr>
     <tr><td class="paramname">fieldType</td><td>(string): select 'Total field', 'Scattered field' or 'Initial field'</td></tr>
     <tr><td class="paramname">Optional</td><td>plotDepthInterval (2x1 float array): from where to where include spheres in the plot? Example: if the field points are all located in the xy-plane, potDepthInterval=[-200,200] will plot all spheres with a center z-coordinate in that interval </td></tr>

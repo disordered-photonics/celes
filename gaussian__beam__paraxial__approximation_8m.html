@@ -7,7 +7,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>sources/postprocessing/gaussian_beam_paraxial_approximation.m File Reference</title>
+<title>src/postprocessing/gaussian_beam_paraxial_approximation.m File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="jquery.js"></script>
@@ -40,7 +40,7 @@ $(function() {
 <div id="main-nav"></div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_08d237fc27d4ecd563f71c5d52f2fecc.html">sources</a></li><li class="navelem"><a class="el" href="dir_4c8dcfeba0569388cb787a9372d5d225.html">postprocessing</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_e272343b3e18644714a39f7f10eded81.html">postprocessing</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -54,6 +54,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a66b1e041d7019eacffa9c2e237b46d7b"><td class="memItemLeft" align="right" valign="top">function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gaussian__beam__paraxial__approximation_8m.html#a66b1e041d7019eacffa9c2e237b46d7b">gaussian_beam_paraxial_approximation</a> (in simulation)</td></tr>
+<tr class="memdesc:a66b1e041d7019eacffa9c2e237b46d7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the electrical field of a Gaussian beam in the paraxial approximation.  <a href="#a66b1e041d7019eacffa9c2e237b46d7b">More...</a><br /></td></tr>
 <tr class="separator:a66b1e041d7019eacffa9c2e237b46d7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -72,6 +73,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Evaluate the electrical field of a Gaussian beam in the paraxial approximation. </p>
+<p>The expressions are taken from Wikipedia.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">simulation</td><td>(<a class="el" href="classceles__simulation.html" title="Central data structure of the celes software. ">celes_simulation</a> object): the Gaussian beam parameters are taken from simulation.input.initialField</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="retval"><dt>Return values</dt><dd>
+  <table class="retval">
+    <tr><td class="paramname">E</td><td>(Nx3 float array): electric field in the format [Ex;Ey;Ez] Each column correspond to one field point specified in simulation.output.fieldPoints </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
