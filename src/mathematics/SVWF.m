@@ -54,38 +54,31 @@ function N = SVWF(k,R,nu,tau,l,m)
 % R in the format [x1,...,xn; y1,...,yn; z1,...,zn]
 
 % spherical coordinates
-r = sqrt(R(:,1).^2+R(:,2).^2+R(:,3).^2);
+r = sqrt(sum(R.^2,2));
 theta = acos(R(:,3)./r);
 phi = atan2(R(:,2),R(:,1));
 
-e_r = R./[r,r,r];
+e_r = R./r;
 e_theta = [cos(theta).*cos(phi),cos(theta).*sin(phi),-sin(theta)];
-e_phi = [-sin(phi),cos(phi),r-r];
+e_phi = [-sin(phi),cos(phi),zeros(size(r))];
 
 % spherical functions
 [p_all] = legendre_normalized_angular(theta,l);
 [pi_all,tau_all] = spherical_functions_angular(theta,l);
 
 P_lm = p_all{l+1,abs(m)+1};
-P_lm=[P_lm,P_lm,P_lm];
 
 pi_lm = pi_all{l+1,abs(m)+1};
-pi_lm=[pi_lm,pi_lm,pi_lm];
 
 tau_lm = tau_all{l+1,abs(m)+1};
-tau_lm=[tau_lm,tau_lm,tau_lm];
 
 z=sph_bessel(nu,l,k*r);
-z=[z,z,z];
 
 dxxz=dx_xz(nu,l,k*r);
-dxxz=[dxxz,dxxz,dxxz];
 
 eimphi=exp(1i*m*phi);
-eimphi=[eimphi,eimphi,eimphi];
 
 kr = k*r;
-kr = [kr,kr,kr];
 
 % SVWFs
 if tau==1  %select M
