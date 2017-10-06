@@ -54,7 +54,7 @@ function Q = T_entry(tau,l,kM,kS,R,varargin)
 % Mishchenko: "Scattering, Absorption and Emission of Light by Small
 % Paritcles", equations (5.42) and (5.43).
 
-m=kS/kM;
+m = kS/kM;
 x = kM*R;
 mx = kS*R;
 
@@ -65,11 +65,6 @@ djx = dx_xz(1,l,x);
 djmx = dx_xz(1,l,mx);
 dhx = dx_xz(3,l,x);
 
-a = (m^2*jmx*djx-jx*djmx)/(m^2*jmx*dhx-hx*djmx);
-b = (jmx*djx-jx*djmx)/(jmx*dhx-hx*djmx);
-c = (jx*dhx-hx*djx)/(jmx*dhx-hx*djmx);
-d = (m*jx*dhx-m*hx*djx)/(m^2*jmx*dhx-hx*djmx);
-
 if(isempty(varargin))
     varargin={'scattered'};
 end
@@ -77,14 +72,14 @@ end
 switch lower(varargin{1})
     case 'scattered'
         if tau==1
-            Q = -b;
+            Q = -(jmx*djx-jx*djmx)/(jmx*dhx-hx*djmx); % -b
         else
-            Q = -a;
+            Q = -(m^2*jmx*djx-jx*djmx)/(m^2*jmx*dhx-hx*djmx); % -a
         end
     case 'internal'
         if tau==1
-            Q = c;
+            Q = (jx*dhx-hx*djx)/(jmx*dhx-hx*djmx); % c
         else
-            Q = d;
+            Q = (m*jx*dhx-m*hx*djx)/(m^2*jmx*dhx-hx*djmx); % d
         end
 end
