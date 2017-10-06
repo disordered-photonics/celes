@@ -43,7 +43,7 @@ installed on your system:
 supported by MATLAB in combination with the given CUDA version.
 
 You can check which CUDA version you need to install by running the command 
-`gpuDevice` in MATLAB and look for `ToolkitVersion` in the output.
+`gpuDevice` in MATLAB and looking for `ToolkitVersion` in the output.
 
 CELES has been successfully tested on Linux using the built-in gcc compiler and 
 on Windows with the following software combinations: MATLAB R2016b + CUDA 7.5 + 
@@ -67,7 +67,7 @@ that the releases do not always represent the most up to date version.
 
 In MATLAB, remember to add CELES to your search path with
 ```{.m}
-addpath(genpath('path/to/celes'));
+addpath(genpath('path/to/celes/src'));
 ```
 
 As an example input you can execute the `CELES_MAIN` script. Comments in the 
@@ -88,13 +88,11 @@ If you use CELES, please cite it as follows:
 
 A. Egel, L. Pattelli, G. Mazzamuto, D. S. Wiersma, and U. Lemmer, 
 "CELES: CUDA-accelerated simulation of electromagnetic scattering by large ensembles of spheres," 
-J. Quant. Spectrosc. Radiat. Transf., vol. 199, pp. 103-110, 2017.
-
-[Link to article homepage.](https://doi.org/10.1016/j.jqsrt.2017.05.010)
+J. Quant. Spectrosc. Radiat. Transf., vol. 199, pp. 103-110, 2017. doi: [10.1016/j.jqsrt.2017.05.010](https://doi.org/10.1016/j.jqsrt.2017.05.010)
 
 
 @section acknowledgments Credits
-CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan has contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.
+CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan and Taylor Fryett have contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.
 
 CELES uses the following codes from other programmers:
 
