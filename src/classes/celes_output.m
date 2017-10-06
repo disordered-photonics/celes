@@ -45,10 +45,10 @@ classdef celes_output
         %> celes_planeWavePattern object for the total field
         totalFieldPlaneWavePattern
         
-        %> power flux of the toal field in +z direction
+        %> power flux of the total field in +z direction
         totalFieldForwardPower
         
-        %> power flux of the toal field in -z direction
+        %> power flux of the total field in -z direction
         totalFieldBackwardPower
         
         %> electric (near) field values of the initial field at the points 
@@ -78,12 +78,12 @@ classdef celes_output
         
         %> if the field points lie on a plane (in order to display the 
         %> field as an image), fieldPointsArrayDims stores the size of the
-        %> image - which can be recustructed by using
+        %> image - which can be reconstructed by using
         %> reshape(...,fieldPointsArrayDims)
         fieldPointsArrayDims
         
         %> array of the relative error of the solution as a function of
-        %> iteration step number. for bicgstab algorithm, the half-steps
+        %> iteration step number. for BiCGSTAB algorithm, the half-steps
         %> are counted
         convergenceHistory
         

@@ -144,7 +144,7 @@ classdef celes_planeWavePattern
         end
         
         % ======================================================================
-        %> @brief Add this plane wave pttern to another one
+        %> @brief Add this plane wave pattern to another one
         %>
         %> @param celes_planeWavePattern pwp2
         %> @return celes_planeWavePattern as the sum of this one with pwp2

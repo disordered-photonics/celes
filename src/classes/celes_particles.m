@@ -80,15 +80,15 @@ classdef celes_particles
         refractiveIndexArrayIndex
         
         %> unique pairs of refractive indices and radii
-        %  for calculating mie coefficients
+        %  for calculating Mie coefficients
         uniqueRadiusIndexPairs
         
         %> unique pairs of refractive indices and radii
-        %  for calculating mie coefficients
+        %  for calculating Mie coefficients
         uniqueSingleRadiusIndexPairs
         
         %> number of unique pairs of refractive indices and radii
-        %  for calculating mie coefficients
+        %  for calculating Mie coefficients
         numUniquePairs
         
         %> single index encompassing radius and refractive index
@@ -198,7 +198,7 @@ classdef celes_particles
         
         % ======================================================================
         %> @brief Get method to get unique pairs of radii and indices for
-        %         computation of mie coefficients
+        %         computation of Mie coefficients
         % ======================================================================
         function value = get.uniqueRadiusIndexPairs(obj)
             [radiiMap,indexMap] = meshgrid(obj.radiusArray,obj.refractiveIndexArray);

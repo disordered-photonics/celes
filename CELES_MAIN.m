@@ -6,10 +6,10 @@
 % do not edit
 % -------------------------------------------------------------------------
 
-% add all folders to the matlab search path
+% add all folders to the MATLAB search path
 addpath(genpath('./src'))
 
-% initialize the celes class instances
+% initialize the CELES class instances
 simulation = celes_simulation;
 particles = celes_particles;
 initialField = celes_initialField;
@@ -68,7 +68,7 @@ numerics.lmax = 3;
 numerics.particleDistanceResolution = 1;
 
 % use GPU for various calculations (deactivate if you experience GPU memory 
-% problems - translation operator always runs on gpu, even if false)
+% problems - translation operator always runs on GPU, even if false)
 numerics.gpuFlag = true;
 
 % sampling of polar angles in the plane wave patterns (radians array)

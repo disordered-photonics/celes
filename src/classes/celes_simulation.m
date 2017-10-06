@@ -57,7 +57,7 @@ classdef celes_simulation
     
     properties (Dependent)
         %> single array which contains a grid of distances used for the
-        %> lookup of the spherical hankel function in the particle coupling
+        %> lookup of the spherical Hankel function in the particle coupling
         lookupParticleDistances
     end
     

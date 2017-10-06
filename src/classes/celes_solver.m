@@ -50,7 +50,7 @@ classdef celes_solver
         %> for type='GMRES': restart parameter
         restart=10;
         
-        %> celes_preconditioner object for faster convergency of solver
+        %> celes_preconditioner object for faster convergence of solver
         preconditioner=celes_preconditioner;
     end
     

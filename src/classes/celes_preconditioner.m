@@ -30,7 +30,7 @@
 
 %> @file celes_preconditioner.m
 % ======================================================================
-%> @brief Preconditioner for the use in iterative celes_solver objects
+%> @brief Preconditioner for the iterative celes_solver objects
 % ======================================================================
 
 classdef celes_preconditioner

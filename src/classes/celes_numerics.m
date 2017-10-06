@@ -48,7 +48,7 @@ classdef celes_numerics
         
         %> shall the GPU be used in computations of, e.g., the
         %> preconditioner?
-        %> NOTE: In the current version, the GPU is alway used for the
+        %> NOTE: In the current version, the GPU is always used for the
         %> matrix vector products. Future versions might offer the
         %> opportunity to run the whole calculation on the CPU
         gpuFlag = true
