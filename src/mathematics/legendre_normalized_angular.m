@@ -77,7 +77,7 @@ end
 for m=1:lmax
     mp1=m+1;
     plm{mp1-1,mp1}=theta-theta;
-    plm{mp1,mp1}=sqrt((2*m+1)/2/factorial(2*m))*factd2(2*m-1)*st.^m;
+    plm{mp1,mp1}=sqrt((2*m+1)/2/factorial(2*m))*prod((2*m-1):-2:1)*st.^m;
     for l=m:lmax-1
         lp1=l+1;
         plm{lp1+1,mp1}=sqrt((2*l+1)*(2*l+3)/(l+1-m)/(l+1+m))*ct.*plm{lp1,mp1} - sqrt((2*l+3)*(l-m)*(l+m)/(2*l-1)/(l+1-m)/(l+1+m))*plm{lp1-1,mp1};
