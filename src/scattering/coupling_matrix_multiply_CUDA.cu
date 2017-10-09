@@ -58,10 +58,12 @@ __device__ float sphericalBesselLookup(int const p, float const r, float const *
 	float rPos = r/rResol;
 	int rIdx = int(rPos);    						// points to table position -1, because for each p, the first entry with respect to r in the spjTable is copied 
 	rPos -= rIdx; 							 	// (remainder of r/rResol) / rResol
-	spj = ((-rPos*rPos*rPos+2*rPos*rPos-rPos) * spjTable[rIdx*(2*LMAX+1)+p]
-			+ (3*rPos*rPos*rPos-5*rPos*rPos+2) * spjTable[(rIdx+1)*(2*LMAX+1)+p]
-			+ (-3*rPos*rPos*rPos+4*rPos*rPos+rPos) * spjTable[(rIdx+2)*(2*LMAX+1)+p]
-			+ (rPos*rPos*rPos-rPos*rPos) * spjTable[(rIdx+3)*(2*LMAX+1)+p])/2;
+	float rPos2 = pow(rPos,2);
+	float rPos3 = pow(rPos,3);
+	spj = ((-rPos3+2*rPos2-rPos) * spjTable[rIdx*(2*LMAX+1)+p]
+			+ (3*rPos3-5*rPos2+2) * spjTable[(rIdx+1)*(2*LMAX+1)+p]
+			+ (-3*rPos3+4*rPos2+rPos) * spjTable[(rIdx+2)*(2*LMAX+1)+p]
+			+ (rPos3-rPos2) * spjTable[(rIdx+3)*(2*LMAX+1)+p])/2;
 	return spj;
 }
 
@@ -79,12 +81,12 @@ __global__ void translationMatrixProduct(int const s2, int const NS, float const
 	float Ppdm[(2*LMAX+1)*(2*LMAX+2)/2];
 	float cosmphi[4*LMAX+1];
 	float sinmphi[4*LMAX+1];
-	int n1, n2;
+	int n1, n2, dm;
 	float re_xTmp, im_xTmp;
 	int loopCounter = 0;
-	int WxIdx,xIdx;
+	int WxIdx, xIdx, abIdx;
 	float re_incr, im_incr;
-	float re_abP,im_abP,re_abPh,im_abPh,re_abPheimp,im_abPheimp;
+	float re_abP, im_abP, re_abPh, im_abPh, re_abPheimp, im_abPheimp;
 	
   if ((s1!=s2)&&s1<=NS)
 	{
@@ -117,36 +119,41 @@ __global__ void translationMatrixProduct(int const s2, int const NS, float const
 		
 		for (int tau1=1; tau1<=2; tau1++) // evaluate matrix vector product
 		{
+			int temp1 = (tau1-1)*LMAX*(LMAX+2);
 			for (int l1=1; l1<=LMAX; l1++)
 			{
+				int coeff1 = temp1+(l1-1)*(l1+1)+l1+1;
 				for (int m1=-l1; m1<=l1; m1++)
 				{
-					n1 = (tau1-1)*LMAX*(LMAX+2)+(l1-1)*(l1+1)+m1+l1+1;
+					n1 = coeff1+m1;
 					WxIdx = (n1-1)*NS+s1-1;
 					re_incr = 0.0f;
 					im_incr = 0.0f;
 					
 					for (int tau2=1; tau2<=2; tau2++)
 					{
+						int temp2 = (tau2-1)*LMAX*(LMAX+2);
 						for (int l2=1; l2<=LMAX; l2++)
 						{
+							int coeff2 = temp2+(l2-1)*(l2+1)+l2+1;
 							for (int m2=-l2; m2<=l2; m2++)
 							{
-								n2 = (tau2-1)*LMAX*(LMAX+2)+(l2-1)*(l2+1)+m2+l2+1;
+								n2 = coeff2+m2;
 								xIdx = (n2-1)*NS+s2-1;
 								re_xTmp = re_x[xIdx];
 								im_xTmp = im_x[xIdx];
-								
-								for (int p=max(abs(m1-m2),abs(l1-l2)+abs(tau1-tau2)); p<=l1+l2; p++)
+								dm=m2-m1;
+								abIdx=dm+2*LMAX;
+								for (int p=max(abs(dm),abs(l1-l2)+abs(tau1-tau2)); p<=l1+l2; p++)
 								{
-									re_abP = re_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(m2-m1)];
-									im_abP = im_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(m2-m1)];
+									re_abP = re_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(dm)];
+									im_abP = im_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(dm)];
 									
 									re_abPh = re_abP*re_h[p] - im_abP*im_h[p];
 									im_abPh = re_abP*im_h[p] + im_abP*re_h[p];
 									
-									re_abPheimp = re_abPh*cosmphi[m2-m1+2*LMAX] - im_abPh*sinmphi[m2-m1+2*LMAX];
-									im_abPheimp = re_abPh*sinmphi[m2-m1+2*LMAX] + im_abPh*cosmphi[m2-m1+2*LMAX];
+									re_abPheimp = re_abPh*cosmphi[abIdx] - im_abPh*sinmphi[abIdx];
+									im_abPheimp = re_abPh*sinmphi[abIdx] + im_abPh*cosmphi[abIdx];
 									
 									re_incr += re_abPheimp*re_xTmp - im_abPheimp*im_xTmp;
 									im_incr += re_abPheimp*im_xTmp + im_abPheimp*re_xTmp;
