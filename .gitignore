@@ -1,6 +1,8 @@
 *.mat
 *.asv
 *.mexa64
+*.mexw64
+*.mexmaci64
 *~
 *.bak
 *.directory
