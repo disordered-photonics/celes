@@ -49,7 +49,7 @@ if pol==1  % TE
     % E_alpha = [-sin(alpha);cos(alpha);0];
     Ex = bsxfun(@times,-sin(alpha), E);
     Ey = bsxfun(@times,cos(alpha), E);
-    Ez = E-E;
+    Ez = zeros(size(E),'like',E);
 else
     % E_beta = [cos(alpha)*kz/k;sin(alpha)*kz/k;-kpar/k];
     Ex = bsxfun(@times,cos(alpha).*cos(beta), E);

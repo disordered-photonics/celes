@@ -64,7 +64,7 @@ function plm = legendre_normalized_trigon(ct,st,lmax)
 
 plm = cell(lmax+1,lmax+1);  % first index: l+1, second index: m+1, inside each cell: same dimension as kpar
 
-plm{1,1}=ct-ct+sqrt(2)/2;  % P_0
+plm{1,1} = ones(size(ct),'like',ct)*sqrt(2)/2;  % P_0
 plm{2,1} = sqrt(3/2)*ct; % P_1
 
 
@@ -75,7 +75,7 @@ end
 
 for m=1:lmax
     mp1=m+1;
-    plm{mp1-1,mp1}=ct-ct;
+    plm{mp1-1,mp1}=zeros(size(ct),'like',ct);
     plm{mp1,mp1}=sqrt((2*m+1)/2/factorial(2*m))*prod((2*m-1):-2:1)*st.^m;
     for l=m:lmax-1
         lp1=l+1;

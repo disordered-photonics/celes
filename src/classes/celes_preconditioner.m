@@ -178,7 +178,7 @@ classdef celes_preconditioner
                     optL.LT = true; % settings for linsolve
                     optU.UT = true;
                     rhs = gather(rhs(:));
-                    value = rhs-rhs;
+                    value = zeros(size(rhs),'like',rhs);
                     for jp=1:length(obj.partitioning)
                         p = obj.factorizedMasterMatrices{jp}.P;
                         U = triu(obj.factorizedMasterMatrices{jp}.Y);

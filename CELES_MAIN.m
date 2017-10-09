@@ -98,7 +98,7 @@ preconditioner.partitionEdgeSizes = [1200,1200,1200];
 
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
-[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=x-x;
+[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=zeros(size(x));
 output.fieldPoints = [x(:),y(:),z(:)];
 
 % dimensions of the array used to restore the original shape of x,y,z 

@@ -60,7 +60,7 @@ phi = atan2(R(:,2),R(:,1));
 
 e_r = R./r;
 e_theta = [cos(theta).*cos(phi),cos(theta).*sin(phi),-sin(theta)];
-e_phi = [-sin(phi),cos(phi),zeros(size(r))];
+e_phi = [-sin(phi),cos(phi),zeros(size(phi),'like',phi)];
 
 % spherical functions
 [p_all] = legendre_normalized_angular(theta,l);

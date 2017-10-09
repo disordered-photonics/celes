@@ -65,7 +65,7 @@ st = sin(theta);
 
 plm = cell(lmax+1,lmax+1);  % first index: l+1, second index: m+1, inside each cell: same dimension as theta
 
-plm{1,1}=theta-theta+sqrt(2)/2;  % P_0
+plm{1,1} = ones(size(theta),'like',theta)*sqrt(2)/2;  % P_0
 plm{2,1} = sqrt(3/2)*ct; % P_1
 
 
@@ -76,7 +76,7 @@ end
 
 for m=1:lmax
     mp1=m+1;
-    plm{mp1-1,mp1}=theta-theta;
+    plm{mp1-1,mp1}=zeros(size(theta),'like',theta);
     plm{mp1,mp1}=sqrt((2*m+1)/2/factorial(2*m))*prod((2*m-1):-2:1)*st.^m;
     for l=m:lmax-1
         lp1=l+1;

@@ -68,7 +68,7 @@ end
 fullBetaArray = simulation.numerics.polarAnglesArray(:);
 directionIdcs = ( sign(cos(fullBetaArray)) == sign(cos(simulation.input.initialField.polarAngle)) );
 betaArray = fullBetaArray(directionIdcs);
-dBeta = betaArray(2:end)-betaArray(1:(end-1));
+dBeta = diff(betaArray);
 sincos = sin(betaArray).*cos(betaArray);
 
 % gauss factor
