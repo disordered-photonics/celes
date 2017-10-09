@@ -37,10 +37,9 @@
 %>
 %> @param       radiusArray (1xN float array): particle radius array
 %>
-%> @param       view (string): select 'view xy','view yz' or 'view xz'
+%> @param       refractiveIndexArray (1xN float array): particle refractive index array
 %>
-%> @param       fieldType (string): select 'Total field', 'Scattered field'
-%>              or 'Initial field'
+%> @param       view (string): select 'view xy','view yz' or 'view xz'
 %>
 %> @param       Optional: plotDepthInterval (2x1 float array): from where to where
 %>              include spheres in the plot? Example: if the field points
