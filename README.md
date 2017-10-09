@@ -33,10 +33,10 @@ What's new in version 2.0:
 
 ### Requirements
 In order to run CELES, the following software (in addition to MATLAB) should be installed on your system:
-* the [CUDA toolkit](https://developer.nvidia.com/cuda-downloads).
+* the [CUDA toolkit](https://developer.nvidia.com/cuda-downloads) matching the `ToolkitVersion` specified when running `gpuDevice` in MATLAB.
 * a [C++ compiler](https://it.mathworks.com/support/compilers.html) which is supported by MATLAB in combination with the given CUDA version.
 
-You can check which CUDA version you need to install by running the command `gpuDevice` in MATLAB and looking for `ToolkitVersion` in the output.
+
 
 CELES has been successfully tested on Linux using the built-in gcc compiler and on Windows with the following software combinations: MATLAB R2016b + CUDA 7.5 + MS Visual Studio 2013 and MATLAB R2017a + CUDA 8 + MS Visual Studio 2013. 
 MS Visual Studio 2013 can be downloaded [here](https://www.microsoft.com/en-us/download/details.aspx?id=48138).
