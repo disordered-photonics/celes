@@ -15,6 +15,7 @@
 ## [Unreleased]
 ### Changed
 - precalculate coefficients in spherical_functions_angular @tkfryett
+- case-insensitive flags and types
 
 
 ## [2.0] - 2017-09-22

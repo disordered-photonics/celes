@@ -57,10 +57,10 @@ E0 = simulation.input.initialField.amplitude;
 k = simulation.input.k_medium;
 w = simulation.input.initialField.beamWidth;
 prefac = E0*k^2*w^2/pi;
-switch simulation.input.initialField.polarization
-    case 'TE'
+switch lower(simulation.input.initialField.polarization)
+    case 'te'
         alphaG = simulation.input.initialField.azimuthalAngle;
-    case 'TM'
+    case 'tm'
         alphaG = simulation.input.initialField.azimuthalAngle-pi/2;
 end
 

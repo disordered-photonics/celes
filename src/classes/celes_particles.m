@@ -106,7 +106,7 @@ classdef celes_particles
         %> @brief Set method for type
         % ======================================================================
         function obj = set.type(obj,value)
-            switch value
+            switch lower(value)
                 case 'sphere'
                     obj.type = value;
                 otherwise
@@ -118,7 +118,7 @@ classdef celes_particles
         %> @brief Set method for disperse
         % ======================================================================
         function obj = set.disperse(obj,value)
-            switch value
+            switch lower(value)
                 case 'mono'
                     obj.disperse=value;
                 otherwise

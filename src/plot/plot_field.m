@@ -56,12 +56,12 @@ function plot_field(ax,simulation,component,fieldType,radiusArray,varargin)
 
 hold(ax,'on')
 
-switch fieldType
-    case 'Total field'
+switch lower(fieldType)
+    case 'total field'
         E = simulation.output.totalField;
-    case 'Scattered field'
+    case 'scattered field'
         E = simulation.output.scatteredField + simulation.output.internalField;
-    case 'Initial field'
+    case 'initial field'
         E = simulation.output.initialField;
 end
 
@@ -83,14 +83,14 @@ elseif all(z==z(1))
     y = reshape(y,simulation.output.fieldPointsArrayDims);
 end   
 
-switch component
-    case 'real Ex'
+switch lower(component)
+    case 'real ex'
         fld = reshape(gather(real(E(:,1))),simulation.output.fieldPointsArrayDims);
-    case 'real Ey'
+    case 'real ey'
         fld = reshape(gather(real(E(:,2))),simulation.output.fieldPointsArrayDims);
-    case 'real Ez'
+    case 'real ez'
         fld = reshape(gather(real(E(:,3))),simulation.output.fieldPointsArrayDims);
-    case 'abs E'
+    case 'abs e'
         fld = reshape(gather(sqrt(abs(E(:,1)).^2 + abs(E(:,2)).^2 + abs(E(:,3)).^2)),simulation.output.fieldPointsArrayDims);
 end
 

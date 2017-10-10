@@ -76,7 +76,7 @@ classdef celes_simulation
         % ======================================================================
         function obj = computeMieCoefficients(obj)
             fprintf(1,'compute Mie coefficients ...');
-            switch obj.input.particles.type
+            switch lower(obj.input.particles.type)
                 case 'sphere'
                     obj.tables.mieCoefficients = zeros(obj.input.particles.numUniquePairs,obj.numerics.nmax,'single');
                     for u_i=1:obj.input.particles.numUniquePairs
@@ -347,7 +347,7 @@ classdef celes_simulation
             obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
             fprintf(1,' done\n');
             tprec=tic;
-            if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
+            if strcmpi(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 fprintf(1,'make particle partition ...');
                 partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
                 obj.numerics.solver.preconditioner.partitioning = partitioning;

@@ -74,7 +74,7 @@ classdef celes_initialField
         %> @brief Set method for type
         % ======================================================================
         function inF = set.type(inF,value)
-            switch(value)
+            switch lower(value)
                 case 'gaussian beam'
                     inF.type='gaussian beam';
                 otherwise
@@ -100,10 +100,10 @@ classdef celes_initialField
         %> @brief Set method for polarization
         % ======================================================================
         function inF = set.polarization(inF,value)
-            switch(value)
-                case 'TE'
+            switch lower(value)
+                case 'te'
                     inF.polarization='TE';
-                case 'TM'
+                case 'tm'
                     inF.polarization='TM';
                 otherwise
                     error('this is not a legal initial field polarization')
@@ -132,10 +132,10 @@ classdef celes_initialField
         %> @brief Get method for pol
         % ======================================================================
         function value = get.pol(inF)
-            switch inF.polarization
-                case 'TE'
+            switch lower(inF.polarization)
+                case 'te'
                     value=1;
-                case 'TM'
+                case 'tm'
                     value=2;
             end
         end

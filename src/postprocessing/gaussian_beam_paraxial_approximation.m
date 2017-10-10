@@ -54,10 +54,10 @@ rho = sqrt((simulation.output.fieldPoints(:,1)-xG).^2 + ...
 k = simulation.input.k_medium;
 wl = 2*pi/k;
 
-switch simulation.input.initialField.polarization
-    case 'TE'
+switch lower(simulation.input.initialField.polarization)
+    case 'te'
         alphaG = simulation.input.initialField.azimuthalAngle;
-    case 'TM'
+    case 'tm'
         alphaG = simulation.input.initialField.azimuthalAngle-pi/2;
 end
 E0 = simulation.input.initialField.amplitude * ...  % complex beam amplitude

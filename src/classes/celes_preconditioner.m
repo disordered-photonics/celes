@@ -74,7 +74,7 @@ classdef celes_preconditioner
         %> where M' is a blockdiagonal approximation to the linear system M
         % ======================================================================
         function simul = prepare(obj,simul)
-            switch obj.type
+            switch lower(obj.type)
                 case 'blockdiagonal'
                     fprintf(1,'prepare blockdiagonal preconditioner ...\n');
                     msg = '';
@@ -162,7 +162,7 @@ classdef celes_preconditioner
         % ======================================================================
         function value = run(obj,rhs,varargin)
             
-            switch obj.type
+            switch lower(obj.type)
                 case 'blockdiagonal'
                     
                     if isempty(varargin)

@@ -44,29 +44,29 @@
 %======================================================================
 function plot_intensity(simulation,direction,polarization,fieldType)
                     
-switch fieldType
-    case 'Total field'
+switch lower(fieldType)
+    case 'total field'
         pwp = simulation.output.totalFieldPlaneWavePattern;
-    case 'Scattered field'
+    case 'scattered field'
         pwp = simulation.output.scatteredFieldPlaneWavePattern;
-    case 'Initial field'
+    case 'initial field'
         pwp = initial_field_plane_wave_pattern(simulation);
 end
 
-switch polarization
-    case 'TE'
+switch lower(polarization)
+    case 'te'
         g2 = gather(abs(pwp{1}.expansionCoefficients).^2);
-    case 'TM'
+    case 'tm'
         g2 = gather(abs(pwp{2}.expansionCoefficients).^2);
-    case 'TE+TM'
+    case 'te+tm'
         g2 = gather(abs(pwp{1}.expansionCoefficients).^2+abs(pwp{2}.expansionCoefficients).^2);
 end
 
-switch direction
-    case 'Forward intensity'
+switch lower(direction)
+    case 'forward intensity'
         forward_idcs = (cos(pwp{1}.polarAngles)>=0);
         g2 = g2(:,forward_idcs);
-    case 'Backward intensity'
+    case 'backward intensity'
         backward_idcs = (cos(pwp{1}.polarAngles)<=0);
         g2 = g2(:,backward_idcs);
         g2 = g2(:,end:-1:1);

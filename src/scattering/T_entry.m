@@ -74,7 +74,7 @@ if(isempty(varargin))
     varargin={'scattered'};
 end
 
-switch varargin{1}
+switch lower(varargin{1})
     case 'scattered'
         if tau==1
             Q = -b;

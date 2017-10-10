@@ -59,7 +59,7 @@ function B = transformation_coefficients(pilm,taulm,tau,l,m,pol,varargin)
 
 if isempty(varargin)
     ifac = 1i;
-elseif strcmp(varargin{1},'dagger')
+elseif strcmp(lower(varargin{1}),'dagger')
     ifac = -1i;
 else
     error('dagger or not?')

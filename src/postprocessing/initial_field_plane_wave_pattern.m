@@ -67,10 +67,10 @@ switch simulation.input.initialField.type
             
             eikrgPrefacCosBetGaussfac = bsxfun(@times,emnikrg,prefacCosBetGaussfac); % Nalpha x Nbeta
             
-            switch simulation.input.initialField.polarization
-                case 'TE'
+            switch lower(simulation.input.initialField.polarization)
+                case 'te'
                     alphaG = simulation.input.initialField.azimuthalAngle;
-                case 'TM'
+                case 'tm'
                     alphaG = simulation.input.initialField.azimuthalAngle-pi/2;
             end
 

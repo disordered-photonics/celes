@@ -83,10 +83,10 @@ classdef celes_solver
             
             prh = @(x) gather(obj.preconditioner.run(x,verbose));
             
-            switch obj.type
-                case 'BiCGStab'
+            switch lower(obj.type)
+                case 'bicgstab'
                     [value,~,~,~,convergenceHistory] = bicgstab_custom(mmm,rhs,obj.tolerance,obj.maxIter,prh,[],initial_guess);
-                case 'GMRES'
+                case 'gmres'
                     fh = str2func('gmres');
                     try
                         fetch_and_patch_gmres();

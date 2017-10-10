@@ -46,7 +46,7 @@ function simulation = sort_particles_by_partition(simulation,partitioning)
 partitionArray = cell2mat(partitioning');
 simulation.input.particles.positionArray = simulation.input.particles.positionArray(partitionArray,:);
 
-switch simulation.input.particles.disperse
+switch lower(simulation.input.particles.disperse)
     case 'mono'
     otherwise
         error('only mono disperse supported')

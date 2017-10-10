@@ -57,7 +57,7 @@ if isempty(varargin)
     alpha = pwp.azimuthalAngles;
     g = pwp.expansionCoefficients;
 else
-    switch varargin{1}
+    switch lower(varargin{1})
         case 'forward'
             forward_idcs = (cos(pwp.polarAngles)>=0);
             beta = pwp.polarAngles(forward_idcs);
