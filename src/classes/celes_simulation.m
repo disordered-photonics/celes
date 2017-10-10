@@ -348,16 +348,16 @@ classdef celes_simulation
             fprintf(1,'compute maximal particle distance ...');
             obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
             fprintf(1,' done\n');
-            tprec=tic;
             if strcmpi(obj.numerics.solver.preconditioner.type,'blockdiagonal')
+                tprec=tic;
                 fprintf(1,'make particle partition ...');
                 partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
                 obj.numerics.solver.preconditioner.partitioning = partitioning;
                 fprintf(1,' done\n');
                 obj = obj.numerics.solver.preconditioner.prepare(obj);
+                obj.output.preconiditionerPreparationTime = toc(tprec);
+                fprintf(1,'preconditioner prepared in %.1f seconds.\n',obj.output.preconiditionerPreparationTime);
             end
-            obj.output.preconiditionerPreparationTime = toc(tprec);
-            fprintf(1,'preconditioner prepared in %.1f seconds.\n',obj.output.preconiditionerPreparationTime);
             tsolv=tic;
             obj = obj.computeInitialFieldCoefficients;
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
