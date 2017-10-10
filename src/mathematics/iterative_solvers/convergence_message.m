@@ -39,9 +39,16 @@
 %======================================================================
 function msg = convergence_message(msg, iternum, resid)
 
-    % fprintf(repmat('\b', [1, length(msg)]));
-    
-    msg = sprintf('iteration number: %g, relative residual: %f', iternum, resid);
-    fprintf('%s\n', msg);
+% fprintf(repmat('\b', [1, length(msg)]));
+
+try
+    oldnow = datevec(msg(1:19));
+    itertime = int2str(etime(clock,oldnow));
+catch
+    itertime = '-';
+end
+
+msg = sprintf('%19s %6s %8s %12s', datestr(now,'yyyy-mm-dd HH:MM:SS'), itertime, num2str(iternum,'%g'), num2str(resid,'%1.2e'));
+fprintf('%s\n', msg);
 
 end

@@ -157,6 +157,8 @@ classdef celes_simulation
         function obj = computeScatteredFieldCoefficients(obj,varargin)
             fprintf(1,'compute scattered field coefficients ...\n');
             mmm = @(x) obj.masterMatrixMultiply(x);
+            fprintf(1,'time                 dt[s]    #iter     residual\n');
+            fprintf(1,'------------------------------------------------\n');
             [b,convHist] = obj.numerics.solver.run(mmm,obj.tables.rightHandSide(:),varargin{:});
             obj.tables.scatteredFieldCoefficients = reshape(gather(b),size(obj.tables.rightHandSide));
             obj.output.convergenceHistory = convHist;
@@ -360,6 +362,7 @@ classdef celes_simulation
             obj = obj.computeInitialFieldCoefficients;
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
             obj.output.solverTime = toc(tsolv);
+            fprintf(1,'------------------------------------------------\n');
             fprintf(1,'solver terminated in %.1f seconds.\n',obj.output.solverTime);
             obj.numerics.solver.preconditioner.factorizedMasterMatrices = []; % clear memory intensive fields
             obj.numerics.solver.preconditioner.masterMatrices = [];
