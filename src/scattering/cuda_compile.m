@@ -36,17 +36,17 @@
 %> @param       verbose (boolean): be verbose in compilation output? 
 %======================================================================
 function cuda_compile(lmax, verbose)
-    fprintf(1,'compiling CUDA-code.\n')
+    fprintf(1,'compiling CUDA-code')
 
     SRC_FILE = 'coupling_matrix_multiply_CUDA.cu';
     script_dir = fileparts(mfilename('fullpath'));
     SRC_FILE = fullfile(script_dir, SRC_FILE);
 
     if exist('lmax','var') == 1
-        fprintf(1,'Building with lmax=%d.\n',lmax)
+        fprintf(1,' using lmax=%d.\n',lmax)
         DEFINES = strcat('-DLMAX=',int2str(lmax));
     else
-        fprintf(1,'Building with default lmax.\n')
+        fprintf(1,' using default lmax.\n')
         DEFINES = '';
     end
 
