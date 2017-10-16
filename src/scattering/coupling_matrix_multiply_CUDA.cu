@@ -81,7 +81,7 @@ __global__ void translationMatrixProduct(int const s2, int const NS, float const
 	float Ppdm[(2*LMAX+1)*(2*LMAX+2)/2];
 	float cosmphi[4*LMAX+1];
 	float sinmphi[4*LMAX+1];
-	int n1, n2, dm;
+	int n1, n2, deltam;
 	float re_xTmp, im_xTmp;
 	int loopCounter = 0;
 	int WxIdx, xIdx, abIdx;
@@ -142,12 +142,12 @@ __global__ void translationMatrixProduct(int const s2, int const NS, float const
 								xIdx = (n2-1)*NS+s2-1;
 								re_xTmp = re_x[xIdx];
 								im_xTmp = im_x[xIdx];
-								dm=m2-m1;
-								abIdx=dm+2*LMAX;
-								for (int p=max(abs(dm),abs(l1-l2)+abs(tau1-tau2)); p<=l1+l2; p++)
+								deltam=m2-m1;
+								abIdx=deltam+2*LMAX;
+								for (int p=max(abs(deltam),abs(l1-l2)+abs(tau1-tau2)); p<=l1+l2; p++)
 								{
-									re_abP = re_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(dm)];
-									im_abP = im_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(dm)];
+									re_abP = re_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(deltam)];
+									im_abP = im_abTable[loopCounter]*Ppdm[p*(p+1)/2+abs(deltam)];
 									
 									re_abPh = re_abP*re_h[p] - im_abP*im_h[p];
 									im_abPh = re_abP*im_h[p] + im_abP*re_h[p];
