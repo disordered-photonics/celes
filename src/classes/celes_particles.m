@@ -39,10 +39,6 @@ classdef celes_particles
         %> particle type, so far only 'sphere' implemented
         type  = 'sphere'  
         
-        %> monodisperse or polydisperse? so far only 'mono' implemented. 
-        %> that means that all particles are the same.
-        disperse  = 'mono'
-        
         %> positions of the particles in the format [x(:),y(:),z(:)]
         positionArray
         
@@ -111,18 +107,6 @@ classdef celes_particles
                     obj.type = value;
                 otherwise
                     error('this particle type is at the moment not implemented')
-            end
-        end
-        
-        % ======================================================================
-        %> @brief Set method for disperse
-        % ======================================================================
-        function obj = set.disperse(obj,value)
-            switch lower(value)
-                case 'mono'
-                    obj.disperse=value;
-                otherwise
-                    error('this is at the moment not implemented')
             end
         end
         
@@ -271,9 +255,6 @@ classdef celes_particles
                 end
             end
         end
-        
-        obj = sort_particles_by_partition(obj,partitioning);
-        
         
     end
 end

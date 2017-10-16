@@ -16,6 +16,7 @@
 ### Changed
 - precalculate coefficients in spherical_functions_angular @tkfryett
 - case-insensitive flags and types
+- remove distinction between mono- and poly-disperse (radii must be specified)
 
 
 ## [2.0] - 2017-09-22
