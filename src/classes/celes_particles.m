@@ -245,13 +245,16 @@ classdef celes_particles
         %> @brief Set the maximalParticleDistance attribute to the correct value
         % ======================================================================
         function obj = compute_maximal_particle_distance(obj)
-            %value=max(pdist(obj.positionArray));  pdist part of statistics and machine learning toolbox and might not be available
-            obj.maxParticleDistance=0;
-            for jp1=1:obj.number
-                diffs=bsxfun(@plus,obj.positionArray((jp1+1):end,:),-obj.positionArray(jp1,:));
-                dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
-                if max(dists2)>obj.maxParticleDistance^2
-                    obj.maxParticleDistance=sqrt(max(dists2));
+            try
+                obj.maxParticleDistance=max(pdist(obj.positionArray));
+            catch
+                obj.maxParticleDistance=0;
+                for jp1=1:obj.number
+                    diffs=bsxfun(@plus,obj.positionArray((jp1+1):end,:),-obj.positionArray(jp1,:));
+                    dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
+                    if max(dists2)>obj.maxParticleDistance^2
+                        obj.maxParticleDistance=sqrt(max(dists2));
+                    end
                 end
             end
         end
