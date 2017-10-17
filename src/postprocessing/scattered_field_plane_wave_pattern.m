@@ -46,6 +46,8 @@ msg='';
 lmax = simulation.numerics.lmax;
 nmax = simulation.numerics.nmax;
 betaArray = simulation.numerics.polarAnglesArray;
+cb = cos(betaArray);
+sb = sin(betaArray);
 alphaArray = simulation.numerics.azimuthalAnglesArray;
 alphaDim = length(alphaArray);
 betaDim = length(betaArray);
@@ -58,7 +60,7 @@ kxGrid = pwp{1}.kxGrid;
 kyGrid = pwp{1}.kyGrid;
 kzGrid = pwp{1}.kzGrid;
 
-[pilm,taulm] = spherical_functions_angular(betaArray,lmax);  % 1 x dimb
+[pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % 1 x dimb
 
 for pol=1:2
     B{pol} = simulation.numerics.deviceArray(zeros(nmax,betaDim,'single'));  % dimn x dimb

@@ -55,16 +55,18 @@ function N = SVWF(k,R,nu,tau,l,m)
 
 % spherical coordinates
 r = sqrt(sum(R.^2,2));
-theta = acos(R(:,3)./r);
+e_r = R./r;
+
+ct = e_r(:,3);
+st = sqrt(1-ct.^2);
 phi = atan2(R(:,2),R(:,1));
 
-e_r = R./r;
-e_theta = [cos(theta).*cos(phi),cos(theta).*sin(phi),-sin(theta)];
+e_theta = [ct.*cos(phi),ct.*sin(phi),-st];
 e_phi = [-sin(phi),cos(phi),zeros(size(phi),'like',phi)];
 
 % spherical functions
-[p_all] = legendre_normalized_angular(theta,l);
-[pi_all,tau_all] = spherical_functions_angular(theta,l);
+[p_all] = legendre_normalized_trigon(ct,st,l);
+[pi_all,tau_all] = spherical_functions_trigon(ct,st,l);
 
 P_lm = p_all{l+1,abs(m)+1};
 

@@ -68,14 +68,14 @@ for jS=1:simulation.input.particles.number
     
     % relative positions
     R = simulation.numerics.deviceArray(single(bsxfun(@plus,simulation.output.fieldPoints,-simulation.input.particles.positionArray(jS,:))));
-    
-    r = sqrt(R(:,1).^2+R(:,2).^2+R(:,3).^2);
-    theta = acos( min(max(R(:,3)./r,-1),1));
+    r = sqrt(sum(R.^2,2));
+    e_r = R./r;
+    ct = e_r(:,3);
+    st = sqrt(1-ct.^2);
     phi = atan2(R(:,2),R(:,1));
-    
-    e_r = R./[r,r,r];
-    e_theta = [cos(theta).*cos(phi),cos(theta).*sin(phi),-sin(theta)];
-    e_phi = [-sin(phi),cos(phi),r-r];
+        
+    e_theta = [ct.*cos(phi),ct.*sin(phi),-st];
+    e_phi = [-sin(phi),cos(phi),zeros(size(phi),'like',phi)];
 
     kr = kM*r;
     
@@ -90,8 +90,8 @@ for jS=1:simulation.input.particles.number
     end
     
     % spherical functions
-    [p_all] = legendre_normalized_angular(theta,simulation.numerics.lmax);
-    [pi_all,tau_all] = spherical_functions_angular(theta,simulation.numerics.lmax);
+    [p_all] = legendre_normalized_trigon(ct,st,simulation.numerics.lmax);
+    [pi_all,tau_all] = spherical_functions_trigon(ct,st,simulation.numerics.lmax);
     
     for l=1:simulation.numerics.lmax
         z=interp1(ri,hi{l},r,'linear');

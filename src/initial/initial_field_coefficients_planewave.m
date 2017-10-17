@@ -45,14 +45,16 @@ E0 = simulation.input.initialField.amplitude;
 k = simulation.input.k_medium;
 
 beta = simulation.input.initialField.polarAngle;
+cb = cos(beta);
+sb = sin(beta);
 alpha = simulation.input.initialField.azimuthalAngle;
 
 % pi and tau symbols for transformation matrix B_dagger
-[pilm,taulm] = spherical_functions_angular(beta,lmax);  % Nk x 1
+[pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
 relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray,-simulation.input.initialField.focalPoint);
-kvec = k*[sin(beta)*cos(alpha);sin(beta)*sin(alpha);cos(beta)];
+kvec = k*[sb*cos(alpha);sb*sin(alpha);cb];
 eikr = exp(1i*relativeParticlePositions*kvec);
 
 % compute initial field coefficients

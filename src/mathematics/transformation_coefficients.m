@@ -35,10 +35,10 @@
 %> For the definition of B, see the \ref theory section.
 %>
 %> @param       pilm (cell array): angular function pi as returned by
-%>                  spherical_functions_angular()
+%>                  spherical_functions_trigon()
 %>
 %> @param       taulm (cell array): angular function tau as returned by
-%>                  spherical_functions_angular()
+%>                  spherical_functions_trigon()
 %>
 %> @param       tau (int): SVWF polarization (1=TE, 2=TM)
 %>

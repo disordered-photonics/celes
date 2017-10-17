@@ -14,10 +14,12 @@
 
 ## [Unreleased]
 ### Changed
-- precalculate coefficients in spherical_functions_angular @tkfryett
+- define only trigonometric versions of legendre and spherical functions
+- precalculate coefficients in spherical functions @tkfryett
 - case-insensitive flags and types
-- remove distinction between mono- and poly-disperse (radii must be specified)
 
+### Removed
+- disperse flag (radii must be specified)
 
 ## [2.0] - 2017-09-22
 ### Added

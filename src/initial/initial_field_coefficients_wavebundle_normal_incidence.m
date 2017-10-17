@@ -69,14 +69,15 @@ fullBetaArray = simulation.numerics.polarAnglesArray(:);
 directionIdcs = ( sign(cos(fullBetaArray)) == sign(cos(simulation.input.initialField.polarAngle)) );
 betaArray = fullBetaArray(directionIdcs);
 dBeta = diff(betaArray);
-sincos = sin(betaArray).*cos(betaArray);
+cb = cos(betaArray);
+sb = sin(betaArray);
 
 % gauss factor
-gaussfac = exp(-w^2/4*k^2*sin(betaArray).^2);   % Nk x 1
-gaussfacSincos = gaussfac .* sincos;
+gaussfac = exp(-w^2/4*k^2*sb.^2);   % Nk x 1
+gaussfacSincos = gaussfac.*cb.*sb;
 
 % pi and tau symbols for transformation matrix B_dagger
-[pilm,taulm] = spherical_functions_angular(betaArray,lmax);  % Nk x 1
+[pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
 relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray,-simulation.input.initialField.focalPoint);
@@ -86,10 +87,10 @@ zGi = relativeParticlePositions(:,3); % NS x 1
 
 % compute initial field coefficients
 aI = simulation.numerics.deviceArray(zeros(simulation.input.particles.number,simulation.numerics.nmax,'single'));
-eikz = exp(1i*zGi*k*cos(betaArray.')); % NS x Nk
+eikz = exp(1i*zGi*k*cb.'); % NS x Nk
 for m=-lmax:lmax
-    eikzJmp1 = eikz .* besselj(abs(m+1),rhoGi*k*sin(betaArray.')); % NS x Nk
-    eikzJmm1 = eikz .* besselj(abs(m-1),rhoGi*k*sin(betaArray.')); % NS x Nk
+    eikzJmp1 = eikz .* besselj(abs(m+1),rhoGi*k*sb.'); % NS x Nk
+    eikzJmm1 = eikz .* besselj(abs(m-1),rhoGi*k*sb.'); % NS x Nk
     eimp1phi = exp(-1i*(m+1)*phiGi); % NS x 1
     eimm1phi = exp(-1i*(m-1)*phiGi); % NS x 1
     plTerm = exp(1i*alphaG)*1i^abs(m+1)*bsxfun(@times,eimp1phi,eikzJmp1);
