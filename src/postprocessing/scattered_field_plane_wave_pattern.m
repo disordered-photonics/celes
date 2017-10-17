@@ -52,9 +52,7 @@ alphaArray = simulation.numerics.azimuthalAnglesArray;
 alphaDim = length(alphaArray);
 betaDim = length(betaArray);
 
-for pol=1:2
-    pwp{pol} = celes_planeWavePattern(betaArray, alphaArray, simulation.input.k_medium);
-end
+pwp(1:2) = {celes_planeWavePattern(betaArray, alphaArray, simulation.input.k_medium)};
 
 kxGrid = pwp{1}.kxGrid;
 kyGrid = pwp{1}.kyGrid;
@@ -62,9 +60,7 @@ kzGrid = pwp{1}.kzGrid;
 
 [pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % 1 x dimb
 
-for pol=1:2
-    B{pol} = simulation.numerics.deviceArray(zeros(nmax,betaDim,'single'));  % dimn x dimb
-end
+B(1:2) = {simulation.numerics.deviceArray(zeros(nmax,betaDim,'single'))};  % dimn x dimb
 
 for tau=1:2
     for l=1:lmax

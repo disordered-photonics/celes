@@ -55,8 +55,7 @@ switch simulation.input.initialField.type
             w = initF.beamWidth;
             k = simulation.input.k_medium;
             
-            pwp{1} = celes_planeWavePattern(betaArray,alphaArray,simulation.input.k_medium);
-            pwp{2} = celes_planeWavePattern(betaArray,alphaArray,simulation.input.k_medium);
+            pwp(1:2) = {celes_planeWavePattern(betaArray, alphaArray, simulation.input.k_medium)};
             
             kxGrid = pwp{1}.kxGrid;
             kyGrid = pwp{1}.kyGrid;
