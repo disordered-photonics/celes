@@ -28,28 +28,28 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Spherical vector wave functions
 %>
-%> The convention for the definition of the SVWFs is taken from 
-%> "Light Scattering by Systems of Particles, Null-Field Method with 
-%> Discrete Sources: Theory and Programs" 
+%> The convention for the definition of the SVWFs is taken from
+%> "Light Scattering by Systems of Particles, Null-Field Method with
+%> Discrete Sources: Theory and Programs"
 %> by A. Doicu, T. Wriedt, and Y.A. Eremin
-%> 
+%>
 %> See also the \ref theory section.
-%> 
+%>
 %> @param k (float): wavenumber
 %> @param R (3xN float array): positions where to evaluate the field in the
-%> format [x1,...,xN; y1,...,yN; z1,...,zN]
+%>        format [x1,...,xN; y1,...,yN; z1,...,zN]
 %> @param nu (int): regular (nu=1) or outgoing (nu=3) SVWF
 %> @param tau (int): polarization (spherical TE, i.e., rxM=0 is tau=1,
-%> spherical TM is tau=2)
+%>        spherical TM is tau=2)
 %> @param l (int): polar quantum number (degree), l=1,...
 %> @param m (int): azimuthal quantum number (order), m=-l,...,l
 %>
-%> @retval N (float array): field components in format 
-%> [Ex1,...,Exn; Ey1,...,Eyn; Ez1,...,Ezn]
-%======================================================================
+%> @retval N (float array): field components in format
+%>         [Ex1,...,Exn; Ey1,...,Eyn; Ez1,...,Ezn]
+%===============================================================================
 function N = SVWF(k,R,nu,tau,l,m)
 % R in the format [x1,...,xn; y1,...,yn; z1,...,zn]
 
@@ -83,9 +83,10 @@ eimphi=exp(1i*m*phi);
 kr = k*r;
 
 % SVWFs
-if tau==1  %select M
-    N = 1/sqrt(2*l*(l+1)) * z .* (1i*m*pi_lm.*e_theta - tau_lm.*e_phi) .* eimphi;
+if tau == 1 %select M
+    N = 1/sqrt(2*l*(l+1)) * z .* (1i*m*pi_lm.*e_theta-tau_lm.*e_phi) .* eimphi;
 else %select N
-    N = 1/sqrt(2*l*(l+1)) * (l*(l+1)*z./kr.*P_lm.*e_r + dxxz./kr.* (tau_lm.*e_theta + 1i*m*pi_lm.*e_phi)) .* eimphi;
+    N = 1/sqrt(2*l*(l+1)) * (l*(l+1)*z./kr.*P_lm.*e_r+ ...
+        dxxz./kr.* (tau_lm.*e_theta + 1i*m*pi_lm.*e_phi)) .* eimphi;
 end
-
+end

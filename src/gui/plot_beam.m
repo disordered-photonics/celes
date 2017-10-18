@@ -28,12 +28,12 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Visualize beam width and focus
 %>
 %> @param       ax (axes object)
 %> @param       app (model_wizard application object)
-%======================================================================
+%===============================================================================
 function plot_beam(ax,app)
 
 beam_color = [1,0.8,0];
@@ -63,3 +63,4 @@ switch app.ViewDropDown.Value
         plot(ax,x2,z,'LineWidth',2,'Color',beam_color)
 end
 hold(ax,'off')
+end

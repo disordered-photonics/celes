@@ -28,16 +28,16 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Expansion coefficients of a plane wave under normal incidence 
-%> as the initial field in terms of regular spherical vector wave functions
-%> relative to the particles centers
+%===============================================================================
+%> @brief Expansion coefficients of a plane wave under normal incidence as the
+%>        initial field in terms of regular spherical vector wave functions
+%>        relative to the particles centers
 %>
 %> @param simulation (celes_simulation)
 %>
-%> @retval aI (device_array (cpu or gpu) of dimension NS x nmax, single
-%> precision)
-%======================================================================
+%> @retval aI (device_array (CPU or GPU) of dimension NS x nmax, single
+%>         precision)
+%===============================================================================
 function aI = initial_field_coefficients_planewave(simulation)
 
 lmax=simulation.numerics.lmax;
@@ -66,4 +66,5 @@ for m=-lmax:lmax
             aI(:,n) = 4 * E0 * exp(-1i*m*alpha) .* eikr .* transformation_coefficients(pilm,taulm,tau,l,m,simulation.input.initialField.pol,'dagger');
         end
     end
+end
 end

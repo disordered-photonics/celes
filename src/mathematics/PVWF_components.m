@@ -28,7 +28,7 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Cartesian components of a vector plane wave with unit amplitude
 %>
 %> @param R (Nx3 float array): positions where to evaluate wave
@@ -38,7 +38,7 @@
 %> @param pol (int): polarization (1=TE, 2=TM)
 %>
 %> @retval E_components (cell array): {Ex,Ey,Ez}
-%======================================================================
+%===============================================================================
 function [E_components] = PVWF_components(R,k,alpha,beta,pol)
 % alpha, beta need to be row vectors
 % R need to be Nx3
@@ -58,3 +58,4 @@ else
 end
 
 E_components = {Ex,Ey,Ez};
+end

@@ -28,23 +28,23 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Evaluate the Mie coefficients, see Bohren and Huffman:
-%> "Absorption and Scattering of Light by Small Particles", equations
-%> (4.52) and (4.53).
+%>        "Absorption and Scattering of Light by Small Particles", equations
+%>        (4.52) and (4.53).
 %>
-%> @param       tau (int): SVWF polarization (1=TE, 2=TM)
+%> @param   tau (int): SVWF polarization (1=TE, 2=TM)
 %>
-%> @param       l (int): SVWF degree (polar quantum number)
+%> @param   l (int): SVWF degree (polar quantum number)
 %>
-%> @param       km (float): wavenumber in surrounding medium
+%> @param   km (float): wavenumber in surrounding medium
 %>
-%> @param       kS (float): wavenumber inside particle
+%> @param   kS (float): wavenumber inside particle
 %>
-%> @param       R (float): radius of sphere
+%> @param   R (float): radius of sphere
 %>
-%> @retval      Q(float): Mie coefficient
-%======================================================================
+%> @retval  Q (float): Mie coefficient
+%===============================================================================
 function Q = T_entry(tau,l,kM,kS,R,varargin)
 
 % The conventions are according to Bohren and Huffman's textbook.
@@ -82,4 +82,5 @@ switch lower(varargin{1})
         else
             Q = (m*jx*dhx-m*hx*djx)/(m^2*jmx*dhx-hx*djmx); % d
         end
+end
 end

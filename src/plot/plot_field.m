@@ -28,30 +28,29 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Show an image-plot of the near field
 %>
 %> The sphere positions are displayed as circles.
 %>
-%> @param       ax (axes object): axes to plot in
+%> @param   ax (axes object): axes to plot in
 %>
-%> @param       simulation (celes_simulation): simulation object
-%>              containing the solution to plot
+%> @param   simulation (celes_simulation): simulation object
+%>          containing the solution to plot
 %>
-%> @param       component (string): select 'real Ex', 'real Ey', 'real Ez'
-%>              or 'abs E'
+%> @param   component (string): select 'real Ex', 'real Ey', 'real Ez'
+%>          or 'abs E'
 %>
-%> @param       fieldType (string): select 'Total field', 'Scattered field'
-%>              or 'Initial field'
+%> @param   fieldType (string): select 'Total field', 'Scattered field'
+%>          or 'Initial field'
 %>
-%> @param       radiusArray (1xN float array): radius array of the spheres
+%> @param   radiusArray (1xN float array): radius array of the spheres
 %>
-%> @param       Optional: plotDepthInterval (2x1 float array): from where to where
-%>              include spheres in the plot? Example: if the field points
-%>              are all located in the xy-plane, potDepthInterval=[-200,200]
-%>              will plot all spheres with a center z-coordinate in that
-%>              interval
-%======================================================================
+%> @param   Optional: plotDepthInterval (2x1 float array): from where to where
+%>          include spheres in the plot? Example: if the field points
+%>          are all located in the xy-plane, potDepthInterval=[-200,200]
+%>          will plot all spheres with a center z-coordinate in that interval
+%===============================================================================
 function plot_field(ax,simulation,component,fieldType,radiusArray,varargin)
 
 hold(ax,'on')
@@ -69,29 +68,33 @@ x = simulation.output.fieldPoints(:,1);
 y = simulation.output.fieldPoints(:,2);
 z = simulation.output.fieldPoints(:,3);
 
-if all(x==x(1))
+if all(x == x(1))
     view = 'yz';
     y = reshape(y,simulation.output.fieldPointsArrayDims);
     z = reshape(z,simulation.output.fieldPointsArrayDims);
-elseif all(y==y(1))
+elseif all(y == y(1))
     view = 'xz';
     x = reshape(x,simulation.output.fieldPointsArrayDims);
     z = reshape(z,simulation.output.fieldPointsArrayDims);
-elseif all(z==z(1))
+elseif all(z == z(1))
     view = 'xy';
     x = reshape(x,simulation.output.fieldPointsArrayDims);
     y = reshape(y,simulation.output.fieldPointsArrayDims);
-end   
+end
 
 switch lower(component)
     case 'real ex'
-        fld = reshape(gather(real(E(:,1))),simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,1))), ...
+                      simulation.output.fieldPointsArrayDims);
     case 'real ey'
-        fld = reshape(gather(real(E(:,2))),simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,2))), ...
+                      simulation.output.fieldPointsArrayDims);
     case 'real ez'
-        fld = reshape(gather(real(E(:,3))),simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,3))), ...
+                      simulation.output.fieldPointsArrayDims);
     case 'abs e'
-        fld = reshape(gather(sqrt(abs(E(:,1)).^2 + abs(E(:,2)).^2 + abs(E(:,3)).^2)),simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(sqrt(abs(E(:,1)).^2+abs(E(:,2)).^2+abs(E(:,3)).^2)), ...
+                      simulation.output.fieldPointsArrayDims);
 end
 
 if isempty(varargin)
@@ -109,34 +112,50 @@ switch view
         imagesc(x(1,:),y(:,1),fld)
         xlabel('x')
         ylabel('y')
-        [~,idx]=sort(positionArray(:,3));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),3)-z(1)>plotDepthInterval(1) && positionArray(idx(jS),3)-z(1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
+        [~,idx] = sort(positionArray(:,3));
+        for jS = 1:length(positionArray(:,1))
+            if positionArray(idx(jS),3)-z(1) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),3)-z(1) < plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor','none', ...
+                    'EdgeColor',[1,1,1])
             end
         end
     case 'xz'
         imagesc(x(1,:),z(:,1),fld)
         xlabel('x')
         ylabel('z')
-        [~,idx]=sort(positionArray(:,2));
+        [~,idx] = sort(positionArray(:,2));
         for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),2)>plotDepthInterval(1) && positionArray(idx(jS),2)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
+            if positionArray(idx(jS),2) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),2) < plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor','none', ...
+                    'EdgeColor',[1,1,1])
             end
         end
     case 'yz'
         imagesc(y(1,:),z(:,1),fld)
         xlabel('y')
         ylabel('z')
-        [~,idx]=sort(positionArray(:,1));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),1)>plotDepthInterval(1) && positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor','none','EdgeColor',[1,1,1])
+        [~,idx] = sort(positionArray(:,1));
+        for jS = 1:length(positionArray(:,1))
+            if positionArray(idx(jS),1) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),1) < plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor','none', ...
+                    'EdgeColor',[1,1,1])
             end
         end
 end
-ax.DataAspectRatio=[1,1,1];
+ax.DataAspectRatio = [1,1,1];
 axis tight
 title([fieldType,', ',component])
 hold(ax,'off')
+end

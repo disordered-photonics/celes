@@ -28,7 +28,7 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Display convergence status to console
 %>
 %> @param msg (string): Previous convergence message
@@ -36,10 +36,8 @@
 %> @param resid (float): Residual
 %>
 %> @retval msg (string): convergence message displayed to screen
-%======================================================================
+%===============================================================================
 function msg = convergence_message(msg, iternum, resid)
-
-% fprintf(repmat('\b', [1, length(msg)]));
 
 try
     oldnow = datevec(msg(1:19));
@@ -48,7 +46,8 @@ catch
     itertime = '-';
 end
 
-msg = sprintf('%19s %6s %8s %12s', datestr(now,'yyyy-mm-dd HH:MM:SS'), itertime, num2str(iternum,'%g'), num2str(resid,'%1.2e'));
+msg = sprintf('%19s %6s %8s %12s', datestr(now,'yyyy-mm-dd HH:MM:SS'), ...
+              itertime, num2str(iternum,'%g'), num2str(resid,'%1.2e'));
 fprintf('%s\n', msg);
 
 end

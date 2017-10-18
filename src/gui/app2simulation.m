@@ -28,12 +28,11 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Generate a celes_simulation object from a model wizard app
-%> object
+%===============================================================================
+%> @brief Generate a celes_simulation object from a model wizard app object
 %>
 %> @param       app (model_wizard application object)
-%======================================================================
+%===============================================================================
 function simulation = app2simulation(app)
 
 simulation = celes_simulation;
@@ -103,4 +102,5 @@ if app.FieldEvaluationCheckBox.Value
             simulation.output.fieldPoints=[dim1(:),dim2(:),dim3(:)];
     end
     simulation.output.fieldPointsArrayDims = sz;
+end
 end

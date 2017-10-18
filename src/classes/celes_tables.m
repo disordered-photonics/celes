@@ -29,43 +29,43 @@
 %  POSSIBILITY OF SUCH DAMAGE.
 
 %> @file celes_tables.m
-% ======================================================================
+% ==============================================================================
 %> @brief Objects of this class hold large tables of interim results
-% ======================================================================
+% ==============================================================================
 
 classdef celes_tables
 
     properties
         %> a table of coefficients needed for the SVWF translation
         translationTable
-        
+
         %> T-matrix of the spheres
         mieCoefficients
-        
+
         %> index array to map T-matrices to particles
         singleUniqueArrayIndex
-        
+
         %> coefficients of the regular SVWF expansion of the initial
-        %> excitation 
+        %> excitation
         initialFieldCoefficients
-        
+
         %> coefficients of the outgoing SVWF expansion of the scattered
-        %> field 
+        %> field
         scatteredFieldCoefficients
     end
-    
+
     properties (Dependent)
         %> right hand side T*aI of linear system M*b=T*aI
         rightHandSide
     end
-    
+
     methods
         % ======================================================================
         %> @brief Get method for rightHandSide
         % ======================================================================
         function TaI = get.rightHandSide(obj)
-            TaI = obj.mieCoefficients(obj.singleUniqueArrayIndex,:).*obj.initialFieldCoefficients;
+            TaI = obj.mieCoefficients(obj.singleUniqueArrayIndex,:).* ...
+                  obj.initialFieldCoefficients;
         end
     end
 end
-

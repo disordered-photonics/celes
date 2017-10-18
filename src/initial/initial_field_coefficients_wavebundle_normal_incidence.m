@@ -28,16 +28,16 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Expansion coefficients of a Gaussian beam under normal incidence 
-%> as the initial field in terms of regular spherical vector wave functions
-%> relative to the particles centers
+%===============================================================================
+%> @brief Expansion coefficients of a Gaussian beam under normal incidence as
+%>        the initial field in terms of regular spherical vector wave functions
+%>        relative to the particles centers
 %>
 %> @param simulation (celes_simulation)
 %>
-%> @retval aI (device_array (cpu or gpu) of dimension NS x nmax, single
-%> precision )
-%======================================================================
+%> @retval aI (device_array (CPU or GPU) of dimension NS x nmax, single
+%>         precision)
+%===============================================================================
 function aI = initial_field_coefficients_wavebundle_normal_incidence(simulation)
 
 %--------------------------------------------------------------------------
@@ -80,8 +80,9 @@ gaussfacSincos = gaussfac.*cb.*sb;
 [pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
-relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray,-simulation.input.initialField.focalPoint);
-rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2);  % NS x 1
+relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray, ...
+                                        -simulation.input.initialField.focalPoint);
+rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2); % NS x 1
 phiGi = atan2(relativeParticlePositions(:,2),relativeParticlePositions(:,1)); % NS x 1
 zGi = relativeParticlePositions(:,3); % NS x 1
 
@@ -100,17 +101,18 @@ for m=-lmax:lmax
     for tau=1:2
         for l=max(1,abs(m)):lmax
             n=multi2single_index(1,tau,l,m,lmax);
-            
+
             gaussSincosBDag1 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,1,'dagger'); % Nk x 1
             gaussSincosBDag2 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,2,'dagger'); % Nk x 1
-            
+
             intgr1a = eikzI1(:,2:end) * (gaussSincosBDag1(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
             intgr1b = eikzI1(:,1:(end-1)) * (gaussSincosBDag1(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-            
+
             intgr2a = eikzI2(:,2:end) * (gaussSincosBDag2(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
             intgr2b = eikzI2(:,1:(end-1)) * (gaussSincosBDag2(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-                        
+
             aI(:,n) = prefac * (intgr1a + intgr1b + intgr2a + intgr2b) /2 ; % trapezoidal rule
         end
     end
+end
 end

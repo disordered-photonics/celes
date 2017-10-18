@@ -31,7 +31,7 @@
 % The M-files have been created using MATLAB Version 4.0 and have been
 % written and checked for use on The Student Edition of MATLAB, 1992."
 
-%======================================================================
+%===============================================================================
 %> @brief Customized BiCGStab algorithm to allow for live monitoring of
 %> convergence progress.
 %>
@@ -42,25 +42,25 @@
 %> @param A (function handle): The linear operator to be solved
 %> @param b (float array): Right hand side of linear system
 %> @param tol (float): Convergence tolerance - algorithm stops when 
-%> relative error is smaller than tol
+%>        relative error is smaller than tol
 %> @param max_it (int): Maximal number of iterations
 %> @param Minv (function handle): Preconditioner operator, should be
-%> similar to the inverse of A
+%>        similar to the inverse of A
 %> @param 0 (-): Empty input parameter to make format consistent with
-%> Matlab's built-in bicgstab
+%>        MATLAB's built-in bicgstab
 %> @param x (float array): Initial guess for solution vector
 %>
 %> @retval x (float array): approximate solution of linear system
 %> @retval error (float): residual relative error
 %> @retval iter (int): number of iterations
 %> @retval flag (int): indicates success of algorithm:
-%> 0 = solution found to tolerance
-%> 1 = no convergence given max_it
-%> -1 = breakdown: rho = 0
-%> -2 = breakdown: omega = 0
+%>         0 = solution found to tolerance
+%>         1 = no convergence given max_it
+%>        -1 = breakdown: rho = 0
+%>        -2 = breakdown: omega = 0
 %> @retval convHist (float array): relative error as a function of
-%> iteration half-steps
-%======================================================================
+%>         iteration half-steps
+%===============================================================================
 function [x, error, iter, flag, convhist] = bicgstab_custom(A, b, tol, max_it, Minv, ~,x)
 
 % original header:
@@ -104,13 +104,13 @@ bnrm2 = norm( b );
 if  ( bnrm2 == 0.0 ), bnrm2 = 1.0; end
 r = b - A(x);
 error = norm( r ) / bnrm2;
-if ( error < tol ) return, end
+if ( error < tol ), return, end
 omega  = 1.0;
 r_tld = r;
 for iter = 1:max_it
     rho   = r_tld'*r;
-    if ( rho == 0.0 ) break, end
-    if ( iter > 1 ),
+    if ( rho == 0.0 ), break, end
+    if ( iter > 1 )
         beta  = ( rho/rho_1 )*( alpha1/omega );
         p = r + beta*( p - omega*v );
     else
@@ -121,42 +121,42 @@ for iter = 1:max_it
     alpha1 = rho / ( r_tld'*v );
     s = r - alpha1*v;
     errhalf = norm(s)/bnrm2;
-    
+
     % status output
     msg=convergence_message(msg,iter-0.5, errhalf);
     convhist(end+1)=gather(errhalf);
 
-    if ( errhalf < tol ),                          % early convergence check
+    if ( errhalf < tol )                        % early convergence check
         x = x + alpha1*p_hat;
         break;
     end
     s_hat = Minv(s);
     t = A(s_hat);
     omega = ( t'*s) / ( t'*t );
-    
-    x = x + alpha1*p_hat + omega*s_hat;             % update approximation
-    
+
+    x = x + alpha1*p_hat + omega*s_hat;         % update approximation
+
     r = s - omega*t;
-    error = norm( r ) / bnrm2;                     % check convergence
-    
+    error = norm( r ) / bnrm2;                  % check convergence
+
     % status output
     msg=convergence_message(msg,iter, errhalf);
     convhist(end+1)=gather(error);
-    
+
     if ( error <= tol ), break, end
     if ( omega == 0.0 ), break, end
     rho_1 = rho;
 end
 
-if ( error <= tol || norm(s)/bnrm2 <= tol )      % converged
+if ( error <= tol || norm(s)/bnrm2 <= tol )     % converged
     if ( norm(s)/bnrm2 <= tol )
         error = norm(s) / bnrm2;
     end
     flag =  0;
-elseif ( omega == 0.0 )                          % breakdown
+elseif ( omega == 0.0 )                         % breakdown
     flag = -2;
 elseif ( rho == 0.0 )
     flag = -1;
-else                                              % no convergence
+else                                            % no convergence
     flag = 1;
 end
