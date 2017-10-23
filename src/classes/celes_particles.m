@@ -187,9 +187,7 @@ classdef celes_particles
         %>        computation of Mie coefficients
         % ======================================================================
         function value = get.uniqueRadiusIndexPairs(obj)
-            [radiiMap,indexMap] = meshgrid(obj.radiusArray, ...
-                                           obj.refractiveIndexArray);
-            allPairs = [radiiMap(:) indexMap(:)];
+            allPairs = [obj.radiusArray obj.refractiveIndexArray];
             value = unique(allPairs,'rows');
         end
 
@@ -198,9 +196,7 @@ classdef celes_particles
         %>        matrix multiplication. For calculation of singleUniqueIndex
         % ======================================================================
         function value = get.uniqueSingleRadiusIndexPairs(obj)
-            [radiiMap, indexMap] = meshgrid(obj.radiusArrayIndex, ...
-                                           obj.refractiveIndexArrayIndex);
-            allPairs = [radiiMap(:) indexMap(:)];
+            allPairs = [obj.radiusArrayIndex obj.refractiveIndexArrayIndex];
             value = unique(allPairs,'rows');
         end
 

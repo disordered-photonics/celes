@@ -21,6 +21,9 @@
 ### Removed
 - disperse flag (radii must be specified)
 
+### Fixed
+- performance issue with polydisperse samples @fragkrag
+
 ## [2.0] - 2017-09-22
 ### Added
 - support for polydisperse sphere size and refractive index @fragkrag
