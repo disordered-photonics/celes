@@ -28,9 +28,9 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Map the SVWF coefficients and the sphere number to the
-%> multi-index jmult
+%===============================================================================
+%> @brief Map the SVWF coefficients and the sphere number to the multi-index
+%>        jmult
 %>
 %> @param       jS (int): Particle number
 %> @param       tau (int): SVWF polarization
@@ -38,7 +38,8 @@
 %> @param       m (int): SVWF order (azimuthal quantum number)
 %> @param       lmax (int): SVWF degree cutoff
 %> @retval      jmult(int): multi-index
-%======================================================================
+%===============================================================================
+
 function jmult = multi2single_index(jS,tau,l,m,lmax)
 % jmult = multi2single_index(jS,tau,l,m,lmax)
 %
@@ -53,12 +54,12 @@ function jmult = multi2single_index(jS,tau,l,m,lmax)
 %
 %     jmult   |   jS,tau,l,m
 %    -----------------------
-%         1   |   1,1,1,-1   
-%         2   |   1,1,1,0    
-%         3   |   1,1,1,1    
-%         4   |   1,1,2,-2  
-%         5   |   1,1,2,-1   
-%         .   |    ....      
+%         1   |   1,1,1,-1
+%         2   |   1,1,1,0
+%         3   |   1,1,1,1
+%         4   |   1,1,2,-2
+%         5   |   1,1,2,-1
+%         .   |    ....
 %         .   |   1,1,lmax,lmax
 %         .   |   1,2,1,-1
 %         .   |   1,2,1,0
@@ -69,3 +70,4 @@ function jmult = multi2single_index(jS,tau,l,m,lmax)
 %   jmult_max |   1,2,1,0
 
 jmult = (jS-1)*2*lmax*(lmax+2)+(tau-1)*lmax*(lmax+2)+(l-1)*(l+1)+m+l+1;
+end

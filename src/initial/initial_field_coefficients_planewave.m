@@ -28,16 +28,16 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Expansion coefficients of a plane wave under normal incidence 
-%> as the initial field in terms of regular spherical vector wave functions
-%> relative to the particles centers
+%===============================================================================
+%> @brief Expansion coefficients of a plane wave under normal incidence as the
+%>        initial field in terms of regular spherical vector wave functions
+%>        relative to the particles centers
 %>
 %> @param simulation (celes_simulation)
 %>
-%> @retval aI (device_array (cpu or gpu) of dimension NS x nmax, single
-%> precision)
-%======================================================================
+%> @retval aI (device_array (CPU or GPU) of dimension NS x nmax, single
+%>         precision)
+%===============================================================================
 function aI = initial_field_coefficients_planewave(simulation)
 
 lmax=simulation.numerics.lmax;
@@ -45,14 +45,16 @@ E0 = simulation.input.initialField.amplitude;
 k = simulation.input.k_medium;
 
 beta = simulation.input.initialField.polarAngle;
+cb = cos(beta);
+sb = sin(beta);
 alpha = simulation.input.initialField.azimuthalAngle;
 
 % pi and tau symbols for transformation matrix B_dagger
-[pilm,taulm] = spherical_functions_angular(beta,lmax);  % Nk x 1
+[pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
 relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray,-simulation.input.initialField.focalPoint);
-kvec = k*[sin(beta)*cos(alpha);sin(beta)*sin(alpha);cos(beta)];
+kvec = k*[sb*cos(alpha);sb*sin(alpha);cb];
 eikr = exp(1i*relativeParticlePositions*kvec);
 
 % compute initial field coefficients
@@ -64,4 +66,5 @@ for m=-lmax:lmax
             aI(:,n) = 4 * E0 * exp(-1i*m*alpha) .* eikr .* transformation_coefficients(pilm,taulm,tau,l,m,simulation.input.initialField.pol,'dagger');
         end
     end
+end
 end

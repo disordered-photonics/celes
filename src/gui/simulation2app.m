@@ -28,13 +28,13 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Read simulation parameters from celes_simulation object and
-%> store them in model_wizard app object
+%>        store them in model_wizard app object
 %>
 %> @param       simulation (celes_simulation)
 %> @param       app (model_wizard application object)
-%======================================================================
+%===============================================================================
 function simulation2app(simulation,app)
 
 app.simulation = simulation;
@@ -79,3 +79,4 @@ app.SolverToleranceEditField.Value = simulation.numerics.solver.tolerance;
 app.SolverMaxiterEditField.Value = simulation.numerics.solver.maxIter;
 
 app.FieldEvaluationCheckBox.Value = false;
+end

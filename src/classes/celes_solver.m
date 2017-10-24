@@ -29,45 +29,44 @@
 %  POSSIBILITY OF SUCH DAMAGE.
 
 %> @file celes_solver.m
-% ======================================================================
-%> @brief Solver settings for the master equation 
-%> \f$\sum_{i',n'}M^{ii'}_{nn'} b_{n'}^{i'} = \sum_{n'} T^i_{nn'} a_{\mathrm{in},n'}^i\f$
-% ======================================================================
-
+% ==============================================================================
+%> @brief Solver settings for the master equation
+%>        \f$\sum_{i',n'}M^{ii'}_{nn'} b_{n'}^{i'} = \sum_{n'} T^i_{nn'} a_{\mathrm{in},n'}^i\f$
+% ==============================================================================
 
 classdef celes_solver
 
     properties
         %> solver type, at the moment 'BiCGStab' and 'GMRES' implemented
         type = 'BiCGStab';
-        
-        %> solution tolerance. solver stops when relative error smaller 
-        tolerance=1e-4;
-        
+
+        %> solution tolerance. solver stops when relative error smaller
+        tolerance = 1e-4;
+
         %> maximal number of iterations. solver stops if exceeded
-        maxIter=1000;
-        
+        maxIter = 1000;
+
         %> for type='GMRES': restart parameter
-        restart=10;
-        
-        %> celes_preconditioner object for faster convergency of solver
-        preconditioner=celes_preconditioner;
+        restart = 50;
+
+        %> celes_preconditioner object for faster convergence of solver
+        preconditioner = celes_preconditioner;
     end
-    
+
     properties (Dependent)
     end
-    
+
     methods
-        
+
         % ======================================================================
         %> @brief Run the solver
         %>
         %> @param mmm (function handle): master matrix multiply operator M*
         %> @param rhs (float array): right hand side of linear system
         %> @param Optional: y0 (float array): initial guess for solution vector
-        %> @param Optional: verbose (logical): If true (default), display detailed timing information
-        %> @return y = M\rhs, 
-        %> an approximation to the solution of the linear system
+        %> @param Optional: verbose (logical): If true (default), display
+        %>        detailed timing information
+        %> @return y = M\rhs, an approximation to the solution of the linear system
         % ======================================================================
         function [value,convergenceHistory] = run(obj,mmm,rhs,varargin)
             if isempty(varargin)
@@ -80,13 +79,14 @@ classdef celes_solver
             else
                 verbose = false;
             end
-            
+
             prh = @(x) gather(obj.preconditioner.run(x,verbose));
-            
-            switch obj.type
-                case 'BiCGStab'
-                    [value,~,~,~,convergenceHistory] = bicgstab_custom(mmm,rhs,obj.tolerance,obj.maxIter,prh,[],initial_guess);
-                case 'GMRES'
+
+            switch lower(obj.type)
+                case 'bicgstab'
+                    [value,~,~,~,convergenceHistory] = ...
+                        bicgstab_custom(mmm,rhs,obj.tolerance,obj.maxIter,prh,[],initial_guess);
+                case 'gmres'
                     fh = str2func('gmres');
                     try
                         fetch_and_patch_gmres();
@@ -94,9 +94,9 @@ classdef celes_solver
                     catch
                         warning('using MATLAB default GMRES');
                     end
-                    [value,~,~,~,convergenceHistory] = fh(mmm,rhs,obj.restart,obj.tolerance,obj.maxIter,prh,[],initial_guess);
+                    [value,~,~,~,convergenceHistory] = ...
+                        fh(mmm,rhs,obj.restart,obj.tolerance,obj.maxIter,prh,[],initial_guess);
             end
         end
     end
 end
-

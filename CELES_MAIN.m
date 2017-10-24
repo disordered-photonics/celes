@@ -1,24 +1,23 @@
-% ======================================================================
+% =========================================================================
 %> @brief Run this script to start the simulation
-% ======================================================================
+% =========================================================================
 
 % -------------------------------------------------------------------------
 % do not edit
 % -------------------------------------------------------------------------
 
-% add all folders to the matlab search path
+% add all folders to the MATLAB search path
 addpath(genpath('./src'))
 
-% initialize the celes class instances
-simulation = celes_simulation;
+% initialize the CELES class instances
+simul = celes_simulation;
 particles = celes_particles;
 initialField = celes_initialField;
 input = celes_input;
 numerics = celes_numerics;
 solver = celes_solver;
-preconditioner = celes_preconditioner;
+precond = celes_preconditioner;
 output = celes_output;
-
 
 % -------------------------------------------------------------------------
 % begin of user editable section - specify the simulation parameters here
@@ -38,7 +37,7 @@ particles.refractiveIndexArray = sphere_data(:,5) + 1i*sphere_data(:, 6);
 % positions of particles (in three-column format: x,y,z)
 particles.positionArray = sphere_data(:,1:3);
 
-% polar angle of incoming beam/wave, in radians (for Gaussian beams, 
+% polar angle of incoming beam/wave, in radians (for Gaussian beams,
 % only 0 and pi are currently possible)
 initialField.polarAngle = 0;
 
@@ -51,7 +50,7 @@ initialField.polarization = 'TE';
 % width of beam waist (use 0 or inf for plane wave)
 initialField.beamWidth = 2000;
 
-% focal point 
+% focal point
 initialField.focalPoint = [0,0,0];
 
 % vacuum wavelength (same unit as particle positions and radius)
@@ -67,8 +66,8 @@ numerics.lmax = 3;
 % wavelength)
 numerics.particleDistanceResolution = 1;
 
-% use GPU for various calculations (deactivate if you experience GPU memory 
-% problems - translation operator always runs on gpu, even if false)
+% use GPU for various calculations (deactivate if you experience GPU memory
+% problems - translation operator always runs on GPU, even if false)
 numerics.gpuFlag = true;
 
 % sampling of polar angles in the plane wave patterns (radians array)
@@ -81,27 +80,27 @@ numerics.azimuthalAnglesArray = 0:pi/1e3:2*pi;
 solver.type = 'GMRES';
 
 % relative accuracy (solver stops when achieved)
-solver.tolerance=5e-4;
+solver.tolerance = 5e-4;
 
 % maximal number of iterations (solver stops if exceeded)
-solver.maxIter=1000;
+solver.maxIter = 1000;
 
 % restart parameter (only for GMRES)
-solver.restart=1000;
+solver.restart = 1000;
 
 % type of preconditioner (currently only 'blockdiagonal' and 'none'
 % possible)
-preconditioner.type = 'blockdiagonal';
+precond.type = 'blockdiagonal';
 
 % for blockdiagonal preconditioner: edge size of partitioning cuboids
-preconditioner.partitionEdgeSizes = [1200,1200,1200];
+precond.partitionEdgeSizes = [1200,1200,1200];
 
 % specify the points where to evaluate the electric near field (3-column
 % array x,y,z)
-[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y=x-x;
+[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y = zeros(size(x));
 output.fieldPoints = [x(:),y(:),z(:)];
 
-% dimensions of the array used to restore the original shape of x,y,z 
+% dimensions of the array used to restore the original shape of x,y,z
 % for display of 2d-images
 output.fieldPointsArrayDims = size(x);
 
@@ -116,28 +115,33 @@ output.fieldPointsArrayDims = size(x);
 % combine all parameters to one simulation object
 input.particles = particles;
 input.initialField = initialField;
-solver.preconditioner = preconditioner; 
+solver.preconditioner = precond;
 numerics.solver = solver;
-simulation.input = input;
-simulation.numerics = numerics;
-simulation.tables = celes_tables;
-simulation.output = output;
+simul.input = input;
+simul.numerics = numerics;
+simul.tables = celes_tables;
+simul.output = output;
 
 % compute
-simulation=simulation.run;
-simulation=simulation.evaluatePower;
-simulation=simulation.evaluateFields;
+simul = simul.run;
+simul = simul.evaluatePower;
+simul = simul.evaluateFields;
 
 % display the particle positions
 figure
-plot_spheres(gca,simulation.input.particles.positionArray,simulation.input.particles.radiusArray,simulation.input.particles.refractiveIndexArray,'view xy')
+plot_spheres(gca,simul.input.particles.positionArray, ...
+                 simul.input.particles.radiusArray, ...
+                 simul.input.particles.refractiveIndexArray,'view xy')
 
 % view near field
 figure
-plot_field(gca,simulation,'abs E','Total field',simulation.input.particles.radiusArray)
+plot_field(gca,simul,'abs E','Total field', ...
+               simul.input.particles.radiusArray)
 colormap(jet)
 colorbar
 caxis([0,1.2])
 
-fprintf('transmitted power: %f %%\n',simulation.output.totalFieldForwardPower/simulation.output.initialFieldPower*100)
-fprintf('reflected power: %f %%\n',simulation.output.totalFieldBackwardPower/simulation.output.initialFieldPower*100)
+fprintf('transmitted power: %f %%\n', ...
+    simul.output.totalFieldForwardPower/simul.output.initialFieldPower*100)
+fprintf('reflected power: %f %%\n', ...
+    simul.output.totalFieldBackwardPower/simul.output.initialFieldPower*100)

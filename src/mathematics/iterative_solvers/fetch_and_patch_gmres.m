@@ -28,10 +28,10 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Copies Matlab's gmres.m function to a temporary folder and adds
-%> status output messages to allow for a live monitoring of the convergence
-%======================================================================
+%===============================================================================
+%> @brief Copies MATLAB's gmres.m function to a temporary folder and adds status
+%>        output messages to allow for a live monitoring of the convergence
+%===============================================================================
 function fetch_and_patch_gmres()
 
     out_dir = fullfile(tempdir, 'celes');
@@ -60,7 +60,7 @@ function fetch_and_patch_gmres()
         v(first_part_end_idx:second_part_start_idx), ...
         '        iternum = iternum + 1; msg = convergence_message(msg, iternum, normr/n2b);', newline, ...
         v(second_part_start_idx:end)
-    ];
+            ];
 
     path = fullfile(out_dir, 'gmres_monitor.m');
     fd = fopen(path, 'w');

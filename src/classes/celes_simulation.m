@@ -29,46 +29,47 @@
 %  POSSIBILITY OF SUCH DAMAGE.
 
 %> @file celes_simulation.m
-% ======================================================================
+% ==============================================================================
 %> @brief Central data structure of the celes software
 %
-%> The simulation class contains all input, intermediate results and 
+%> The simulation class contains all input, intermediate results and
 %> output for one calculation.
-% ======================================================================
+% ==============================================================================
 classdef celes_simulation
-    
+
     properties
         %> celes_input object which contains the parameters that specify
         %> the simulation geometry and initial field
         input
-        
+
         %> celes_numerics object which contains the numerical settings
         numerics
-        
+
         %> celes_tables object which contains lookup tables and other
         %> intermediate results
         tables
-        
+
         %> celes_output object which contains the results of the
         %> simulation
         output
-        
     end
-    
+
     properties (Dependent)
         %> single array which contains a grid of distances used for the
-        %> lookup of the spherical hankel function in the particle coupling
+        %> lookup of the spherical Hankel function in the particle coupling
         lookupParticleDistances
     end
-    
+
     methods
         % ======================================================================
         %> @brief get method for dependent property lookupParticleDistances
         % ======================================================================
         function value = get.lookupParticleDistances(obj)
-            value = [0,0:obj.numerics.particleDistanceResolution:(obj.input.particles.maxParticleDistance + 3*obj.numerics.particleDistanceResolution)];  % add two zeros at beginning to allow for interpolation also in first segment
+            value = [0,0:obj.numerics.particleDistanceResolution: ...
+                        (obj.input.particles.maxParticleDistance+ ...
+                       3*obj.numerics.particleDistanceResolution)]; % add two zeros at beginning to allow for interpolation also in first segment
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the Mie coefficients
         %>
@@ -76,15 +77,19 @@ classdef celes_simulation
         % ======================================================================
         function obj = computeMieCoefficients(obj)
             fprintf(1,'compute Mie coefficients ...');
-            switch obj.input.particles.type
+            switch lower(obj.input.particles.type)
                 case 'sphere'
-                    obj.tables.mieCoefficients = zeros(obj.input.particles.numUniquePairs,obj.numerics.nmax,'single');
-                    for u_i=1:obj.input.particles.numUniquePairs
-                        for tau=1:2
-                            for l=1:obj.numerics.lmax
-                                for m=-l:l
+                    obj.tables.mieCoefficients = zeros(obj.input.particles.numUniquePairs, ...
+                                                       obj.numerics.nmax,'single');
+                    for u_i = 1:obj.input.particles.numUniquePairs
+                        for tau = 1:2
+                            for l = 1:obj.numerics.lmax
+                                for m = -l:l
                                     jmult = multi2single_index(1,tau,l,m,obj.numerics.lmax);
-                                    obj.tables.mieCoefficients(u_i,jmult) = T_entry(tau,l,obj.input.k_medium,obj.input.omega*obj.input.particles.uniqueRadiusIndexPairs(u_i,2),obj.input.particles.uniqueRadiusIndexPairs(u_i,1));
+                                    obj.tables.mieCoefficients(u_i,jmult) = ...
+                                        T_entry(tau,l,obj.input.k_medium,obj.input.omega* ...
+                                        obj.input.particles.uniqueRadiusIndexPairs(u_i,2), ...
+                                        obj.input.particles.uniqueRadiusIndexPairs(u_i,1));
                                 end
                             end
                         end
@@ -95,10 +100,10 @@ classdef celes_simulation
             end
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
-        %> @brief Prepare a lookup for the a and b coefficients for
-        %> particle coupling
+        %> @brief Prepare a lookup for the a and b coefficients for particle
+        %>        coupling
         %>
         %> @return celes_simulation object with updated translationTable
         % ======================================================================
@@ -107,11 +112,11 @@ classdef celes_simulation
             obj.tables.translationTable = translation_table_ab(obj.numerics.lmax);
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the initial field coefficients \f$a^S_{0,n}\f$
-        %> of the initial field expansion around each particle:
-        %> \f$\mathbf{E}_0=\sum_n a^S_{0,n}\mathbf{\Psi}^{(1)}_n\f$
+        %>        of the initial field expansion around each particle:
+        %>        \f$\mathbf{E}_0=\sum_n a^S_{0,n}\mathbf{\Psi}^{(1)}_n\f$
         %>
         %> @return celes_simulation object with updated initialFieldCoefficients
         % ======================================================================
@@ -120,7 +125,8 @@ classdef celes_simulation
             if isfinite(obj.input.initialField.beamWidth) && obj.input.initialField.beamWidth
                 fprintf(1,' Gaussian beam ...');
                 if obj.input.initialField.normalIncidence
-                    obj.tables.initialFieldCoefficients = initial_field_coefficients_wavebundle_normal_incidence(obj);
+                    obj.tables.initialFieldCoefficients = ...
+                        initial_field_coefficients_wavebundle_normal_incidence(obj);
                 else
                     error('this case is not implemented')
                 end
@@ -130,7 +136,7 @@ classdef celes_simulation
             end
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the power flux of the initial field
         %>
@@ -145,44 +151,46 @@ classdef celes_simulation
             end
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
-        %> @brief Compute the scattered field coefficients b by iteratively 
-        %> solving the linear system M*b=T*aI
+        %> @brief Compute the scattered field coefficients b by iteratively
+        %>        solving the linear system M*b=T*aI
         %>
-        %> @param Optional: b0, initial guess for scattered field
-        %> coefficients
+        %> @param Optional: b0, initial guess for scattered field coefficients
         %> @return celes_simulation object with updated initialFieldPower
         % ======================================================================
         function obj = computeScatteredFieldCoefficients(obj,varargin)
             fprintf(1,'compute scattered field coefficients ...\n');
             mmm = @(x) obj.masterMatrixMultiply(x);
+            fprintf(1,'time                 dt[s]    #iter     residual\n');
+            fprintf(1,'------------------------------------------------\n');
             [b,convHist] = obj.numerics.solver.run(mmm,obj.tables.rightHandSide(:),varargin{:});
             obj.tables.scatteredFieldCoefficients = reshape(gather(b),size(obj.tables.rightHandSide));
             obj.output.convergenceHistory = convHist;
         end
-        
+
         % ======================================================================
         %> @brief Compute the plane wave pattern of the scattered field
-        %> (i.e., the expansion coefficients of the scattered field in plane
-        %> vector wave functions)
+        %>        (i.e., the expansion coefficients of the scattered field in
+        %>        plane vector wave functions)
         %>
         %> @return celes_simulation object with updated
-        %> output.scatteredFieldPlaneWavePattern
+        %>         output.scatteredFieldPlaneWavePattern
         % ======================================================================
         function obj = computeScatteredFieldPWP(obj)
             fprintf(1,'compute scattered field plane wave pattern: ');
-            obj.output.scatteredFieldPlaneWavePattern = scattered_field_plane_wave_pattern(obj);
+            obj.output.scatteredFieldPlaneWavePattern = ...
+                                        scattered_field_plane_wave_pattern(obj);
             fprintf(1,' ... done\n');
         end
-        
+
         % ======================================================================
         %> @brief Compute the plane wave pattern of the total field
-        %> (i.e., the expansion coefficients of the scattered field in plane
-        %> vector wave functions)
+        %>        (i.e., the expansion coefficients of the scattered field in
+        %>        plane vector wave functions)
         %>
         %> @return celes_simulation object with updated
-        %> output.totalFieldPlaneWavePattern
+        %>         output.totalFieldPlaneWavePattern
         % ======================================================================
         function obj = computeTotalFieldPWP(obj)
             fprintf(1,'compute total field coefficients table ...');
@@ -191,32 +199,39 @@ classdef celes_simulation
             pwpIn = initial_field_plane_wave_pattern(obj);
             for pol=1:2
                 obj.output.totalFieldPlaneWavePattern{pol} = pwpScat{pol};
-                obj.output.totalFieldPlaneWavePattern{pol} = obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpIn{pol});
+                obj.output.totalFieldPlaneWavePattern{pol} = ...
+                   obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpIn{pol});
             end
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
         %> @brief Evaluate the power flux of the total field, both in
-        %> forward and in backward direction
+        %>        forward and in backward direction
         %>
         %> @return celes_simulation object with updated
-        %> output.totalFieldForwardPower and output.totalFieldBackwardPower
+        %>         output.totalFieldForwardPower and
+        %>         output.totalFieldBackwardPower
         % ======================================================================
         function obj = computeTotalFieldPower(obj)
             fprintf(1,'compute total field power ...');
-            obj.output.totalFieldForwardPower = gather(pwp_power_flux(obj.output.totalFieldPlaneWavePattern{1},obj,'forward') + pwp_power_flux(obj.output.totalFieldPlaneWavePattern{2},obj,'forward'));
-            obj.output.totalFieldBackwardPower = gather(pwp_power_flux(obj.output.totalFieldPlaneWavePattern{1},obj,'backward') + pwp_power_flux(obj.output.totalFieldPlaneWavePattern{2},obj,'backward'));
+            obj.output.totalFieldForwardPower = ...
+                gather(pwp_power_flux(obj.output.totalFieldPlaneWavePattern{1},obj,'forward')+ ...
+                       pwp_power_flux(obj.output.totalFieldPlaneWavePattern{2},obj,'forward'));
+            obj.output.totalFieldBackwardPower = ...
+                gather(pwp_power_flux(obj.output.totalFieldPlaneWavePattern{1},obj,'backward')+ ...
+                       pwp_power_flux(obj.output.totalFieldPlaneWavePattern{2},obj,'backward'));
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
         %> @brief First prepare the scattered and total field's plane wave
-        %> pattern, then evaluate the power flux
+        %>        pattern, then evaluate the power flux
         %>
         %> @return celes_simulation object with updated
-        %> scatteredFieldPlaneWavePattern, totalFieldPlaneWavePattern,
-        %> output.totalFieldForwardPower and output.totalFieldBackwardPower
+        %>         scatteredFieldPlaneWavePattern, totalFieldPlaneWavePattern,
+        %>         output.totalFieldForwardPower and
+        %>         output.totalFieldBackwardPower
         % ======================================================================
         function obj = evaluatePower(obj)
             tpow = tic;
@@ -226,53 +241,50 @@ classdef celes_simulation
             obj.output.powerEvaluationTime = toc(tpow);
             fprintf(1,'power flux evaluated in %.1f seconds.\n',obj.output.powerEvaluationTime);
         end
-        
+
         % ======================================================================
-        %> @brief Evaluate the initial (near)field at the positions 
-        %> specified in the input. The field can then be plotted.
+        %> @brief Evaluate the initial (near)field at the positions
+        %>        specified in the input. The field can then be plotted.
         %>
-        %> @return celes_simulation object with updated 
-        %> output.InitialField
+        %> @return celes_simulation object with updated output.InitialField
         % ======================================================================
         function obj = evaluateInitialField(obj)
             fprintf(1,'evaluate initial field ...');
             obj.output.initialField = compute_initial_field(obj);
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
-        %> @brief Evaluate the scattered (near)field at the positions 
-        %> specified in the input. The field can then be plotted.
+        %> @brief Evaluate the scattered (near)field at the positions
+        %>        specified in the input. The field can then be plotted.
         %>
-        %> @return celes_simulation object with updated 
-        %> output.scatteredField
+        %> @return celes_simulation object with updated output.scatteredField
         % ======================================================================
         function obj = evaluateScatteredField(obj)
             fprintf(1,'evaluate scattered field ...');
             obj.output.scatteredField = compute_scattered_field(obj);
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
-        %> @brief Evaluate the internal (near)field at the positions 
-        %> specified in the input. The field can then be plotted.
+        %> @brief Evaluate the internal (near)field at the positions
+        %>        specified in the input. The field can then be plotted.
         %>
-        %> @return celes_simulation object with updated 
-        %> output.internalField
+        %> @return celes_simulation object with updated output.internalField
         % ======================================================================
         function obj = evaluateInternalField(obj)
             fprintf(1,'evaluate internal field ...');
             [obj.output.internalField,obj.output.internalIndices] = compute_internal_field(obj);
             fprintf(1,' done\n');
         end
-        
+
         % ======================================================================
-        %> @brief Evaluate both the initial and the scattered (near)field 
-        %> at the positions specified in the input. The field can then be
-        %> plotted.
+        %> @brief Evaluate both the initial and the scattered (near)field
+        %>        at the positions specified in the input. The field can then be
+        %>        plotted.
         %>
-        %> @return celes_simulation object with updated 
-        %> output.initialField and output.scatteredField
+        %> @return celes_simulation object with updated output.initialField and
+        %>         output.scatteredField
         % ======================================================================
         function obj = evaluateFields(obj)
             tfld = tic;
@@ -282,43 +294,44 @@ classdef celes_simulation
             obj.output.fieldEvaluationTime = toc(tfld);
             fprintf(1,'fields evaluated in %.1f seconds.\n',obj.output.fieldEvaluationTime);
         end
-        
+
         % ======================================================================
         %> @brief Multiply the master matrix M=1-T*W to some vector x
         %>
         %> @param Vector x of incoming field SVWF coefficients
-        %> @param verbose (logical, optional): If true (default), display detailed timing information
+        %> @param verbose (logical, optional): If true (default), display
+        %>        detailed timing information
         %> @return Vector M*x
         % ======================================================================
         function Mx = masterMatrixMultiply(obj,value,varargin)
-            value=value(:);
-            
+            value = value(:);
+
             if isempty(varargin)
-                verbose=false;
+                verbose = false;
             else
-                verbose=varargin{1};
+                verbose = varargin{1};
             end
-            
-            Wx=coupling_matrix_multiply(obj,value,varargin{:});
-            
+
+            Wx = coupling_matrix_multiply(obj,value,varargin{:});
+
             if verbose
                 fprintf('apply T-matrix ... ')
             end
             t_matrix_timer = tic;
-            
-            Wx=reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
+
+            Wx = reshape(Wx,obj.input.particles.number,obj.numerics.nmax);
             TWx = obj.tables.mieCoefficients(obj.input.particles.singleUniqueArrayIndex,:).*Wx;
             Mx = gather(value - TWx(:));
-            
+
             t_matrix_time = toc(t_matrix_timer);
             if verbose
                 fprintf(' done in %f seconds.\n', t_matrix_time)
             end
         end
-        
+
         % ======================================================================
         %> @brief Run the simulation.
-        %> 
+        %>
         %> A simulation run includes:
         %> - computation of initial field power
         %> - computation of Mie coefficients
@@ -329,15 +342,15 @@ classdef celes_simulation
         %> - preparation of the blockdiagonal preconditioner (if active)
         %> - computation of initial field coefficients
         %> - solution of linear system
-        %> 
+        %>
         %> @param Optional: Initial guess b0 for the scattered field
-        %> coefficients vector b
+        %>        coefficients vector b
         %> @return celes_simulation object with various fields updated
         % ======================================================================
         function obj = run(obj,varargin)
             print_logo
             print_parameters(obj)
-            tcomp=tic;
+            tcomp = tic;
             cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
@@ -346,20 +359,24 @@ classdef celes_simulation
             fprintf(1,'compute maximal particle distance ...');
             obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
             fprintf(1,' done\n');
-            tprec=tic;
-            if strcmp(obj.numerics.solver.preconditioner.type,'blockdiagonal')
+            if strcmpi(obj.numerics.solver.preconditioner.type,'blockdiagonal')
+                tprec = tic;
                 fprintf(1,'make particle partition ...');
-                partitioning = make_particle_partion(obj.input.particles.positionArray,obj.numerics.solver.preconditioner.partitionEdgeSizes);
+                partitioning = ...
+                    make_particle_partion(obj.input.particles.positionArray, ...
+                                          obj.numerics.solver.preconditioner.partitionEdgeSizes);
                 obj.numerics.solver.preconditioner.partitioning = partitioning;
                 fprintf(1,' done\n');
                 obj = obj.numerics.solver.preconditioner.prepare(obj);
+                obj.output.preconiditionerPreparationTime = toc(tprec);
+                fprintf(1,'preconditioner prepared in %.1f seconds.\n', ...
+                        obj.output.preconiditionerPreparationTime);
             end
-            obj.output.preconiditionerPreparationTime = toc(tprec);
-            fprintf(1,'preconditioner prepared in %.1f seconds.\n',obj.output.preconiditionerPreparationTime);
-            tsolv=tic;
+            tsolv = tic;
             obj = obj.computeInitialFieldCoefficients;
             obj = obj.computeScatteredFieldCoefficients(varargin{:});
             obj.output.solverTime = toc(tsolv);
+            fprintf(1,'------------------------------------------------\n');
             fprintf(1,'solver terminated in %.1f seconds.\n',obj.output.solverTime);
             obj.numerics.solver.preconditioner.factorizedMasterMatrices = []; % clear memory intensive fields
             obj.numerics.solver.preconditioner.masterMatrices = [];

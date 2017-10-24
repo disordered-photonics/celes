@@ -28,16 +28,16 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
-%> @brief Expansion coefficients of a Gaussian beam under normal incidence 
-%> as the initial field in terms of regular spherical vector wave functions
-%> relative to the particles centers
+%===============================================================================
+%> @brief Expansion coefficients of a Gaussian beam under normal incidence as
+%>        the initial field in terms of regular spherical vector wave functions
+%>        relative to the particles centers
 %>
 %> @param simulation (celes_simulation)
 %>
-%> @retval aI (device_array (cpu or gpu) of dimension NS x nmax, single
-%> precision )
-%======================================================================
+%> @retval aI (device_array (CPU or GPU) of dimension NS x nmax, single
+%>         precision)
+%===============================================================================
 function aI = initial_field_coefficients_wavebundle_normal_incidence(simulation)
 
 %--------------------------------------------------------------------------
@@ -57,10 +57,10 @@ E0 = simulation.input.initialField.amplitude;
 k = simulation.input.k_medium;
 w = simulation.input.initialField.beamWidth;
 prefac = E0*k^2*w^2/pi;
-switch simulation.input.initialField.polarization
-    case 'TE'
+switch lower(simulation.input.initialField.polarization)
+    case 'te'
         alphaG = simulation.input.initialField.azimuthalAngle;
-    case 'TM'
+    case 'tm'
         alphaG = simulation.input.initialField.azimuthalAngle-pi/2;
 end
 
@@ -68,28 +68,30 @@ end
 fullBetaArray = simulation.numerics.polarAnglesArray(:);
 directionIdcs = ( sign(cos(fullBetaArray)) == sign(cos(simulation.input.initialField.polarAngle)) );
 betaArray = fullBetaArray(directionIdcs);
-dBeta = betaArray(2:end)-betaArray(1:(end-1));
-sincos = sin(betaArray).*cos(betaArray);
+dBeta = diff(betaArray);
+cb = cos(betaArray);
+sb = sin(betaArray);
 
 % gauss factor
-gaussfac = exp(-w^2/4*k^2*sin(betaArray).^2);   % Nk x 1
-gaussfacSincos = gaussfac .* sincos;
+gaussfac = exp(-w^2/4*k^2*sb.^2);   % Nk x 1
+gaussfacSincos = gaussfac.*cb.*sb;
 
 % pi and tau symbols for transformation matrix B_dagger
-[pilm,taulm] = spherical_functions_angular(betaArray,lmax);  % Nk x 1
+[pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
-relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray,-simulation.input.initialField.focalPoint);
-rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2);  % NS x 1
+relativeParticlePositions = bsxfun(@plus,simulation.input.particles.positionArray, ...
+                                        -simulation.input.initialField.focalPoint);
+rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2); % NS x 1
 phiGi = atan2(relativeParticlePositions(:,2),relativeParticlePositions(:,1)); % NS x 1
 zGi = relativeParticlePositions(:,3); % NS x 1
 
 % compute initial field coefficients
 aI = simulation.numerics.deviceArray(zeros(simulation.input.particles.number,simulation.numerics.nmax,'single'));
-eikz = exp(1i*zGi*k*cos(betaArray.')); % NS x Nk
+eikz = exp(1i*zGi*k*cb.'); % NS x Nk
 for m=-lmax:lmax
-    eikzJmp1 = eikz .* besselj(abs(m+1),rhoGi*k*sin(betaArray.')); % NS x Nk
-    eikzJmm1 = eikz .* besselj(abs(m-1),rhoGi*k*sin(betaArray.')); % NS x Nk
+    eikzJmp1 = eikz .* besselj(abs(m+1),rhoGi*k*sb.'); % NS x Nk
+    eikzJmm1 = eikz .* besselj(abs(m-1),rhoGi*k*sb.'); % NS x Nk
     eimp1phi = exp(-1i*(m+1)*phiGi); % NS x 1
     eimm1phi = exp(-1i*(m-1)*phiGi); % NS x 1
     plTerm = exp(1i*alphaG)*1i^abs(m+1)*bsxfun(@times,eimp1phi,eikzJmp1);
@@ -99,17 +101,18 @@ for m=-lmax:lmax
     for tau=1:2
         for l=max(1,abs(m)):lmax
             n=multi2single_index(1,tau,l,m,lmax);
-            
+
             gaussSincosBDag1 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,1,'dagger'); % Nk x 1
             gaussSincosBDag2 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,2,'dagger'); % Nk x 1
-            
+
             intgr1a = eikzI1(:,2:end) * (gaussSincosBDag1(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
             intgr1b = eikzI1(:,1:(end-1)) * (gaussSincosBDag1(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-            
+
             intgr2a = eikzI2(:,2:end) * (gaussSincosBDag2(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
             intgr2b = eikzI2(:,1:(end-1)) * (gaussSincosBDag2(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-                        
+
             aI(:,n) = prefac * (intgr1a + intgr1b + intgr2a + intgr2b) /2 ; % trapezoidal rule
         end
     end
+end
 end

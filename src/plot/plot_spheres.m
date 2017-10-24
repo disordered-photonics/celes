@@ -28,26 +28,25 @@
 %  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 %  POSSIBILITY OF SUCH DAMAGE.
 
-%======================================================================
+%===============================================================================
 %> @brief Add circles representing the sphere positions to some axes object
 %>
-%> @param       ax (axes object): axes to plot in
+%> @param   ax (axes object): axes to plot in
 %>
-%> @param       positionArray (Nx3 float array): particle positions [x,y,z]
+%> @param   positionArray (Nx3 float array): particle positions [x,y,z]
 %>
-%> @param       radiusArray (1xN float array): particle radius array
+%> @param   radiusArray (1xN float array): particle radius array
 %>
-%> @param       view (string): select 'view xy','view yz' or 'view xz'
+%> @param   refractiveIndexArray (1xN float array): particle refractive index array
 %>
-%> @param       fieldType (string): select 'Total field', 'Scattered field'
-%>              or 'Initial field'
+%> @param   view (string): select 'view xy','view yz' or 'view xz'
 %>
-%> @param       Optional: plotDepthInterval (2x1 float array): from where to where
-%>              include spheres in the plot? Example: if the field points
-%>              are all located in the xy-plane, potDepthInterval=[-200,200]
-%>              will plot all spheres with a center z-coordinate in that
-%>              interval
-%======================================================================
+%> @param   Optional: plotDepthInterval (2x1 float array): from where to where
+%>          include spheres in the plot? Example: if the field points
+%>          are all located in the xy-plane, potDepthInterval=[-200,200]
+%>          will plot all spheres with a center z-coordinate in that
+%>          interval
+%===============================================================================
 function plot_spheres(ax,positionArray,radiusArray,refractiveIndexArray,view,varargin)
 
 % normalize to 1
@@ -63,33 +62,52 @@ hold(ax,'on')
 
 switch view
     case 'view xy'
-        [~,idx]=sort(positionArray(:,3));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),3)>plotDepthInterval(1) && positionArray(idx(jS),3)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
+        [~,idx] = sort(positionArray(:,3));
+        for jS = 1:length(positionArray(:,1))
+            if positionArray(idx(jS),3) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),3) < plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position', [positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
-        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,2))-3*max(radiusArray) , max(positionArray(:,2))+3*max(radiusArray)];
+        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray), ...
+                   max(positionArray(:,1))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,2))-3*max(radiusArray), ...
+                   max(positionArray(:,2))+3*max(radiusArray)];
     case 'view xz'
-        [~,idx]=sort(positionArray(:,2));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),2)>plotDepthInterval(1) && positionArray(idx(jS),2)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
+        [~,idx] = sort(positionArray(:,2));
+        for jS = 1:length(positionArray(:,1))
+            if positionArray(idx(jS),2) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),2) < plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
-        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray) , max(positionArray(:,1))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray) , max(positionArray(:,3))+3*max(radiusArray)];
+        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray), ...
+                   max(positionArray(:,1))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray), ...
+                   max(positionArray(:,3))+3*max(radiusArray)];
     case 'view yz'
-        [~,idx]=sort(positionArray(:,1));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),1)>plotDepthInterval(1) && positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax,'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)],'Curvature',[1 1],'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
+        [~,idx] = sort(positionArray(:,1));
+        for jS = 1:length(positionArray(:,1))
+            if positionArray(idx(jS),1) > plotDepthInterval(1) && ...
+               positionArray(idx(jS),1)<plotDepthInterval(2)
+                rectangle(ax, ...
+                    'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
+                    'Curvature',[1 1], ...
+                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
             end
         end
-        ax.XLim = [min(positionArray(:,2))-3*max(radiusArray) , max(positionArray(:,2))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray) , max(positionArray(:,3))+3*max(radiusArray)];
+        ax.XLim = [min(positionArray(:,2))-3*max(radiusArray), ...
+                   max(positionArray(:,2))+3*max(radiusArray)];
+        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray), ...
+                   max(positionArray(:,3))+3*max(radiusArray)];
 end
 ax.DataAspectRatio=[1,1,1];
 
 hold(ax,'off')
+end
