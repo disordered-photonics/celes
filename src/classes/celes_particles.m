@@ -33,7 +33,7 @@
 %> @brief Parameters that specify the particle aggregate
 % ==============================================================================
 
-classdef celes_particles
+classdef celes_particles < matlab.System
 
     properties
         %> particle type, so far only 'sphere' implemented
@@ -47,12 +47,9 @@ classdef celes_particles
 
         %> radii of the particles
         radiusArray
-
-        %> maximal distance between two particles
-        maxParticleDistance
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> number of particles
         number
 
@@ -94,164 +91,74 @@ classdef celes_particles
         %> singleUniqueIndexMap in terms of indices given by singleUniqueIndex
         %> serves as a lookup table for matrix multiplication
         singleUniqueArrayIndex
+
+        %> maximal distance between two particles
+        maxParticleDistance
     end
 
     methods
         % ======================================================================
-        %> @brief Set method for type
+        %> @brief Class constructor
         % ======================================================================
-        function obj = set.type(obj,value)
-            switch lower(value)
-                case 'sphere'
-                    obj.type = value;
-                otherwise
-                    error('this particle type is at the moment not implemented')
-            end
+        function obj = celes_particles(varargin)
+            setProperties(obj,nargin,varargin{:});
+            obj.number = size(obj.positionArray,1);
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
         end
 
         % ======================================================================
-        %> @brief Set method for positionArray
+        %> @brief Compute unique values of refractive indices
         % ======================================================================
-        function obj = set.positionArray(obj,value)
-            if length(value(1,:))==3
-                obj.positionArray = single(value);
-            else
-                error('illegal position array')
-            end
+        function computeUniqueRefractiveIndices(obj)
+            obj.uniqueRefractiveIndices = unique(obj.refractiveIndexArray);
+            obj.numUniqueRefractiveIndices = length(obj.uniqueRefractiveIndices);
+            obj.refractiveIndexArrayIndex = dsearchn(obj.uniqueRefractiveIndices, ...
+                                                     obj.refractiveIndexArray);
         end
 
         % ======================================================================
-        %> @brief Set method for refractive index
+        %> @brief Compute unique values of sphere radii
         % ======================================================================
-        function obj = set.refractiveIndexArray(obj,value)
-            obj.refractiveIndexArray = single(value(:));
+        function computeUniqueRadii(obj)
+            obj.uniqueRadii = unique(obj.radiusArray);
+            obj.numUniqueRadii = length(obj.radiusArray);
+            obj.radiusArrayIndex = dsearchn(obj.uniqueRadii, obj.radiusArray);
         end
 
         % ======================================================================
-        %> @brief Get method for unique refractive index values, returns ordered
-        %>        vector of unique refractive indices
+        %> @brief Compute unique combinations of radii and refractive indices
         % ======================================================================
-        function value = get.uniqueRefractiveIndices(obj)
-            value = unique(obj.refractiveIndexArray);
+        function computeUniqueRadiiIndexPairs(obj)
+            obj.uniqueRadiusIndexPairs = ...
+                unique([obj.radiusArray, obj.refractiveIndexArray],'rows');
+            obj.uniqueSingleRadiusIndexPairs = ...
+                unique([obj.radiusArrayIndex, obj.refractiveIndexArrayIndex],'rows');
+            obj.radiusArrayIndex = dsearchn(obj.uniqueRadii, obj.radiusArray);
         end
 
         % ======================================================================
-        %> @brief Get method for the number of unique refractive indices
+        %> @brief Compute single unique index
         % ======================================================================
-        function value = get.numUniqueRefractiveIndices(obj)
-            value = length(unique(obj.refractiveIndexArray));
-        end
-
-        % ======================================================================
-        %> @brief Get method for refractive index array in terms of indices
-        %>        given by uniqueRefractiveIndices, sorted smallest to largest
-        % ======================================================================
-        function value = get.refractiveIndexArrayIndex(obj)
-            value = dsearchn(obj.uniqueRefractiveIndices, ...
-                             obj.refractiveIndexArray);
-        end
-
-        % ======================================================================
-        %> @brief Set method for radiusArray
-        %>        added floor to guarantee validity of pairing function
-        % ======================================================================
-        function obj = set.radiusArray(obj,value)
-            obj.radiusArray = single(value(:));
-        end
-
-        % ======================================================================
-        %> @brief Get method for unique radii values, returns ordered vector of
-        %>        unique radii
-        % ======================================================================
-        function value = get.uniqueRadii(obj)
-            value = unique(obj.radiusArray);
-        end
-
-        % ======================================================================
-        %> @brief Get method for the number of unique radii
-        % ======================================================================
-        function value = get.numUniqueRadii(obj)
-            value = length(unique(obj.radiusArray));
-        end
-
-        % ======================================================================
-        %> @brief Get method for radius array in terms of indices given by
-        %>        uniqueRadii, sorted smallest to largest
-        % ======================================================================
-        function value = get.radiusArrayIndex(obj)
-            value = dsearchn(obj.uniqueRadii,obj.radiusArray);
-        end
-
-        % ======================================================================
-        %> @brief Get method to get unique pairs of radii and indices for
-        %>        computation of Mie coefficients
-        % ======================================================================
-        function value = get.uniqueRadiusIndexPairs(obj)
-            allPairs = [obj.radiusArray obj.refractiveIndexArray];
-            value = unique(allPairs,'rows');
-        end
-
-        % ======================================================================
-        %> @brief Get method to get unique pairs of radii and indices for
-        %>        matrix multiplication. For calculation of singleUniqueIndex
-        % ======================================================================
-        function value = get.uniqueSingleRadiusIndexPairs(obj)
-            allPairs = [obj.radiusArrayIndex obj.refractiveIndexArrayIndex];
-            value = unique(allPairs,'rows');
-        end
-
-        % ======================================================================
-        %> @brief Get method for creating a single index encompassing unique
-        %>        pair indices combined by pairing function:
-        %>        p(rad,index) := 1/2(rad+index)(rad+index+1)+index
-        % ======================================================================
-        function value = get.singleUniqueIndex(obj)
-            value = 1/2*(obj.uniqueSingleRadiusIndexPairs(:,1)+ ...
-                         obj.uniqueSingleRadiusIndexPairs(:,2)).* ...
-                        (obj.uniqueSingleRadiusIndexPairs(:,1)+ ...
-                         obj.uniqueSingleRadiusIndexPairs(:,2)+1)+ ...
-                         obj.uniqueSingleRadiusIndexPairs(:,2);
-        end
-
-        % ======================================================================
-        %> @brief Get method for a map of particles indexed by singleUniqueIndex
-        %>        combined by pairing function:
-        %>        p(rad,index) := 1/2(rad+index)(rad+index+1)+index
-        % ======================================================================
-        function value = get.singleUniqueArrayIndex(obj)
+        function computeSingleUniqueIndex(obj)
+            obj.singleUniqueIndex = 1/2*(obj.uniqueSingleRadiusIndexPairs(:,1)+ ...
+                                         obj.uniqueSingleRadiusIndexPairs(:,2)).* ...
+                                        (obj.uniqueSingleRadiusIndexPairs(:,1)+ ...
+                                         obj.uniqueSingleRadiusIndexPairs(:,2)+1)+ ...
+                                         obj.uniqueSingleRadiusIndexPairs(:,2);
             pairedArray = 1/2*(obj.radiusArrayIndex+ ...
                                obj.refractiveIndexArrayIndex).* ...
                               (obj.radiusArrayIndex+ ...
                                obj.refractiveIndexArrayIndex+1)+ ...
                                obj.refractiveIndexArrayIndex;
-            value = dsearchn(obj.singleUniqueIndex,pairedArray);
-        end
-
-        % ======================================================================
-        %> @brief Get method for the number of unique pairs of indices and radii
-        % ======================================================================
-        function value = get.numUniquePairs(obj)
-            value = length(obj.uniqueRadiusIndexPairs(:,1));
-        end
-
-        % ======================================================================
-        %> @brief Set method for particle number
-        % ======================================================================
-        function obj = set.number(obj,value)
-            obj.positionArray = obj.positionArray(1:int32(value),:);
-        end
-
-        % ======================================================================
-        %> @brief Set method for particle number
-        % ======================================================================
-        function value = get.number(obj)
-            value = length(obj.positionArray(:,1));
+            obj.singleUniqueArrayIndex = dsearchn(obj.singleUniqueIndex, pairedArray);
+            obj.numUniquePairs = length(obj.uniqueRadiusIndexPairs(:,1));
         end
 
         % ======================================================================
         %> @brief Set the maximalParticleDistance attribute to the correct value
         % ======================================================================
-        function obj = compute_maximal_particle_distance(obj)
+        function compute_maximal_particle_distance(obj)
             try
                 obj.maxParticleDistance = max(pdist(obj.positionArray));
             catch
@@ -267,5 +174,33 @@ classdef celes_particles
             end
         end
 
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeUniqueRefractiveIndices(obj)
+            computeUniqueRadii(obj)
+            computeUniqueRadiiIndexPairs(obj)
+            computeSingleUniqueIndex(obj)
+            compute_maximal_particle_distance(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            if lower(obj.type) ~= 'sphere'
+                error('this particle type is not implemented at the moment')
+            end
+            try validateattributes(obj.positionArray,{'numeric'},{'real','nonnan','finite','2d','ncols',3})
+            catch e, error('invalid positionArray: %s', e.message); end
+            try validateattributes(obj.refractiveIndexArray,{'numeric'},{'nonnan','finite','numel',obj.number})
+            catch e, error('invalid refractiveIndexArray: %s', e.message); end
+            try validateattributes(obj.radiusArray,{'numeric'},{'nonnan','real','finite','numel',obj.number})
+            catch e, error('invalid radiusArray: %s', e.message); end
+        end
     end
 end

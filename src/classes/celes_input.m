@@ -34,7 +34,7 @@
 %>        and the excitation
 % ==============================================================================
 
-classdef celes_input
+classdef celes_input < matlab.System
 
     properties
         %> vacuum wavelength
@@ -52,7 +52,7 @@ classdef celes_input
         initialField
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> angular frequency (we use c=1)
         omega
 
@@ -65,25 +65,51 @@ classdef celes_input
 
     methods
         % ======================================================================
-        %> @brief Get method for omega
+        %> @brief Class constructor
         % ======================================================================
-        function value = get.omega(obj)
-            value = single(2*pi/obj.wavelength);
+        function obj = celes_input(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
         end
 
         % ======================================================================
-        %> @brief Get method for k_medium
+        %> @brief Compute omega
         % ======================================================================
-        function value = get.k_medium(obj)
-            value = obj.omega*obj.mediumRefractiveIndex;
+        function computeOmega(obj)
+            obj.omega = single(2*pi/obj.wavelength);
         end
 
         % ======================================================================
-        %> @brief Get method for k_particle
+        %> @brief Compute k_medium and k_particle
         % ======================================================================
-        function value = get.k_particle(obj)
-            value = obj.omega.*obj.particles.refractiveIndexArray;
+        function computeKs(obj)
+            obj.k_medium = obj.omega*obj.mediumRefractiveIndex;
+            obj.k_particle = obj.omega.*obj.particles.refractiveIndexArray;
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeOmega(obj);
+            computeKs(obj);
         end
 
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.wavelength,{'numeric'},{'real','nonnan','finite','scalar'})
+            catch e, error('invalid wavelength value: %s', e.message); end
+            try validateattributes(obj.mediumRefractiveIndex,{'numeric'},{'nonnan','finite','scalar'})
+            catch e, error('invalid mediumRefractiveIndex value: %s', e.message); end
+            try validateattributes(obj.particles,{'celes_particles'},{'nonempty'})
+            catch, error('expected a valid celes_particles instance'); end
+            try validateattributes(obj.initialField,{'celes_initialField'},{'nonempty'})
+            catch, error('expected a valid celes_initialField instance'); end
+        end
     end
 end

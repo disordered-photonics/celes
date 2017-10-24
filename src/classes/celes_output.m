@@ -33,7 +33,7 @@
 %> @brief Holds the output of a celes_simulation
 % ==============================================================================
 
-classdef celes_output
+classdef celes_output < matlab.System
 
     properties
         %> power flux of the initial field
@@ -114,6 +114,14 @@ classdef celes_output
 
     methods
         % ======================================================================
+        %> @brief Class constructor
+        % ======================================================================
+        function obj = celes_output(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+        end
+
+        % ======================================================================
         %> @brief Get method for totalField
         % ======================================================================
         function E = get.totalField(obj)
@@ -124,6 +132,18 @@ classdef celes_output
             catch
                 E = [];
             end
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.fieldPoints,{'numeric'},{'real','nonnan','finite','2d','ncols',3})
+            catch e, error('invalid fieldPoints array: %s', e.message); end
+            try validateattributes(obj.fieldPointsArrayDims,{'numeric'},{'integer','finite','nonnan','numel',2})
+            catch e, error('invalid fieldPointsArrayDims values: %s', e.message); end
         end
     end
 end

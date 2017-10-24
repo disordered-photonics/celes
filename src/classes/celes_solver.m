@@ -34,11 +34,11 @@
 %>        \f$\sum_{i',n'}M^{ii'}_{nn'} b_{n'}^{i'} = \sum_{n'} T^i_{nn'} a_{\mathrm{in},n'}^i\f$
 % ==============================================================================
 
-classdef celes_solver
+classdef celes_solver < matlab.System
 
     properties
         %> solver type, at the moment 'BiCGStab' and 'GMRES' implemented
-        type = 'BiCGStab';
+        type = 'gmres';
 
         %> solution tolerance. solver stops when relative error smaller
         tolerance = 1e-4;
@@ -47,16 +47,20 @@ classdef celes_solver
         maxIter = 1000;
 
         %> for type='GMRES': restart parameter
-        restart = 50;
+        restart = 100;
 
         %> celes_preconditioner object for faster convergence of solver
         preconditioner = celes_preconditioner;
     end
 
-    properties (Dependent)
-    end
-
     methods
+        % ======================================================================
+        %> @brief Class constructor
+        % ======================================================================
+        function obj = celes_solver(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+        end
 
         % ======================================================================
         %> @brief Run the solver
@@ -70,9 +74,9 @@ classdef celes_solver
         % ======================================================================
         function [value,convergenceHistory] = run(obj,mmm,rhs,varargin)
             if isempty(varargin)
-                initial_guess=gather(rhs);
+                initial_guess = gather(rhs);
             else
-                initial_guess=varargin{1};
+                initial_guess = varargin{1};
             end
             if length(varargin) > 1
                 verbose = varargin{2};
@@ -96,7 +100,25 @@ classdef celes_solver
                     end
                     [value,~,~,~,convergenceHistory] = ...
                         fh(mmm,rhs,obj.restart,obj.tolerance,obj.maxIter,prh,[],initial_guess);
+                otherwise
+                    error('please specify a valid solver type')
             end
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.type,{'char'},{'nonempty'})
+            catch e, error('invalid solver type: %s', e.message); end
+            try validateattributes(obj.tolerance,{'numeric'},{'real','nonnan','finite','nonempty','positive','scalar'})
+            catch e, error('invalid tolerance value: %s', e.message); end
+            try validateattributes(obj.maxIter,{'numeric'},{'nonempty','integer','positive'})
+            catch e, error('invalid maxIter value: %s', e.message); end
+            try validateattributes(obj.restart,{'numeric'},{'nonempty','integer','positive'})
+            catch e, error('invalid restart value: %s', e.message); end
         end
     end
 end

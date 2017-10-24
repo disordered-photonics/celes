@@ -33,7 +33,7 @@
 %> @brief Parameters describing the numerical settings used in the simulation
 % ==============================================================================
 
-classdef celes_numerics
+classdef celes_numerics < matlab.System
 
     properties
         %> maximal polar multipole order
@@ -63,17 +63,26 @@ classdef celes_numerics
         particleDistanceResolution = single(10);
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> number of unknowns per particle
         nmax
     end
 
     methods
         % ======================================================================
-        %> @brief Get method for nmax
+        %> @brief Class constructor
         % ======================================================================
-        function value = get.nmax(obj)
-            value = jmult_max(1,obj.lmax);
+        function obj = celes_numerics(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
+        end
+
+        % ======================================================================
+        %> @brief Compute nmax
+        % ======================================================================
+        function computeNmax(obj)
+            obj.nmax = jmult_max(1,obj.lmax);
         end
 
         % ======================================================================
@@ -91,5 +100,30 @@ classdef celes_numerics
             end
         end
 
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeNmax(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.lmax,{'numeric'},{'positive','integer','scalar'})
+            catch e, error('invalid lmax value: %s', e.message); end
+            try validateattributes(obj.polarAnglesArray,{'numeric'},{'real','nonnan','increasing','row','>=',0,'<=',pi})
+            catch e, error('invalid polarAnglesArray array: %s', e.message); end
+            try validateattributes(obj.azimuthalAnglesArray,{'numeric'},{'real','nonnan','increasing','row','>=',0,'<=',2*pi})
+            catch e, error('invalid azimuthalAnglesArray array: %s', e.message); end
+            try validateattributes(obj.particleDistanceResolution,{'numeric'},{'real','nonnan','positive','scalar'})
+            catch e, error('invalid particleDistanceResolution value: %s', e.message); end
+            try validateattributes(obj.solver,{'celes_solver'},{'nonempty'})
+            catch, error('expected a valid celes_solver instance'); end
+        end
     end
 end

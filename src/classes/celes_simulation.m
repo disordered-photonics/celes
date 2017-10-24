@@ -35,7 +35,7 @@
 %> The simulation class contains all input, intermediate results and
 %> output for one calculation.
 % ==============================================================================
-classdef celes_simulation
+classdef celes_simulation < matlab.System
 
     properties
         %> celes_input object which contains the parameters that specify
@@ -54,7 +54,7 @@ classdef celes_simulation
         output
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical Hankel function in the particle coupling
         lookupParticleDistances
@@ -62,12 +62,24 @@ classdef celes_simulation
 
     methods
         % ======================================================================
-        %> @brief get method for dependent property lookupParticleDistances
+        %> @brief Class constructor
         % ======================================================================
-        function value = get.lookupParticleDistances(obj)
-            value = [0,0:obj.numerics.particleDistanceResolution: ...
-                        (obj.input.particles.maxParticleDistance+ ...
-                       3*obj.numerics.particleDistanceResolution)]; % add two zeros at beginning to allow for interpolation also in first segment
+        function obj = celes_simulation(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
+        end
+
+        % ======================================================================
+        %> @brief Generate the lookupParticleDistances array
+        % ======================================================================
+        function computeLookupParticleDistances(obj)
+            % add two zeros at beginning to allow interpolation
+            % also in the first segment
+            step = obj.numerics.particleDistanceResolution;
+            maxdist = obj.input.particles.maxParticleDistance+ ...
+                      3*obj.numerics.particleDistanceResolution;
+            obj.lookupParticleDistances = [0, 0:step:maxdist];
         end
 
         % ======================================================================
@@ -315,7 +327,7 @@ classdef celes_simulation
             Wx = coupling_matrix_multiply(obj,value,varargin{:});
 
             if verbose
-                fprintf('apply T-matrix ... ')
+                fprintf('apply T-matrix ...')
             end
             t_matrix_timer = tic;
 
@@ -336,7 +348,6 @@ classdef celes_simulation
         %> - computation of initial field power
         %> - computation of Mie coefficients
         %> - computation of the translation table
-        %> - computation of the maximal distance between pairs of particles
         %> - preparation of the particle partitioning (if blockdiagonal
         %>   preconditioner is active)
         %> - preparation of the blockdiagonal preconditioner (if active)
@@ -356,9 +367,6 @@ classdef celes_simulation
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
-            fprintf(1,'compute maximal particle distance ...');
-            obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
-            fprintf(1,' done\n');
             if strcmpi(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 tprec = tic;
                 fprintf(1,'make particle partition ...');
@@ -382,6 +390,29 @@ classdef celes_simulation
             obj.numerics.solver.preconditioner.masterMatrices = [];
             obj.output.runningTime = toc(tcomp);
             fprintf(1,'simulation ran in %.1f seconds.\n',obj.output.runningTime);
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeLookupParticleDistances(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.input,{'celes_input'},{'nonempty'})
+            catch, error('expected a valid celes_input instance'); end
+            try validateattributes(obj.numerics,{'celes_numerics'},{'nonempty'})
+            catch, error('expected a valid celes_numerics instance'); end
+            try validateattributes(obj.tables,{'celes_tables'},{'nonempty'})
+            catch, error('expected a valid celes_tables instance'); end
+            try validateattributes(obj.output,{'celes_output'},{'nonempty'})
+            catch, error('expected a valid celes_output instance'); end
         end
     end
 end

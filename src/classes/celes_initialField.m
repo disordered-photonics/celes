@@ -34,7 +34,7 @@
 %>        beam.
 % ==============================================================================
 
-classdef celes_initialField
+classdef celes_initialField < matlab.System
 
     properties
         %> specify the type of the field:
@@ -46,7 +46,7 @@ classdef celes_initialField
 
         %> incident angle (polar, in radians)
         %> currently, only normal incidence (0) is possible
-        polarAngle  = single(0)
+        polarAngle = single(0)
 
         %> incident angle (azimuth, in radians)
         azimuthalAngle = single(0)
@@ -61,7 +61,7 @@ classdef celes_initialField
         focalPoint
     end
 
-    properties(Dependent)
+    properties (SetAccess=private, Hidden)
         %> incident beam polarization (1 for 'TE', 2 for 'TM')
         pol
 
@@ -72,81 +72,68 @@ classdef celes_initialField
 
     methods
         % ======================================================================
-        %> @brief Set method for type
+        %> @brief Class constructor
         % ======================================================================
-        function inF = set.type(inF,value)
-            switch lower(value)
-                case 'gaussian beam'
-                    inF.type='gaussian beam';
-                otherwise
-                    error('this is not a legal initial field type')
-            end
+        function obj = celes_initialField(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
         end
 
         % ======================================================================
-        %> @brief Set method for polarAngle
+        %> @brief Set incident beam polarization (1 for 'TE', 2 for 'TM')
         % ======================================================================
-        function inF = set.polarAngle(inF,value)
-            inF.polarAngle=single(value);
-        end
-
-        % ======================================================================
-        %> @brief Set method for azimthalAngle
-        % ======================================================================
-        function inF = set.azimuthalAngle(inF,value)
-            inF.azimuthalAngle=single(value);
-        end
-
-        % ======================================================================
-        %> @brief Set method for polarization
-        % ======================================================================
-        function inF = set.polarization(inF,value)
-            switch lower(value)
+        function setPolIdx(obj)
+            switch lower(obj.polarization)
                 case 'te'
-                    inF.polarization='TE';
+                    obj.pol = 1;
                 case 'tm'
-                    inF.polarization='TM';
+                    obj.pol = 2;
                 otherwise
-                    error('this is not a legal initial field polarization')
+                    error('invalid polarization')
             end
         end
 
         % ======================================================================
-        %> @brief Set method for beamWidth
+        %> @brief Set normalIncidenceFlag
         % ======================================================================
-        function inF = set.beamWidth(inF,value)
-            inF.beamWidth=single(value);
+        function setNormalIncidence(obj)
+            obj.normalIncidence = (abs(sin(obj.polarAngle))<1e-5);
+        end
+
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            setPolIdx(obj)
+            setNormalIncidence(obj)
         end
 
         % ======================================================================
-        %> @brief Set method for focalPoint
+        %> @brief Validate class properties
         % ======================================================================
-        function inF = set.focalPoint(inF,value)
-            if length(value)==3
-                inF.focalPoint=single(value);
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.type,{'char'},{'nonempty'})
+            catch e, error('invalid initialField type: %s', e.message); end
+            try validateattributes(obj.amplitude,{'numeric'},{'real','nonnan','finite','scalar'})
+            catch e, error('invalid amplitude value: %s', e.message); end
+            if strcmpi(obj.type,'gaussian beam')
+                try validateattributes(obj.polarAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                catch e, error('invalid polarAngle value: %s', e.message); end
+                try validateattributes(obj.azimuthalAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                catch e, error('invalid azimuthalAngle value: %s', e.message); end
+                try validateattributes(obj.polarization,{'char'},{'nonempty'})
+                catch e, error('invalid polarization type: %s', e.message); end
+                try validateattributes(obj.beamWidth,{'numeric'},{'real','nonnan','scalar'})
+                catch e, error('invalid beamWidth value: %s', e.message); end
+                try validateattributes(obj.focalPoint,{'numeric'},{'real','nonnan','finite','row','numel',3})
+                catch e, error('invalid focalPoint array: %s', e.message); end
             else
-                error('illegal focal point')
+                error('invalid initialField type')
             end
         end
-
-        % ======================================================================
-        %> @brief Get method for pol
-        % ======================================================================
-        function value = get.pol(inF)
-            switch lower(inF.polarization)
-                case 'te'
-                    value=1;
-                case 'tm'
-                    value=2;
-            end
-        end
-
-        % ======================================================================
-        %> @brief Get method for normalIncidence
-        % ======================================================================
-        function value = get.normalIncidence(obj)
-            value = (abs(sin(obj.polarAngle))<1e-5);
-        end
-
     end
 end

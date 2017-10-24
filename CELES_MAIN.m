@@ -2,146 +2,140 @@
 %> @brief Run this script to start the simulation
 % =========================================================================
 
-% -------------------------------------------------------------------------
-% do not edit
-% -------------------------------------------------------------------------
-
-% add all folders to the MATLAB search path
+%% add all folders to the MATLAB search path
 addpath(genpath('./src'))
 
-% initialize the CELES class instances
-simul = celes_simulation;
-particles = celes_particles;
-initialField = celes_initialField;
-input = celes_input;
-numerics = celes_numerics;
-solver = celes_solver;
-precond = celes_preconditioner;
-output = celes_output;
+%% import example file with sphere positions, radii and refractive indices
+data = dlmread('examples/sphere_parameters.txt');
 
-% -------------------------------------------------------------------------
-% begin of user editable section - specify the simulation parameters here
-% -------------------------------------------------------------------------
+%% initialize the CELES class instances
 
-% import example sphere positions, radii and refractive indices
-sphere_data = dlmread('examples/sphere_parameters.txt');
+% initialize particle class instance
+%   - positionArray:        Nx3 array (float) in [x,y,z] format
+%   - refractiveIndexArray: Nx1 array (complex) of complex refractive indices
+%   - radiusArray:          Nx1 array (float) of sphere radii
+particles = celes_particles('positionArray',        data(:,1:3), ...
+                            'refractiveIndexArray', data(:,5)+1i*data(:,6), ...
+                            'radiusArray',          data(:,4) ...
+                            );
 
-% radii of particles
-% must be an array with one element per sphere
-particles.radiusArray = sphere_data(:, 4);
+% initialize initial field class instance
+%   - polarAngle:           scalar (float) polar angle of incoming beam/wave,
+%                           in radians. for Gaussian beams, only 0 or pi are
+%                           currently possible
+%   - azimuthalAngle:       scalar (float) azimuthal angle of incoming
+%                           beam/wave, in radians
+%   - polarization:         string (char) polarization of incoming beam/wave
+%                           ('TE' or 'TM')
+%   - beamWidth:            scalar (float) width of beam waist. use 0 or inf
+%                           for plane wave
+%   - focalPoint:           1x3 array (float) focal point
+initialField = celes_initialField('polarAngle',     0, ...
+                                  'azimuthalAngle', 0, ...
+                                  'polarization',   'TE', ...
+                                  'beamWidth',      2000, ...
+                                  'focalPoint',     [0,0,0] ...
+                                  );
 
-% complex refractive index of particles, n+ik
-% refractiveIndexArray must be same dimension as radiusArray
-particles.refractiveIndexArray = sphere_data(:,5) + 1i*sphere_data(:, 6);
+% initialize input class instance
+%   - wavelength:           scalar (float) vacuum wavelength, same unit as
+%                           particle positions and radii
+%   - mediumRefractiveIndex: scalar (complex) refractive index of environment
+%   - particles:            valid instance of celes_particles class
+%   - initialField:         valid instance of celes_initialField class
+input = celes_input('wavelength',                   550, ...
+                    'mediumRefractiveIndex',        1, ...
+                    'particles',                    particles, ...
+                    'initialField',                 initialField ...
+                    );
 
-% positions of particles (in three-column format: x,y,z)
-particles.positionArray = sphere_data(:,1:3);
+% initialize preconditioner class instance
+%   - type:                 string (char) type of preconditioner (currently
+%                           only 'blockdiagonal' and 'none' available)
+%   - partitionEdgeSizes    1x3 array (float) edge size of partitioning cuboids
+%                           (applies to 'blockdiagonal' type only)
+precnd = celes_preconditioner('type',               'blockdiagonal', ...
+                              'partitionEdgeSizes', [1200,1200,1200] ...
+                              );
 
-% polar angle of incoming beam/wave, in radians (for Gaussian beams,
-% only 0 and pi are currently possible)
-initialField.polarAngle = 0;
+% initialize solver class instance
+%   - type:                 string (char) solver type (currently 'BiCGStab' or
+%                           'GMRES' are implemented)
+%   - tolerance:            scalar (float) target relative accuracy of solution
+%   - maxIter:              scalar (int) maximum number of iterations allowed
+%   - restart:              scalar (int) restart parameter (applies only to
+%                           GMRES solver)
+%   - preconditioner:       valid instance of celes_preconditioner class
+solver = celes_solver('type',                       'GMRES', ...
+                      'tolerance',                  5e-4, ...
+                      'maxIter',                    1000, ...
+                      'restart',                    200, ...
+                      'preconditioner',             precnd);
 
-% azimuthal angle of incoming beam/wave, in radians
-initialField.azimuthalAngle = 0;
+% initialize numerics class instance
+%   - lmax:                 scalar (int) maximal expansion order of scattered
+%                           fields around particle center
+%   - polarAnglesArray:     1xN array (float) sampling of polar angles in the
+%                           plane wave patterns, in radians
+%   - azimuthalAnglesArray: sampling of azimuthal angles in the plane wave
+%                           patterns, in radians
+%   - gpuFlag:              scalar (bool) set to false if you experience GPU
+%                           memory problems at evaluation time (translation
+%                           operator always runs on GPU, though)
+%   - particleDistanceResolution: scalar (float) resolution of lookup table for
+%                           spherical Hankel function (same unit as wavelength)
+%   - solver:               valid instance of celes_solver class
+numerics = celes_numerics('lmax',                   3, ...
+                          'polarAnglesArray',       0:pi/5e3:pi, ...
+                          'azimuthalAnglesArray',   0:pi/1e2:2*pi, ...
+                          'gpuFlag',                true, ...
+                          'particleDistanceResolution', 1, ...
+                          'solver',                 solver);
 
-% polarization of incoming beam/wave ('TE' or 'TM')
-initialField.polarization = 'TE';
+% define a grid of points where the field will be evaulated
+[x,z] = meshgrid(-4000:50:4000, -3000:50:5000); y = zeros(size(x));
+% initialize output class instance
+%   - fieldPoints:          Nx3 array (float) points where to evaluate the
+%                           electric near field
+%   - fieldPointsArrayDims: 1x2 array (int) dimensions of the array, needed to
+%                           recompose the computed field as a n-by-m image
+output = celes_output('fieldPoints',                [x(:),y(:),z(:)], ...
+                      'fieldPointsArrayDims',       size(x));
 
-% width of beam waist (use 0 or inf for plane wave)
-initialField.beamWidth = 2000;
+% initialize simulation class instance
+%   - input:                valid instance of celes_input class
+%   - numerics:             valid instance of celes_input class
+%   - tables:               instance of celes_tables class
+%   - output:               valid instance of celes_output class
+simul = celes_simulation('input',                   input, ...
+                         'numerics',                numerics, ...
+                         'tables',                  celes_tables, ...
+                         'output',                  output);
 
-% focal point
-initialField.focalPoint = [0,0,0];
+%% run simulation
+simul.run;
 
-% vacuum wavelength (same unit as particle positions and radius)
-input.wavelength = 550;
+% evaluate transmitted and reflected power
+simul.evaluatePower;
+fprintf('transmitted power: \t%.4f %%\n', ...
+    simul.output.totalFieldForwardPower/simul.output.initialFieldPower*100)
+fprintf('reflected power: \t%.4f %%\n', ...
+    simul.output.totalFieldBackwardPower/simul.output.initialFieldPower*100)
 
-% complex refractive index of surrounding medium
-input.mediumRefractiveIndex = 1;
+% evaluate field at output.fieldPoints
+simul.evaluateFields;
 
-% maximal expansion order of scattered fields (around particle center)
-numerics.lmax = 3;
-
-% resolution of lookup table for spherical Hankel function (same unit as
-% wavelength)
-numerics.particleDistanceResolution = 1;
-
-% use GPU for various calculations (deactivate if you experience GPU memory
-% problems - translation operator always runs on GPU, even if false)
-numerics.gpuFlag = true;
-
-% sampling of polar angles in the plane wave patterns (radians array)
-numerics.polarAnglesArray = 0:pi/1e3:pi;
-
-% sampling of azimuthal angles in the plane wave patterns (radians array)
-numerics.azimuthalAnglesArray = 0:pi/1e3:2*pi;
-
-% specify solver type (currently 'BiCGStab' or 'GMRES')
-solver.type = 'GMRES';
-
-% relative accuracy (solver stops when achieved)
-solver.tolerance = 5e-4;
-
-% maximal number of iterations (solver stops if exceeded)
-solver.maxIter = 1000;
-
-% restart parameter (only for GMRES)
-solver.restart = 1000;
-
-% type of preconditioner (currently only 'blockdiagonal' and 'none'
-% possible)
-precond.type = 'blockdiagonal';
-
-% for blockdiagonal preconditioner: edge size of partitioning cuboids
-precond.partitionEdgeSizes = [1200,1200,1200];
-
-% specify the points where to evaluate the electric near field (3-column
-% array x,y,z)
-[x,z] = meshgrid(-4000:50:4000,-3000:50:5000); y = zeros(size(x));
-output.fieldPoints = [x(:),y(:),z(:)];
-
-% dimensions of the array used to restore the original shape of x,y,z
-% for display of 2d-images
-output.fieldPointsArrayDims = size(x);
-
-% -------------------------------------------------------------------------
-% end of user editable section
-% -------------------------------------------------------------------------
-
-% -------------------------------------------------------------------------
-% do not edit
-% -------------------------------------------------------------------------
-
-% combine all parameters to one simulation object
-input.particles = particles;
-input.initialField = initialField;
-solver.preconditioner = precond;
-numerics.solver = solver;
-simul.input = input;
-simul.numerics = numerics;
-simul.tables = celes_tables;
-simul.output = output;
-
-% compute
-simul = simul.run;
-simul = simul.evaluatePower;
-simul = simul.evaluateFields;
-
-% display the particle positions
+%% plot results
+% display particle positions
 figure
 plot_spheres(gca,simul.input.particles.positionArray, ...
                  simul.input.particles.radiusArray, ...
                  simul.input.particles.refractiveIndexArray,'view xy')
 
-% view near field
+% plot near field
 figure
 plot_field(gca,simul,'abs E','Total field', ...
                simul.input.particles.radiusArray)
 colormap(jet)
 colorbar
 caxis([0,1.2])
-
-fprintf('transmitted power: %f %%\n', ...
-    simul.output.totalFieldForwardPower/simul.output.initialFieldPower*100)
-fprintf('reflected power: %f %%\n', ...
-    simul.output.totalFieldBackwardPower/simul.output.initialFieldPower*100)
