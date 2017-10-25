@@ -11,15 +11,26 @@
     Fixed     	for any bug fixes.
 -->
 
+## [Testing]
+### Changed
+- subclass celes classes from `matlab.System`
+- implement `setProperties` methods for name-value style initialization
+- implement `validatePropertiesImpl` methods for validation
+- limit use of `Dependent` properties to avoid redundant calculations
+- implement `setupImpl` where appropriate for one-time calculations to improve performance
+- compute and set maximal particle distance inside particles class
 
 ## [Unreleased]
+-
+
+## [2.1] - 2017-10-25
 ### Changed
 - define only trigonometric versions of legendre and spherical functions
 - precalculate coefficients in spherical functions @tkfryett
 - case-insensitive flags and types
 
 ### Removed
-- disperse flag (radii must be specified)
+- `disperse` flag (radii must be specified)
 
 ### Fixed
 - performance issue with polydisperse samples @fragkrag
@@ -43,5 +54,7 @@
 
 ## 1.0 - 2017-02-24
 
-[Unreleased]: https://github.com/disordered-photonics/celes/compare/v2.0...HEAD
+[Testing]: https://github.com/disordered-photonics/celes/compare/HEAD...develop
+[Unreleased]: https://github.com/disordered-photonics/celes/compare/v2.1...HEAD
+[2.1]: https://github.com/disordered-photonics/celes/compare/v2.0...v2.1
 [2.0]: https://github.com/disordered-photonics/celes/compare/v1.0...v2.0
