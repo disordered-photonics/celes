@@ -47,7 +47,7 @@ classdef celes_simulation < matlab.System
 
         %> celes_tables object which contains lookup tables and other
         %> intermediate results
-        tables
+        tables = celes_tables
 
         %> celes_output object which contains the results of the
         %> simulation
