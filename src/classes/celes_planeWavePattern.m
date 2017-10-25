@@ -33,7 +33,7 @@
 %> @brief Expansion of a field in plane vector wave functions
 % ==============================================================================
 
-classdef celes_planeWavePattern
+classdef celes_planeWavePattern < matlab.System
 
     properties
         %> array of polar angle values (in rad)
@@ -49,7 +49,7 @@ classdef celes_planeWavePattern
         expansionCoefficients
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> meshigrid of polar angles
         polarAnglesGrid
 
@@ -80,69 +80,9 @@ classdef celes_planeWavePattern
         %> @brief Constructor method
         % ======================================================================
         function obj = celes_planeWavePattern(varargin)
-            if ~isempty(varargin)
-                obj.polarAngles = varargin{1};
-                obj.azimuthalAngles = varargin{2};
-                obj.k = varargin{3};
-            end
-        end
-
-        % ======================================================================
-        %> @brief Get method for polarAnglesGrid
-        % ======================================================================
-        function value = get.polarAnglesGrid(obj)
-            [value,~] = meshgrid(obj.polarAngles,obj.azimuthalAngles);
-        end
-
-        % ======================================================================
-        %> @brief Get method for azimuthalAnglesGrid
-        % ======================================================================
-        function value = get.azimuthalAnglesGrid(obj)
-            [~,value] = meshgrid(obj.polarAngles,obj.azimuthalAngles);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kparArray
-        % ======================================================================
-        function value = get.kparArray(obj)
-            value = obj.k*sin(obj.polarAngles);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kzArray
-        % ======================================================================
-        function value = get.kzArray(obj)
-            value = obj.k*cos(obj.polarAngles);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kxGrid
-        % ======================================================================
-        function value = get.kxGrid(obj)
-            value = obj.k*sin(obj.polarAnglesGrid).* ...
-                          cos(obj.azimuthalAnglesGrid);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kyGrid
-        % ======================================================================
-        function value = get.kyGrid(obj)
-            value = obj.k*sin(obj.polarAnglesGrid).* ...
-                          sin(obj.azimuthalAnglesGrid);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kparGrid
-        % ======================================================================
-        function value = get.kparGrid(obj)
-            value = obj.k*sin(obj.polarAnglesGrid);
-        end
-
-        % ======================================================================
-        %> @brief Get method for kzGrid
-        % ======================================================================
-        function value = get.kzGrid(obj)
-            value = obj.k*cos(obj.polarAnglesGrid);
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
         end
 
         % ======================================================================
@@ -161,5 +101,45 @@ classdef celes_planeWavePattern
                                             obj2.expansionCoefficients;
             end
         end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            generateGrids(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.polarAngles,{'numeric'},{'real','nonnan','finite'})
+            catch e, error('invalid polarAngles array: %s', e.message); end
+            try validateattributes(obj.azimuthalAngles,{'numeric'},{'real','nonnan','finite'})
+            catch e, error('invalid azimuthalAngles array: %s', e.message); end
+            try validateattributes(obj.k,{'numeric'},{'nonnan','real','finite','scalar'})
+            catch e, error('invalid k value: %s', e.message); end
+            try validateattributes(obj.expansionCoefficients,{'gpuArray','numeric'},{'nonnan','finite','2d'})
+            catch e, error('invalid expansionCoefficients: %s', e.message); end
+        end
+
+        % ======================================================================
+        %> @brief Create grids
+        % ======================================================================
+        function generateGrids(obj)
+            obj.kparArray = obj.k*sin(obj.polarAngles);
+            obj.kzArray = obj.k*cos(obj.polarAngles);
+            [obj.polarAnglesGrid, obj.azimuthalAnglesGrid] = ...
+                                meshgrid(obj.polarAngles,obj.azimuthalAngles);
+
+            obj.kparGrid = obj.k*sin(obj.polarAnglesGrid);
+
+            obj.kxGrid = obj.kparGrid.*cos(obj.azimuthalAnglesGrid);
+            obj.kyGrid = obj.kparGrid.*sin(obj.azimuthalAnglesGrid);
+            obj.kzGrid = obj.k*cos(obj.polarAnglesGrid);
+        end
+
     end
 end
