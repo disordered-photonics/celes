@@ -206,10 +206,9 @@ classdef celes_simulation < matlab.System
         % ======================================================================
         function obj = computeTotalFieldPWP(obj)
             fprintf(1,'compute total field coefficients table ...');
-            obj.output.totalFieldPlaneWavePattern = cell(2,1);
             pwpScat = obj.output.scatteredFieldPlaneWavePattern;
             pwpIn = initial_field_plane_wave_pattern(obj);
-            for pol = 1:2
+            for pol = 2:-1:1
                 obj.output.totalFieldPlaneWavePattern{pol} = pwpScat{pol};
                 obj.output.totalFieldPlaneWavePattern{pol} = ...
                    obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpIn{pol});
