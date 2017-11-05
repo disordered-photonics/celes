@@ -117,8 +117,10 @@ classdef celes_output < matlab.System
         %> @brief Class constructor
         % ======================================================================
         function obj = celes_output(varargin)
-            setProperties(obj,nargin,varargin{:});
-            validatePropertiesImpl(obj);
+            if nargin
+                setProperties(obj,nargin,varargin{:});
+                validatePropertiesImpl(obj);
+            end
         end
 
         % ======================================================================

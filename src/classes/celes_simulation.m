@@ -51,7 +51,7 @@ classdef celes_simulation < matlab.System
 
         %> celes_output object which contains the results of the
         %> simulation
-        output
+        output = celes_output
     end
 
     properties (SetAccess=private, Hidden)
@@ -298,6 +298,9 @@ classdef celes_simulation < matlab.System
         %>         output.scatteredField
         % ======================================================================
         function obj = evaluateFields(obj)
+            if isempty(obj.output.fieldPoints)
+                error('fieldPoints property of celes_output class not specified')
+            end
             tfld = tic;
             obj = obj.evaluateInitialField;
             obj = obj.evaluateScatteredField;
