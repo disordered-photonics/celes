@@ -29,7 +29,7 @@
 %  POSSIBILITY OF SUCH DAMAGE.
 
 %===============================================================================
-%> @brief Add circles representing the sphere positions to some axes object
+%> @brief Plot spheres in 3D, spheres' colors depend on their refractive index
 %>
 %> @param   ax (axes object): axes to plot in
 %>
@@ -39,75 +39,51 @@
 %>
 %> @param   refractiveIndexArray (1xN float array): particle refractive index array
 %>
-%> @param   view (string): select 'view xy','view yz' or 'view xz'
-%>
-%> @param   Optional: plotDepthInterval (2x1 float array): from where to where
-%>          include spheres in the plot? Example: if the field points
-%>          are all located in the xy-plane, potDepthInterval=[-200,200]
-%>          will plot all spheres with a center z-coordinate in that
-%>          interval
+%> @param   sphereResolution (scalar int): optional resolution for sphere()
 %===============================================================================
-function plot_spheres(ax,positionArray,radiusArray,refractiveIndexArray,view,varargin)
+function plot_spheres(ax, positionArray, radiusArray, refractiveIndexArray, sphereResolution)
+
+if ~exist('sphereResolution','var')
+    sphres = 16; % looks sufficiently like a sphere
+else
+    sphres = sphereResolution;
+end
+[vx, vy, vz] = sphere(sphres); % sphere base model
 
 % normalize to 1
-refractiveIndexArray = abs(refractiveIndexArray)/max(abs(refractiveIndexArray));
-
-if isempty(varargin)
-    plotDepthInterval = [-Inf,Inf];
-else
-    plotDepthInterval = varargin{1};
+realRInorm = real(refractiveIndexArray)/max(abs((refractiveIndexArray)));
+imagRInorm = imag(refractiveIndexArray)/max(abs(imag(refractiveIndexArray)));
+if isnan(imagRInorm)
+    imagRInorm = imag(refractiveIndexArray);
 end
+
+realRInorm = repmat(repelem(realRInorm, sphres+2),[1,sphres+1]);
+imagRInorm = repmat(repelem(imagRInorm, sphres+2),[1,sphres+1]);
 
 hold(ax,'on')
 
-switch view
-    case 'view xy'
-        [~,idx] = sort(positionArray(:,3));
-        for jS = 1:length(positionArray(:,1))
-            if positionArray(idx(jS),3) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),3) < plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position', [positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
-            end
-        end
-        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray), ...
-                   max(positionArray(:,1))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,2))-3*max(radiusArray), ...
-                   max(positionArray(:,2))+3*max(radiusArray)];
-    case 'view xz'
-        [~,idx] = sort(positionArray(:,2));
-        for jS = 1:length(positionArray(:,1))
-            if positionArray(idx(jS),2) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),2) < plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
-            end
-        end
-        ax.XLim = [min(positionArray(:,1))-3*max(radiusArray), ...
-                   max(positionArray(:,1))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray), ...
-                   max(positionArray(:,3))+3*max(radiusArray)];
-    case 'view yz'
-        [~,idx] = sort(positionArray(:,1));
-        for jS = 1:length(positionArray(:,1))
-            if positionArray(idx(jS),1) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),1)<plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor',[0.5,0.5,refractiveIndexArray(jS)])
-            end
-        end
-        ax.XLim = [min(positionArray(:,2))-3*max(radiusArray), ...
-                   max(positionArray(:,2))+3*max(radiusArray)];
-        ax.YLim = [min(positionArray(:,3))-3*max(radiusArray), ...
-                   max(positionArray(:,3))+3*max(radiusArray)];
+% plotting just one merged surface is incredibly faster
+xmerged = zeros(size(positionArray,1)*(sphres+2), sphres+1);
+ymerged = zeros(size(positionArray,1)*(sphres+2), sphres+1);
+zmerged = zeros(size(positionArray,1)*(sphres+2), sphres+1);
+
+for jS = 1:size(positionArray,1)
+    idx = (1:sphres+2)+(jS-1)*(sphres+2);
+    xmerged(idx,:) = [vx*radiusArray(jS) + positionArray(jS,1); NaN*ones(1,sphres+1)];
+    ymerged(idx,:) = [vy*radiusArray(jS) + positionArray(jS,2); NaN*ones(1,sphres+1)];
+    zmerged(idx,:) = [vz*radiusArray(jS) + positionArray(jS,3); NaN*ones(1,sphres+1)];
 end
-ax.DataAspectRatio=[1,1,1];
+
+% color each sphere with a unique shade
+CO(:,:,1) = imagRInorm; % red
+CO(:,:,2) = zeros(size(zmerged)); % green
+CO(:,:,3) = realRInorm; % blue
+
+surf(xmerged, ymerged, zmerged, CO, 'LineStyle', 'none');
+
+light; lighting gouraud
+ax.DataAspectRatio = [1,1,1];
+xlabel('x'); ylabel('y'); zlabel('z');
 
 hold(ax,'off')
 end

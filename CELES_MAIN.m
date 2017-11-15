@@ -124,11 +124,11 @@ fprintf('reflected power: \t%.4f %%\n', ...
 simul.evaluateFields;
 
 %% plot results
-% display particle positions
-figure
+% display particles
+figure('Name','Particle positions','NumberTitle','off');
 plot_spheres(gca,simul.input.particles.positionArray, ...
                  simul.input.particles.radiusArray, ...
-                 simul.input.particles.refractiveIndexArray,'view xy')
+                 simul.input.particles.refractiveIndexArray)
 
 % plot near field
 figure
