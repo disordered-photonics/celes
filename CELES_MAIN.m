@@ -131,9 +131,7 @@ plot_spheres(gca,simul.input.particles.positionArray, ...
                  simul.input.particles.refractiveIndexArray)
 
 % plot near field
-figure
-plot_field(gca,simul,'abs E','Total field', ...
-               simul.input.particles.radiusArray)
-colormap(jet)
+figure('Name','Near-field cross-cut','NumberTitle','off');
+plot_field(gca,simul,'abs E','Total field')
 colorbar
-caxis([0,1.2])
+caxis([0,2])

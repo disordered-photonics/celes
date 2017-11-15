@@ -43,17 +43,14 @@
 %>
 %> @param   fieldType (string): select 'Total field', 'Scattered field'
 %>          or 'Initial field'
-%>
-%> @param   radiusArray (1xN float array): radius array of the spheres
-%>
-%> @param   Optional: plotDepthInterval (2x1 float array): from where to where
-%>          include spheres in the plot? Example: if the field points
-%>          are all located in the xy-plane, potDepthInterval=[-200,200]
-%>          will plot all spheres with a center z-coordinate in that interval
 %===============================================================================
-function plot_field(ax,simulation,component,fieldType,radiusArray,varargin)
+function plot_field(ax,simulation,component,fieldType)
 
 hold(ax,'on')
+
+pArr = simulation.input.particles.positionArray;
+rArr = simulation.input.particles.radiusArray;
+dims = simulation.output.fieldPointsArrayDims;
 
 switch lower(fieldType)
     case 'total field'
@@ -64,98 +61,61 @@ switch lower(fieldType)
         E = simulation.output.initialField;
 end
 
-x = simulation.output.fieldPoints(:,1);
-y = simulation.output.fieldPoints(:,2);
-z = simulation.output.fieldPoints(:,3);
-
-if all(x == x(1))
-    view = 'yz';
-    y = reshape(y,simulation.output.fieldPointsArrayDims);
-    z = reshape(z,simulation.output.fieldPointsArrayDims);
-elseif all(y == y(1))
-    view = 'xz';
-    x = reshape(x,simulation.output.fieldPointsArrayDims);
-    z = reshape(z,simulation.output.fieldPointsArrayDims);
-elseif all(z == z(1))
-    view = 'xy';
-    x = reshape(x,simulation.output.fieldPointsArrayDims);
-    y = reshape(y,simulation.output.fieldPointsArrayDims);
-end
-
 switch lower(component)
     case 'real ex'
-        fld = reshape(gather(real(E(:,1))), ...
-                      simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,1))), dims);
     case 'real ey'
-        fld = reshape(gather(real(E(:,2))), ...
-                      simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,2))), dims);
     case 'real ez'
-        fld = reshape(gather(real(E(:,3))), ...
-                      simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(real(E(:,3))), dims);
     case 'abs e'
-        fld = reshape(gather(sqrt(abs(E(:,1)).^2+abs(E(:,2)).^2+abs(E(:,3)).^2)), ...
-                      simulation.output.fieldPointsArrayDims);
+        fld = reshape(gather(sqrt(sum(abs(E).^2,2))), dims);
 end
 
-if isempty(varargin)
-    plotDepthInterval = [-Inf,Inf];
+
+fldPoints = reshape([simulation.output.fieldPoints(:,1), ...
+                     simulation.output.fieldPoints(:,2), ...
+                     simulation.output.fieldPoints(:,3)], [dims,3]);
+
+if all(fldPoints(:,:,1) == fldPoints(1,1,1))    % fldPoints are on the yz plane
+    perpdim = 1;                                % 1->x is the perp. direction
+    draw_image(ax, fldPoints, fld, perpdim, pArr, rArr)
+    xlabel('y')
+    ylabel('z')
+elseif all(fldPoints(:,:,2) == fldPoints(1,1,2))% fldPoints are on the xz plane
+    perpdim = 2;                                % 2->y is the perp. direction
+    draw_image(ax, fldPoints, fld, perpdim, pArr, rArr)
+    xlabel('x')
+    ylabel('z')
+elseif all(fldPoints(:,:,3) == fldPoints(1,1,3))% fldPoints are on the xy plane
+    perpdim = 3;                                % 3->z is the perp. direction
+    draw_image(ax, fldPoints, fld, perpdim, pArr, rArr)
+    xlabel('x')
+    ylabel('y')
 else
-    plotDepthInterval = varargin{1};
+    error('fieldPoint must define an xy, xz or yz-like plane')
 end
 
-hold(ax,'on')
-
-positionArray = simulation.input.particles.positionArray;
-
-switch view
-    case 'xy'
-        imagesc(x(1,:),y(:,1),fld)
-        xlabel('x')
-        ylabel('y')
-        [~,idx] = sort(positionArray(:,3));
-        for jS = 1:length(positionArray(:,1))
-            if positionArray(idx(jS),3)-z(1) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),3)-z(1) < plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position',[positionArray(idx(jS),1:2)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor','none', ...
-                    'EdgeColor',[1,1,1])
-            end
-        end
-    case 'xz'
-        imagesc(x(1,:),z(:,1),fld)
-        xlabel('x')
-        ylabel('z')
-        [~,idx] = sort(positionArray(:,2));
-        for jS=1:length(positionArray(:,1))
-            if positionArray(idx(jS),2) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),2) < plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position',[positionArray(idx(jS),[1,3])-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor','none', ...
-                    'EdgeColor',[1,1,1])
-            end
-        end
-    case 'yz'
-        imagesc(y(1,:),z(:,1),fld)
-        xlabel('y')
-        ylabel('z')
-        [~,idx] = sort(positionArray(:,1));
-        for jS = 1:length(positionArray(:,1))
-            if positionArray(idx(jS),1) > plotDepthInterval(1) && ...
-               positionArray(idx(jS),1) < plotDepthInterval(2)
-                rectangle(ax, ...
-                    'Position',[positionArray(idx(jS),2:3)-[1,1]*radiusArray(jS),[2,2]*radiusArray(jS)], ...
-                    'Curvature',[1 1], ...
-                    'FaceColor','none', ...
-                    'EdgeColor',[1,1,1])
-            end
-        end
-end
 ax.DataAspectRatio = [1,1,1];
-axis tight
 title([fieldType,', ',component])
 hold(ax,'off')
+end
+
+function draw_image(ax, fldP, fld, perpdim, pArr, rArr)
+xy = setdiff([1,2,3], perpdim);                 % here xy are the in-plane dimensions
+x = fldP(:,:,xy(1));
+y = fldP(:,:,xy(2));
+imagesc(x(1,:), y(:,1), fld)                    % plot field on a xy plane
+dist = abs(pArr(:,perpdim) - fldP(1,1,perpdim));% particle distances from xy plane
+idx = find(dist<rArr);                          % find particles intersecting the plane
+rArr(idx) = sqrt(rArr(idx).^2 - dist(idx).^2);  % overwrite radius of the intersection circle
+for i=1:length(idx)
+    rectangle(ax, ...
+             'Position', [pArr(idx(i),xy)-rArr(idx(i)), [2,2]*rArr(idx(i))], ...
+             'Curvature', [1 1], ...
+             'FaceColor', 'none', ...
+             'EdgeColor', [0,0,0], ...
+             'LineWidth', 0.75)
+end
+axis([min(x(:)),max(x(:)),min(y(:)),max(y(:))]) % set axis tight to fldPoints
 end
