@@ -43,8 +43,7 @@ function E = compute_scattered_field(simulation)
 msg='';
 
 % spherical bessel lookup
-Rlast = bsxfun(@plus,simulation.output.fieldPoints, ...
-                    -simulation.input.particles.positionArray(simulation.input.particles.number,:));
+Rlast = simulation.output.fieldPoints-simulation.input.particles.positionArray(simulation.input.particles.number,:);
 rlast = sqrt(Rlast(:,1).^2+Rlast(:,2).^2+Rlast(:,3).^2);
 rmax = max(rlast); % estimate for maximal distance
 resol = simulation.numerics.particleDistanceResolution; % resolution of lookup
@@ -68,7 +67,7 @@ for jS = 1:simulation.input.particles.number
     kM = simulation.input.k_medium;
 
     % relative positions
-    R = simulation.numerics.deviceArray(single(bsxfun(@plus,simulation.output.fieldPoints,-simulation.input.particles.positionArray(jS,:))));
+    R = simulation.numerics.deviceArray(single(simulation.output.fieldPoints-simulation.input.particles.positionArray(jS,:)));
     r = sqrt(sum(R.^2,2));
     e_r = R./r;
     ct = e_r(:,3);
@@ -108,16 +107,15 @@ for jS = 1:simulation.input.particles.number
                 % SVWFs
                 if tau == 1  %select M
                     fac1 = 1/sqrt(2*l*(l+1)) * z .* eimphi;
-                    fac2 = bsxfun(@times,1i*m*pi_lm,e_theta)- ...
-                           bsxfun(@times,tau_lm,e_phi);
-                    N = bsxfun(@times,fac1,fac2);
+                    fac2 = (1i*m*pi_lm).*e_theta - tau_lm.*e_phi;
+                    N = fac1.*fac2;
                 else %select N
                     fac1 = 1/sqrt(2*l*(l+1)) * eimphi;
-                    term1 = bsxfun(@times,l*(l+1)*z./kr.*P_lm,e_r);
-                    term22 = bsxfun(@times,tau_lm,e_theta);
-                    term23 = bsxfun(@times,1i*m*pi_lm,e_phi);
-                    term2 = bsxfun(@times,dxxz./kr,term22+term23);
-                    N = bsxfun(@times,fac1,term1+term2);
+                    term1 = (l*(l+1)*z./kr.*P_lm).*e_r;
+                    term22 = tau_lm.*e_theta;
+                    term23 = (1i*m*pi_lm).*e_phi;
+                    term2 = (dxxz./kr).*(term22+term23);
+                    N = fac1.*(term1+term2);
                 end
                 E = E + simulation.tables.scatteredFieldCoefficients(jS,n) * N;
             end

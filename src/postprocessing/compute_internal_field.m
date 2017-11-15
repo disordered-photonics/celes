@@ -57,8 +57,7 @@ for jS=1:simulation.input.particles.number
     nu = 1;
 
     % relative positions
-    R = bsxfun(@plus,simulation.output.fieldPoints, ...
-                    -simulation.input.particles.positionArray(jS,:));
+    R = simulation.output.fieldPoints - simulation.input.particles.positionArray(jS,:);
     r = sqrt(sum(R.^2,2));
     Rint = R(r < simulation.input.particles.radiusArray(jS),:);
 

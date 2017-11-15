@@ -19,6 +19,7 @@
 - limit use of `Dependent` properties to avoid redundant calculations
 - implement `setupImpl` where appropriate for one-time calculations to improve performance
 - compute and set maximal particle distance inside particles class
+- prefer implicit expansion over `bsxfun` (requires MATLAB >= R2016b)
 
 ## [Unreleased]
 -

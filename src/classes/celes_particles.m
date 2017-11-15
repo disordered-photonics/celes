@@ -162,10 +162,9 @@ classdef celes_particles < matlab.System
             try
                 obj.maxParticleDistance = max(pdist(obj.positionArray));
             catch
-                obj.maxParticleDistance=0;
+                obj.maxParticleDistance = 0;
                 for jp1 = 1:obj.number
-                    diffs = bsxfun(@plus,obj.positionArray((jp1+1):end,:), ...
-                                        -obj.positionArray(jp1,:));
+                    diffs = obj.positionArray((jp1+1):end,:)-obj.positionArray(jp1,:);
                     dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
                     if max(dists2) > obj.maxParticleDistance^2
                         obj.maxParticleDistance = sqrt(max(dists2));
