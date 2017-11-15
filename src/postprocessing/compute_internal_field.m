@@ -58,8 +58,9 @@ for jS=1:simulation.input.particles.number
 
     % relative positions
     R = simulation.output.fieldPoints - simulation.input.particles.positionArray(jS,:);
-    r = sqrt(sum(R.^2,2));
-    Rint = R(r < simulation.input.particles.radiusArray(jS),:);
+    r2 = sum(R.^2,2);
+    intidx = find(r2 < simulation.input.particles.radiusArray(jS)^2);
+    Rint = R(intidx,:);
 
     for l = 1:simulation.numerics.lmax
         for m = -l:l
@@ -68,12 +69,12 @@ for jS=1:simulation.input.particles.number
                 N = SVWF(kS,Rint,nu,tau,l,m);
                 b_to_c = T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'internal')/...
                          T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'scattered');
-                E(r < simulation.input.particles.radiusArray(jS),:) = ...
-                    E(r < simulation.input.particles.radiusArray(jS),:)+ ...
+                E(intidx,:) = ...
+                    E(intidx,:)+ ...
                     simulation.tables.scatteredFieldCoefficients(jS,n) * b_to_c * N;
             end
         end
     end
-    internal_indices = [internal_indices; find(r < simulation.input.particles.radiusArray(jS))];
+    internal_indices = [internal_indices; intidx];
 end
 end
