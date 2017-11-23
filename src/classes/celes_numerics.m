@@ -66,6 +66,10 @@ classdef celes_numerics < matlab.System
     properties (SetAccess=private, Hidden)
         %> number of unknowns per particle
         nmax
+
+        %> single precision (lmax+1)x(lmax+1)x(ceil(lmax/2)) array of
+        %> coefficients of the (trigonometric) associated legendre polynomials
+        Plm_coeff_table
     end
 
     methods
@@ -83,6 +87,36 @@ classdef celes_numerics < matlab.System
         % ======================================================================
         function computeNmax(obj)
             obj.nmax = jmult_max(1,obj.lmax);
+        end
+
+        % ======================================================================
+        %> @brief Compute the coefficients for the calculation of the associated
+        %>        Legendre functions (requires MATLAB's symbolic toolbox)
+        %>
+        %> @param lmax
+        %> @retval Plm_coeff_table (single precision float array of size
+        %>         lmax+1 x lmax+1 x ceil(lmax/2)). Plm_coeff_table can be used
+        %>         to reconstruct the actual Legendre functions for example by
+        %>         using the function check_legendre()
+        % ======================================================================
+        function Plm_coefficients(obj)
+            syms ct
+            syms st
+            plm = legendre_normalized_trigon(ct,st,2*obj.lmax);
+
+            obj.Plm_coeff_table = zeros(2*obj.lmax+1, ...
+                                        2*obj.lmax+1, ...
+                                        ceil(2*obj.lmax/2), ...
+                                        'single');
+
+            for l = 0:2*obj.lmax
+                for m = 0:l
+                    [cf,~] = coeffs(plm{l+1,m+1});
+                    obj.Plm_coeff_table(l+1,m+1,1:length(cf)) = single(cf);
+                end
+            end
+%             clear ct st
+%             reset(symengine)
         end
 
         % ======================================================================
@@ -108,6 +142,7 @@ classdef celes_numerics < matlab.System
         % ======================================================================
         function setupImpl(obj)
             computeNmax(obj);
+            Plm_coefficients(obj);
         end
 
         % ======================================================================

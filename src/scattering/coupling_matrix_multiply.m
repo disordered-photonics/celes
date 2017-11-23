@@ -57,9 +57,7 @@ preparation_timer = tic;
 
 lmax = simulation.numerics.lmax;
 NS = simulation.input.particles.number;
-
-% initialize tables
-PlmCoeffTable = gpuArray(single(Plm_coefficients(2*lmax)));
+PlmCoeffTable = gpuArray(single(simulation.numerics.Plm_coeff_table));
 
 h3_table = spherical_bessel_table(simulation);
 real_hTab = gpuArray(single(h3_table.real_h3));
