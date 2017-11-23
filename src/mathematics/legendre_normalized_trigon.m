@@ -68,19 +68,16 @@ plm{1,1} = ones(size(ct),'like',ct)*sqrt(2)/2;  % P_0
 plm{2,1} = sqrt(3/2)*ct; % P_1
 
 for l = 1:lmax-1  % l+1
-    lp1 = l+1;  % as index for cell array
-    plm{lp1+1,1} = 1/(l+1)*sqrt((2*l+1)*(2*l+3))*ct.*plm{lp1,1}- ...
-                   l/lp1*sqrt((2*l+3)/(2*l-1))*plm{lp1-1,1};
+    plm{l+2,1} = 1/(l+1)*sqrt((2*l+1)*(2*l+3))*ct.*plm{l+1,1}- ...
+                 l/(l+1)*sqrt((2*l+3)/(2*l-1))*plm{l,1};
 end
 
 for m = 1:lmax
-    mp1 = m+1;
-    plm{mp1-1,mp1} = zeros(size(ct),'like',ct);
-    plm{mp1,mp1} = sqrt((2*m+1)/2/factorial(2*m))*prod((2*m-1):-2:1)*st.^m;
+    plm{m,m+1} = zeros(size(ct),'like',ct);
+    plm{m+1,m+1} = sqrt((2*m+1)/2/factorial(2*m))*prod((2*m-1):-2:1)*st.^m;
     for l = m:lmax-1
-        lp1 = l+1;
-        plm{lp1+1,mp1} = sqrt((2*l+1)*(2*l+3)/(l+1-m)/(l+1+m))*ct.*plm{lp1,mp1}- ...
-                         sqrt((2*l+3)*(l-m)*(l+m)/(2*l-1)/(l+1-m)/(l+1+m))*plm{lp1-1,mp1};
+        plm{l+2,m+1} = sqrt((2*l+1)*(2*l+3)/(l+1-m)/(l+1+m))*ct.*plm{l+1,m+1}- ...
+                         sqrt((2*l+3)*(l-m)*(l+m)/(2*l-1)/(l+1-m)/(l+1+m))*plm{l,m+1};
     end
 end
 end
