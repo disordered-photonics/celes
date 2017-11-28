@@ -59,9 +59,8 @@ lmax = simulation.numerics.lmax;
 NS = simulation.input.particles.number;
 PlmCoeffTable = gpuArray(single(simulation.numerics.Plm_coeff_table));
 
-h3_table = spherical_bessel_table(simulation);
-real_hTab = gpuArray(single(h3_table.real_h3));
-imag_hTab = gpuArray(single(h3_table.imag_h3));
+real_hTab = simulation.h3_table.real_h3;
+imag_hTab = simulation.h3_table.imag_h3;
 rResol = single(simulation.numerics.particleDistanceResolution);
 
 real_x = gpuArray(single(real(x)));

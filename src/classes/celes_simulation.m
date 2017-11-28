@@ -58,6 +58,11 @@ classdef celes_simulation < matlab.System
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical Hankel function in the particle coupling
         lookupParticleDistances
+
+        %> h3_table.real_h3(i,j) and h3_table.imag_h3(i,j) contain the real and
+        %> imaginary part of the spherical Hankel function of first kind of
+        %> order i-1, evaluated at simulation.input.k_medium * simulation.lookupParticleDistances,
+        h3_table
     end
 
     methods
@@ -80,6 +85,23 @@ classdef celes_simulation < matlab.System
             maxdist = obj.input.particles.maxParticleDistance+ ...
                       3*obj.numerics.particleDistanceResolution;
             obj.lookupParticleDistances = [0, 0:step:maxdist];
+        end
+
+        % ======================================================================
+        %> @brief Generate tabulated data of the spherical Hankel function
+        % ======================================================================
+        function compute_h3_table(obj)
+            obj.h3_table.real_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                                                  length(obj.lookupParticleDistances), ...
+                                                  'single');
+            obj.h3_table.imag_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                                                  length(obj.lookupParticleDistances), ...
+                                                  'single');
+            for p = 0:2*obj.numerics.lmax
+                spbs = sph_bessel(3,p,obj.input.k_medium * obj.lookupParticleDistances);
+                obj.h3_table.real_h3(p+1,:) = real(spbs);
+                obj.h3_table.imag_h3(p+1,:) = imag(spbs);
+            end
         end
 
         % ======================================================================
@@ -400,7 +422,8 @@ classdef celes_simulation < matlab.System
         %> @brief Class implementation
         % ======================================================================
         function setupImpl(obj)
-            computeLookupParticleDistances(obj);
+            computeLookupParticleDistances(obj); % this must be calculated first
+            compute_h3_table(obj);
         end
 
         % ======================================================================
