@@ -41,7 +41,6 @@ simulation = celes_simulation;
 simulation.input = celes_input;
 simulation.numerics = celes_numerics;
 simulation.tables = celes_tables;
-simulation.output = celes_output;
 
 % initialize fields of simulation.input object
 simulation.input.wavelength = single(app.WavelengthEditField.Value);
@@ -87,20 +86,6 @@ simulation.numerics.solver.tolerance = app.SolverToleranceEditField.Value;
 simulation.numerics.solver.maxIter = app.SolverMaxiterEditField.Value;
 
 % initialize fields of simulation.output object
-if app.FieldEvaluationCheckBox.Value
-    dim1arr = app.FieldDim1MinEditField.Value:app.FieldDim1StepEditField.Value:app.FieldDim1MaxEditField.Value;
-    dim2arr = app.FieldDim2MinEditField.Value:app.FieldDim2StepEditField.Value:app.FieldDim2MaxEditField.Value;
-    [dim1,dim2]=meshgrid(dim1arr,dim2arr);
-    dim3=dim1-dim1+app.FieldPlanePosEditField.Value;
-    sz=size(dim1);
-    switch app.FieldPlaneDropDown.Value
-        case 'xz-Plane'
-            simulation.output.fieldPoints=[dim1(:),dim3(:),dim2(:)];
-        case 'yz-Plane'
-            simulation.output.fieldPoints=[dim3(:),dim1(:),dim2(:)];
-        case 'xy-Plane'
-            simulation.output.fieldPoints=[dim1(:),dim2(:),dim3(:)];
-    end
-    simulation.output.fieldPointsArrayDims = sz;
-end
+simulation.output = app2output(app);
+
 end
