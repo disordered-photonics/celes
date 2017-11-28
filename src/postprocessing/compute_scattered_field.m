@@ -47,7 +47,7 @@ Rlast = bsxfun(@plus,simulation.output.fieldPoints, ...
                     -simulation.input.particles.positionArray(simulation.input.particles.number,:));
 rlast = sqrt(Rlast(:,1).^2+Rlast(:,2).^2+Rlast(:,3).^2);
 rmax = max(rlast); % estimate for maximal distance
-resol = 1; % resolution of lookup
+resol = simulation.numerics.particleDistanceResolution; % resolution of lookup
 ri = 0:resol:(rmax+resol);
 hi = cell(simulation.numerics.lmax,1);
 dhi = cell(simulation.numerics.lmax,1);
