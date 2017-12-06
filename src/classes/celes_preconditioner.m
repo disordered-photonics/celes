@@ -33,7 +33,7 @@
 %> @brief Preconditioner for the iterative celes_solver objects
 % ==============================================================================
 
-classdef celes_preconditioner
+classdef celes_preconditioner < matlab.System
 
     properties
         %> what kind of preconditioner?
@@ -62,10 +62,15 @@ classdef celes_preconditioner
         factorizedMasterMatrices
     end
 
-    properties (Dependent)
-    end
-
     methods
+        % ======================================================================
+        %> @brief Class constructor
+        % ======================================================================
+        function obj = celes_preconditioner(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+        end
+
         % ======================================================================
         %> @brief Run the preconditioner.
         %>
@@ -188,11 +193,25 @@ classdef celes_preconditioner
                     value = gpuArray(value(:));
                     prec_time = toc(prec_timer);
                     if verbose
-                        fprintf('done in %f seconds. \n', prec_time)
+                        fprintf('done in %f seconds.\n', prec_time)
                     end
 
                 case 'none'
                     value=rhs;
+            end
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.type,{'char'},{'nonempty'})
+            catch e, error('invalid preconditioner type: %s', e.message); end
+            if strcmpi(obj.type,'blockdiagonal')
+                try validateattributes(obj.partitionEdgeSizes,{'numeric'},{'real','nonnan','finite','row','numel',3})
+                catch e, error('invalid partitionEdgeSizes array: %s', e.message); end
             end
         end
     end

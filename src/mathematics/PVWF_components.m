@@ -47,14 +47,14 @@ kvec = k*[sin(beta).*cos(alpha);sin(beta).*sin(alpha);cos(beta)];
 E = exp(1i*R*kvec);
 if pol==1  % TE
     % E_alpha = [-sin(alpha);cos(alpha);0];
-    Ex = bsxfun(@times,-sin(alpha), E);
-    Ey = bsxfun(@times,cos(alpha), E);
+    Ex = -sin(alpha).*E;
+    Ey = cos(alpha).*E;
     Ez = zeros(size(E),'like',E);
 else
     % E_beta = [cos(alpha)*kz/k;sin(alpha)*kz/k;-kpar/k];
-    Ex = bsxfun(@times,cos(alpha).*cos(beta), E);
-    Ey = bsxfun(@times,sin(alpha).*cos(beta), E);
-    Ez = bsxfun(@times,-sin(beta), E);
+    Ex = (cos(alpha).*cos(beta)).*E;
+    Ey = (sin(alpha).*cos(beta)).*E;
+    Ez = -sin(beta).*E;
 end
 
 E_components = {Ex,Ey,Ez};

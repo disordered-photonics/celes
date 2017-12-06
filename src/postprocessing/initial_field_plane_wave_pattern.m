@@ -55,7 +55,13 @@ switch simulation.input.initialField.type
             w = initF.beamWidth;
             k = simulation.input.k_medium;
 
-            pwp(1:2) = {celes_planeWavePattern(betaArray, alphaArray, simulation.input.k_medium)};
+            for pol = 2:-1:1
+            pwp{pol} = celes_planeWavePattern('polarAngles', betaArray, ...
+                                              'azimuthalAngles', alphaArray, ...
+                                              'k', simulation.input.k_medium, ...
+                                              'expansionCoefficients', simulation.numerics.deviceArray(zeros(length(alphaArray),length(betaArray),'single')) ... % dima x dimb
+                                              );
+            end
 
             kxGrid = pwp{1}.kxGrid;
             kyGrid = pwp{1}.kyGrid;
@@ -64,7 +70,7 @@ switch simulation.input.initialField.type
             emnikrg = exp(-1i*(kxGrid*RG(1) + kyGrid*RG(2) + kzGrid*RG(3)));  % Nalpha x Nbeta
             prefacCosBetGaussfac = E0*k^2*w^2/(4*pi)* cos(betaArray(:).') .* exp(-w^2/4*k^2*sin(betaArray(:).').^2)  .*  ( sign(cos(betaArray(:).')) == sign(cos(initF.polarAngle)) ) ;  % 1 x Nbeta, make sure only the correct direction contributes
 
-            eikrgPrefacCosBetGaussfac = bsxfun(@times,emnikrg,prefacCosBetGaussfac); % Nalpha x Nbeta
+            eikrgPrefacCosBetGaussfac = emnikrg.*prefacCosBetGaussfac; % Nalpha x Nbeta
 
             switch lower(simulation.input.initialField.polarization)
                 case 'te'
@@ -73,8 +79,8 @@ switch simulation.input.initialField.type
                     alphaG = simulation.input.initialField.azimuthalAngle-pi/2;
             end
             
-            pwp{1}.expansionCoefficients = bsxfun(@times, cos(alphaArray(:)-alphaG), eikrgPrefacCosBetGaussfac);
-            pwp{2}.expansionCoefficients = sign(cos(initF.polarAngle)) * bsxfun(@times, sin(alphaArray(:)-alphaG), eikrgPrefacCosBetGaussfac);
+            pwp{1}.expansionCoefficients = cos(alphaArray(:)-alphaG).*eikrgPrefacCosBetGaussfac;
+            pwp{2}.expansionCoefficients = sign(cos(initF.polarAngle)) * (sin(alphaArray(:)-alphaG).*eikrgPrefacCosBetGaussfac);
 
         else
             error('this is not implemented')

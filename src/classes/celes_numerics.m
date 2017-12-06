@@ -33,7 +33,7 @@
 %> @brief Parameters describing the numerical settings used in the simulation
 % ==============================================================================
 
-classdef celes_numerics
+classdef celes_numerics < matlab.System
 
     properties
         %> maximal polar multipole order
@@ -63,17 +63,60 @@ classdef celes_numerics
         particleDistanceResolution = single(10);
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> number of unknowns per particle
         nmax
+
+        %> single precision (lmax+1)x(lmax+1)x(ceil(lmax/2)) array of
+        %> coefficients of the (trigonometric) associated legendre polynomials
+        Plm_coeff_table
     end
 
     methods
         % ======================================================================
-        %> @brief Get method for nmax
+        %> @brief Class constructor
         % ======================================================================
-        function value = get.nmax(obj)
-            value = jmult_max(1,obj.lmax);
+        function obj = celes_numerics(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
+        end
+
+        % ======================================================================
+        %> @brief Compute nmax
+        % ======================================================================
+        function computeNmax(obj)
+            obj.nmax = jmult_max(1,obj.lmax);
+        end
+
+        % ======================================================================
+        %> @brief Compute the coefficients for the calculation of the associated
+        %>        Legendre functions (requires MATLAB's symbolic toolbox)
+        %>
+        %> @param lmax
+        %> @retval Plm_coeff_table (single precision float array of size
+        %>         lmax+1 x lmax+1 x ceil(lmax/2)). Plm_coeff_table can be used
+        %>         to reconstruct the actual Legendre functions for example by
+        %>         using the function check_legendre()
+        % ======================================================================
+        function Plm_coefficients(obj)
+            syms ct
+            syms st
+            plm = legendre_normalized_trigon(ct,st,2*obj.lmax);
+
+            obj.Plm_coeff_table = zeros(2*obj.lmax+1, ...
+                                        2*obj.lmax+1, ...
+                                        ceil(2*obj.lmax/2), ...
+                                        'single');
+
+            for l = 0:2*obj.lmax
+                for m = 0:l
+                    [cf,~] = coeffs(plm{l+1,m+1});
+                    obj.Plm_coeff_table(l+1,m+1,1:length(cf)) = single(cf);
+                end
+            end
+%             clear ct st
+%             reset(symengine)
         end
 
         % ======================================================================
@@ -91,5 +134,31 @@ classdef celes_numerics
             end
         end
 
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeNmax(obj);
+            Plm_coefficients(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.lmax,{'numeric'},{'positive','integer','scalar'})
+            catch e, error('invalid lmax value: %s', e.message); end
+            try validateattributes(obj.polarAnglesArray,{'numeric'},{'real','nonnan','increasing','row','>=',0,'<=',pi})
+            catch e, error('invalid polarAnglesArray array: %s', e.message); end
+            try validateattributes(obj.azimuthalAnglesArray,{'numeric'},{'real','nonnan','increasing','row','>=',0,'<=',2*pi})
+            catch e, error('invalid azimuthalAnglesArray array: %s', e.message); end
+            try validateattributes(obj.particleDistanceResolution,{'numeric'},{'real','nonnan','positive','scalar'})
+            catch e, error('invalid particleDistanceResolution value: %s', e.message); end
+            try validateattributes(obj.solver,{'celes_solver'},{'nonempty'})
+            catch, error('expected a valid celes_solver instance'); end
+        end
     end
 end

@@ -70,9 +70,9 @@ switch simulation.input.initialField.type
                         E_comps = PVWF_components(R,k,alphArr(ja),betArr,pol);
 
                         coeffs = sinBet.*pwp{pol}.expansionCoefficients(ja,:);
-                        betaxIntegrand = bsxfun(@times,coeffs,E_comps{1});
-                        betayIntegrand = bsxfun(@times,coeffs,E_comps{2});
-                        betazIntegrand = bsxfun(@times,coeffs,E_comps{3});
+                        betaxIntegrand = coeffs.*E_comps{1};
+                        betayIntegrand = coeffs.*E_comps{2};
+                        betazIntegrand = coeffs.*E_comps{3};
 
                         axIntegrand(:,ja) = trapz(betArr,betaxIntegrand,2);
                         ayIntegrand(:,ja) = trapz(betArr,betayIntegrand,2);

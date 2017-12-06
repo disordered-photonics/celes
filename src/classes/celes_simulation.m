@@ -35,7 +35,7 @@
 %> The simulation class contains all input, intermediate results and
 %> output for one calculation.
 % ==============================================================================
-classdef celes_simulation
+classdef celes_simulation < matlab.System
 
     properties
         %> celes_input object which contains the parameters that specify
@@ -47,27 +47,61 @@ classdef celes_simulation
 
         %> celes_tables object which contains lookup tables and other
         %> intermediate results
-        tables
+        tables = celes_tables
 
         %> celes_output object which contains the results of the
         %> simulation
-        output
+        output = celes_output
     end
 
-    properties (Dependent)
+    properties (SetAccess=private, Hidden)
         %> single array which contains a grid of distances used for the
         %> lookup of the spherical Hankel function in the particle coupling
         lookupParticleDistances
+
+        %> h3_table.real_h3(i,j) and h3_table.imag_h3(i,j) contain the real and
+        %> imaginary part of the spherical Hankel function of first kind of
+        %> order i-1, evaluated at simulation.input.k_medium * simulation.lookupParticleDistances,
+        h3_table
     end
 
     methods
         % ======================================================================
-        %> @brief get method for dependent property lookupParticleDistances
+        %> @brief Class constructor
         % ======================================================================
-        function value = get.lookupParticleDistances(obj)
-            value = [0,0:obj.numerics.particleDistanceResolution: ...
-                        (obj.input.particles.maxParticleDistance+ ...
-                       3*obj.numerics.particleDistanceResolution)]; % add two zeros at beginning to allow for interpolation also in first segment
+        function obj = celes_simulation(varargin)
+            setProperties(obj,nargin,varargin{:});
+            validatePropertiesImpl(obj);
+            setupImpl(obj);
+        end
+
+        % ======================================================================
+        %> @brief Generate the lookupParticleDistances array
+        % ======================================================================
+        function computeLookupParticleDistances(obj)
+            % add two zeros at beginning to allow interpolation
+            % also in the first segment
+            step = obj.numerics.particleDistanceResolution;
+            maxdist = obj.input.particles.maxParticleDistance+ ...
+                      3*obj.numerics.particleDistanceResolution;
+            obj.lookupParticleDistances = [0, 0:step:maxdist];
+        end
+
+        % ======================================================================
+        %> @brief Generate tabulated data of the spherical Hankel function
+        % ======================================================================
+        function compute_h3_table(obj)
+            obj.h3_table.real_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                                                  length(obj.lookupParticleDistances), ...
+                                                  'single');
+            obj.h3_table.imag_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                                                  length(obj.lookupParticleDistances), ...
+                                                  'single');
+            for p = 0:2*obj.numerics.lmax
+                spbs = sph_bessel(3,p,obj.input.k_medium * obj.lookupParticleDistances);
+                obj.h3_table.real_h3(p+1,:) = real(spbs);
+                obj.h3_table.imag_h3(p+1,:) = imag(spbs);
+            end
         end
 
         % ======================================================================
@@ -194,10 +228,9 @@ classdef celes_simulation
         % ======================================================================
         function obj = computeTotalFieldPWP(obj)
             fprintf(1,'compute total field coefficients table ...');
-            obj.output.totalFieldPlaneWavePattern=cell(2,1);
             pwpScat = obj.output.scatteredFieldPlaneWavePattern;
             pwpIn = initial_field_plane_wave_pattern(obj);
-            for pol=1:2
+            for pol = 2:-1:1
                 obj.output.totalFieldPlaneWavePattern{pol} = pwpScat{pol};
                 obj.output.totalFieldPlaneWavePattern{pol} = ...
                    obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpIn{pol});
@@ -287,6 +320,9 @@ classdef celes_simulation
         %>         output.scatteredField
         % ======================================================================
         function obj = evaluateFields(obj)
+            if isempty(obj.output.fieldPoints)
+                error('fieldPoints property of celes_output class not specified')
+            end
             tfld = tic;
             obj = obj.evaluateInitialField;
             obj = obj.evaluateScatteredField;
@@ -315,7 +351,7 @@ classdef celes_simulation
             Wx = coupling_matrix_multiply(obj,value,varargin{:});
 
             if verbose
-                fprintf('apply T-matrix ... ')
+                fprintf('apply T-matrix ...')
             end
             t_matrix_timer = tic;
 
@@ -336,7 +372,6 @@ classdef celes_simulation
         %> - computation of initial field power
         %> - computation of Mie coefficients
         %> - computation of the translation table
-        %> - computation of the maximal distance between pairs of particles
         %> - preparation of the particle partitioning (if blockdiagonal
         %>   preconditioner is active)
         %> - preparation of the blockdiagonal preconditioner (if active)
@@ -356,9 +391,6 @@ classdef celes_simulation
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;
             obj = obj.computeTranslationTable;
-            fprintf(1,'compute maximal particle distance ...');
-            obj.input.particles = obj.input.particles.compute_maximal_particle_distance;
-            fprintf(1,' done\n');
             if strcmpi(obj.numerics.solver.preconditioner.type,'blockdiagonal')
                 tprec = tic;
                 fprintf(1,'make particle partition ...');
@@ -382,6 +414,30 @@ classdef celes_simulation
             obj.numerics.solver.preconditioner.masterMatrices = [];
             obj.output.runningTime = toc(tcomp);
             fprintf(1,'simulation ran in %.1f seconds.\n',obj.output.runningTime);
+        end
+    end
+
+    methods(Access = protected)
+        % ======================================================================
+        %> @brief Class implementation
+        % ======================================================================
+        function setupImpl(obj)
+            computeLookupParticleDistances(obj); % this must be calculated first
+            compute_h3_table(obj);
+        end
+
+        % ======================================================================
+        %> @brief Validate class properties
+        % ======================================================================
+        function validatePropertiesImpl(obj)
+            try validateattributes(obj.input,{'celes_input'},{'nonempty'})
+            catch, error('expected a valid celes_input instance'); end
+            try validateattributes(obj.numerics,{'celes_numerics'},{'nonempty'})
+            catch, error('expected a valid celes_numerics instance'); end
+            try validateattributes(obj.tables,{'celes_tables'},{'nonempty'})
+            catch, error('expected a valid celes_tables instance'); end
+            try validateattributes(obj.output,{'celes_output'},{'nonempty'})
+            catch, error('expected a valid celes_output instance'); end
         end
     end
 end
