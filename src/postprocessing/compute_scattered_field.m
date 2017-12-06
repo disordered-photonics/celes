@@ -44,7 +44,7 @@ msg='';
 
 % spherical bessel lookup
 Rlast = simulation.output.fieldPoints-simulation.input.particles.positionArray(simulation.input.particles.number,:);
-rlast = sqrt(Rlast(:,1).^2+Rlast(:,2).^2+Rlast(:,3).^2);
+rlast = sqrt(sum(Rlast.^2,2));
 rmax = max(rlast); % estimate for maximal distance
 resol = simulation.numerics.particleDistanceResolution; % resolution of lookup
 ri = 0:resol:(rmax+resol);
