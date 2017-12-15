@@ -73,7 +73,8 @@ If you have questions, bug reports or feature requests, please use the [Issues](
 This software is published under the BSD 3-clause license, please read the [LICENSE](LICENSE) file for more information.
 
 ### Credits
-CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan and Taylor Fryett have contributed code to the project. We thank Yasuhiko Okada for valuable comments and feedback.
+CELES was initiated by Amos Egel, Lorenzo Pattelli and Giacomo Mazzamuto. In addition, Alan Zhan and Taylor Fryett have contributed code to the project. 
+We thank Yasuhiko Okada and Aso Rahimzadegan for valuable comments and bug reports.
 
 CELES uses the following codes from other programmers:
 * [polarplot3d](https://it.mathworks.com/matlabcentral/fileexchange/13200-3d-polar-plot/content/polarplot3d.m) from Kenn Gerard
