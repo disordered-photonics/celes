@@ -71,7 +71,8 @@ for jS = 1:simulation.input.particles.number
     r = sqrt(sum(R.^2,2));
     e_r = R./r;
     ct = e_r(:,3);
-    st = sqrt(abs(1-ct.^2));
+    ct(ct < 0) = 0; % check for rounding errors
+    st = sqrt(1-ct.^2);
     phi = atan2(R(:,2),R(:,1));
 
     e_theta = [ct.*cos(phi),ct.*sin(phi),-st];
