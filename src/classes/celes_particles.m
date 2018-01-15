@@ -159,13 +159,15 @@ classdef celes_particles < matlab.System
         %> @brief Set the maximalParticleDistance attribute to the correct value
         % ======================================================================
         function compute_maximal_particle_distance(obj)
+                CH = convhull(double(obj.positionArray)); % double required by convhull
+                CH = obj.positionArray(unique(CH(:)),:);  % unique vertices
             try
-                obj.maxParticleDistance = max(pdist(obj.positionArray));
+                obj.maxParticleDistance = max(pdist(CH));
             catch
                 obj.maxParticleDistance = 0;
-                for jp1 = 1:obj.number
-                    diffs = obj.positionArray((jp1+1):end,:)-obj.positionArray(jp1,:);
-                    dists2 = diffs(:,1).^2+diffs(:,2).^2+diffs(:,3).^2;
+                for jp1 = 1:size(CH,1)
+                    diffs = CH((jp1+1):end,:)-CH(jp1,:);
+                    dists2 = sum(diffs.^2,2);
                     if max(dists2) > obj.maxParticleDistance^2
                         obj.maxParticleDistance = sqrt(max(dists2));
                     end
