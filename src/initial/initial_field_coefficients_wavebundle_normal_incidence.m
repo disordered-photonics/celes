@@ -68,7 +68,7 @@ end
 fullBetaArray = simulation.numerics.polarAnglesArray(:);
 directionIdcs = ( sign(cos(fullBetaArray)) == sign(cos(simulation.input.initialField.polarAngle)) );
 betaArray = fullBetaArray(directionIdcs);
-dBeta = diff(betaArray);
+dBeta = mean(diff(betaArray));
 cb = cos(betaArray);
 sb = sin(betaArray);
 
@@ -85,18 +85,23 @@ rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2
 phiGi = atan2(relativeParticlePositions(:,2),relativeParticlePositions(:,1)); % NS x 1
 zGi = relativeParticlePositions(:,3); % NS x 1
 
+clear fullBetaArray directionIdcs betaArray gaussfac relativeParticlePositions % clean up some memory?
+
 % compute initial field coefficients
 aI = simulation.numerics.deviceArray(zeros(simulation.input.particles.number,simulation.numerics.nmax,'single'));
-eikz = exp(1i*zGi*k*cb.'); % NS x Nk
 for m=-lmax:lmax
-    eikzJmp1 = eikz .* besselj(abs(m+1),rhoGi*k*sb.'); % NS x Nk
-    eikzJmm1 = eikz .* besselj(abs(m-1),rhoGi*k*sb.'); % NS x Nk
-    eimp1phi = exp(-1i*(m+1)*phiGi); % NS x 1
-    eimm1phi = exp(-1i*(m-1)*phiGi); % NS x 1
-    plTerm = exp(1i*alphaG)*1i^abs(m+1)*(eimp1phi.*eikzJmp1);
-    mnTerm = exp(-1i*alphaG)*1i^abs(m-1)*(eimm1phi.*eikzJmm1);
-    eikzI1 = pi*( mnTerm + plTerm );
-    eikzI2 = pi*1i*(-mnTerm + plTerm);
+
+    % calculate terms on the fly to avoid storing temporary NSxNk-sized variables
+    % inefficient performance-wise, for some calculations are now repeated twice
+    eikzI1 = pi*( ...
+              exp(-1i*alphaG) * 1i^abs(m-1) * ( exp(-1i*(m-1)*phiGi) .* (exp(1i*zGi*k*cb.') .* besselj(abs(m-1),rhoGi*k*sb.')) ) ...
+            + exp( 1i*alphaG) * 1i^abs(m+1) * ( exp(-1i*(m+1)*phiGi) .* (exp(1i*zGi*k*cb.') .* besselj(abs(m+1),rhoGi*k*sb.')) ) ...
+                );
+
+    eikzI2 = pi*1i*( ...
+            - exp(-1i*alphaG) * 1i^abs(m-1) * ( exp(-1i*(m-1)*phiGi) .* (exp(1i*zGi*k*cb.') .* besselj(abs(m-1),rhoGi*k*sb.')) ) ...
+            + exp( 1i*alphaG) * 1i^abs(m+1) * ( exp(-1i*(m+1)*phiGi) .* (exp(1i*zGi*k*cb.') .* besselj(abs(m+1),rhoGi*k*sb.')) ) ...
+                    );
     for tau=1:2
         for l=max(1,abs(m)):lmax
             n=multi2single_index(1,tau,l,m,lmax);
@@ -104,13 +109,12 @@ for m=-lmax:lmax
             gaussSincosBDag1 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,1,'dagger'); % Nk x 1
             gaussSincosBDag2 = gaussfacSincos .* transformation_coefficients(pilm,taulm,tau,l,m,2,'dagger'); % Nk x 1
 
-            intgr1a = eikzI1(:,2:end) * (gaussSincosBDag1(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-            intgr1b = eikzI1(:,1:(end-1)) * (gaussSincosBDag1(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-
-            intgr2a = eikzI2(:,2:end) * (gaussSincosBDag2(2:end).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-            intgr2b = eikzI2(:,1:(end-1)) * (gaussSincosBDag2(1:(end-1)).*dBeta);  % NS x Nk * Nk x 1 = NS x 1
-
-            aI(:,n) = prefac * (intgr1a + intgr1b + intgr2a + intgr2b) /2 ; % trapezoidal rule
+            aI(:,n) = prefac * (...
+                                eikzI1(:,2:end) * gaussSincosBDag1(2:end) + ...
+                                eikzI1(:,1:(end-1)) * gaussSincosBDag1(1:end-1) + ...
+                                eikzI2(:,2:end) * gaussSincosBDag2(2:end) + ...
+                                eikzI2(:,1:(end-1)) * gaussSincosBDag2(1:end-1) ...
+                                ) * dBeta / 2;
         end
     end
 end

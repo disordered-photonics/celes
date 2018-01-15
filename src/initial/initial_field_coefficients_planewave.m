@@ -40,7 +40,7 @@
 %===============================================================================
 function aI = initial_field_coefficients_planewave(simulation)
 
-lmax=simulation.numerics.lmax;
+lmax = simulation.numerics.lmax;
 E0 = simulation.input.initialField.amplitude;
 k = simulation.input.k_medium;
 
@@ -53,9 +53,11 @@ alpha = simulation.input.initialField.azimuthalAngle;
 [pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
-relativeParticlePositions = simulation.input.particles.positionArray-simulation.input.initialField.focalPoint;
+relativeParticlePositions = simulation.input.particles.positionArray - simulation.input.initialField.focalPoint;
 kvec = k*[sb*cos(alpha);sb*sin(alpha);cb];
 eikr = exp(1i*relativeParticlePositions*kvec);
+
+clear k beta cb sb kvec relativeParticlePositions % clean up some memory?
 
 % compute initial field coefficients
 aI = simulation.numerics.deviceArray(zeros(simulation.input.particles.number,simulation.numerics.nmax,'single'));
