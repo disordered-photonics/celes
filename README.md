@@ -44,7 +44,7 @@ In order to fully take advantage of preconditioned iterative solvers we recommen
 ### Getting started
 CELES can be installed via cloning the GitHub repository with
 ```bash
-git clone git@github.com:disordered-photonics/celes.git
+git clone https://github.com/disordered-photonics/celes.git
 ```
 or by downloading and extracting one of the [releases](https://github.com/disordered-photonics/celes/releases). Please note that the releases do not always represent the most up to date version (see the [CHANGELOG](CHANGELOG.md) for further details).
 
