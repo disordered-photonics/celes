@@ -177,13 +177,17 @@ classdef celes_simulation < matlab.System
         %> @return celes_simulation object with updated initialFieldPower
         % ======================================================================
         function obj = computeInitialFieldPower(obj)
-            fprintf(1,'compute initial field power ...');
-            if obj.input.initialField.normalIncidence
-                obj.output.initialFieldPower = initial_power_wavebundle_normal_incidence(obj);
+            if obj.input.initialField.beamWidth==0 || obj.input.initialField.beamWidth==inf
+                obj.output.initialFieldPower = inf;  % plane wave has infinite power
             else
-                error('this case is not implemented')
+                fprintf(1,'compute initial field power ...');
+                if obj.input.initialField.normalIncidence
+                    obj.output.initialFieldPower = initial_power_wavebundle_normal_incidence(obj);
+                else
+                    error('this case is not implemented')
+                end
+                fprintf(1,' done\n');
             end
-            fprintf(1,' done\n');
         end
 
         % ======================================================================
