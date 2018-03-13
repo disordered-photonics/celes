@@ -4,33 +4,26 @@
   format inspired by [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
   
   please use the following types where appropriate
-    Added     	for new features.
-    Changed   	for changes in existing functionality.
+    Added       for new features.
+    Changed     for changes in existing functionality.
     Deprecated  for soon-to-be removed features.
-    Removed   	for now removed features.
-    Fixed     	for any bug fixes.
+    Removed     for now removed features.
+    Fixed       for any bug fixes.
 -->
 
 ## [Testing]
 ### Changed
--
-
-## [Unreleased]
-### Changed
-- subclass CELES classes from `matlab.System`
+- subclass celes classes from `matlab.System`
 - implement `setProperties` methods for name-value style initialization
 - implement `validatePropertiesImpl` methods for validation
 - limit use of `Dependent` properties to avoid redundant calculations
 - implement `setupImpl` where appropriate for one-time calculations to improve performance
 - compute and set maximal particle distance inside particles class
-- compute and set h3_table inside simulation class
-- compute and set Plm_coefficient table inside numerics class
-- initialize simulation instance with a default output instance
 - prefer implicit expansion over `bsxfun` (requires MATLAB >= R2016b)
 - fancier, faster plotting functions
 
-### Fixed
-- remove hardcoded lookup resolution value in GUI example parameters
+## [Unreleased]
+-
 
 ## [2.1] - 2017-10-25
 ### Changed
