@@ -71,7 +71,8 @@ for jS = 1:simulation.input.particles.number
     r = sqrt(sum(R.^2,2));
     e_r = R./r;
     ct = e_r(:,3);
-    ct(ct < 0) = 0; % check for rounding errors
+    ct(ct < -1) = -1; % check for rounding errors
+    ct(ct > 1) = 1;
     st = sqrt(1-ct.^2);
     phi = atan2(R(:,2),R(:,1));
 
