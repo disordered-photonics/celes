@@ -11,7 +11,12 @@
     Fixed       for any bug fixes.
 -->
 
+
 ## [Testing]
+### Fixed
+- fallback to pdist if sphere positions are coplanar or collinear
+
+## [Unreleased]
 ### Changed
 - subclass celes classes from `matlab.System`
 - implement `setProperties` methods for name-value style initialization
@@ -21,9 +26,10 @@
 - compute and set maximal particle distance inside particles class
 - prefer implicit expansion over `bsxfun` (requires MATLAB >= R2016b)
 - fancier, faster plotting functions
+- use convex hull in compute_maximal_particle_distance
 
-## [Unreleased]
--
+### Fixed
+- don't try to compute initial power for plane waves
 
 ## [2.1] - 2017-10-25
 ### Changed
