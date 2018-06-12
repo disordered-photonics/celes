@@ -38,7 +38,10 @@ for tau1 = 1:2
                                     AB = B(m+1, l1, l2);
                                 end
                             end
-                            W(j2, j1) = W(j2, j1) + D1 * AB * D2;  % remember that W is the transpose of A or B
+                            if abs(m)<=min(l1, l2)
+                                W(j2, j1) = W(j2, j1) + D1 * AB * D2;  % remember that W is the transpose of A or B
+%                                 W(j2, j1) = D2;  % remember that W is the transpose of A or B
+                            end
                         end
                     end
                 end

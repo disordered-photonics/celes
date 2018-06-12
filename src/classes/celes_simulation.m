@@ -91,16 +91,30 @@ classdef celes_simulation < matlab.System
         %> @brief Generate tabulated data of the spherical Hankel function
         % ======================================================================
         function compute_h3_table(obj)
-            obj.h3_table.real_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
-                                                  length(obj.lookupParticleDistances), ...
-                                                  'single');
-            obj.h3_table.imag_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
-                                                  length(obj.lookupParticleDistances), ...
-                                                  'single');
-            for p = 0:2*obj.numerics.lmax
-                spbs = sph_bessel(3,p,obj.input.k_medium * obj.lookupParticleDistances);
-                obj.h3_table.real_h3(p+1,:) = real(spbs);
-                obj.h3_table.imag_h3(p+1,:) = imag(spbs);
+            if obj.numerics.rotTransRotFlag
+                obj.h3_table.real_h3 = gpuArray.zeros(2*obj.numerics.lmax+2, ...
+                    length(obj.lookupParticleDistances), ...
+                    'single');
+                obj.h3_table.imag_h3 = gpuArray.zeros(2*obj.numerics.lmax+2, ...
+                    length(obj.lookupParticleDistances), ...
+                    'single');
+                for p = 0:(2*obj.numerics.lmax+1)
+                    spbs = sph_bessel(3,p,obj.input.k_medium * obj.lookupParticleDistances);
+                    obj.h3_table.real_h3(p+1,:) = real(spbs);
+                    obj.h3_table.imag_h3(p+1,:) = imag(spbs);
+                end
+            else
+                obj.h3_table.real_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                    length(obj.lookupParticleDistances), ...
+                    'single');
+                obj.h3_table.imag_h3 = gpuArray.zeros(2*obj.numerics.lmax+1, ...
+                    length(obj.lookupParticleDistances), ...
+                    'single');
+                for p = 0:2*obj.numerics.lmax
+                    spbs = sph_bessel(3,p,obj.input.k_medium * obj.lookupParticleDistances);
+                    obj.h3_table.real_h3(p+1,:) = real(spbs);
+                    obj.h3_table.imag_h3(p+1,:) = imag(spbs);
+                end
             end
         end
 
@@ -351,8 +365,12 @@ classdef celes_simulation < matlab.System
             else
                 verbose = varargin{1};
             end
-
-            Wx = coupling_matrix_multiply(obj,value,varargin{:});
+            
+            if obj.numerics.rotTransRotFlag
+                Wx = coupling_matrix_multiply_rtr(obj,value,varargin{:});
+            else
+                Wx = coupling_matrix_multiply(obj,value,varargin{:});
+            end
 
             if verbose
                 fprintf('apply T-matrix ...')
@@ -390,7 +408,11 @@ classdef celes_simulation < matlab.System
             print_logo
             print_parameters(obj)
             tcomp = tic;
-            cuda_compile(obj.numerics.lmax);
+            if obj.numerics.rotTransRotFlag
+                cuda_compile_rtr(obj.numerics.lmax);
+            else
+                cuda_compile(obj.numerics.lmax);
+            end
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;

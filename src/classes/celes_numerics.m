@@ -53,6 +53,10 @@ classdef celes_numerics < matlab.System
         %> matrix vector products. Future versions might offer the
         %> opportunity to run the whole calculation on the CPU
         gpuFlag = true
+        
+        %> apply rotation/axial-translation/rotation scheme?
+        %> NOTE: For large lmax it is recommended to set this flag to true
+        rotTransRotFlag = false
 
         %> celes_solver object that contains all the information about
         %> how the linear system is to be solved
@@ -142,7 +146,9 @@ classdef celes_numerics < matlab.System
         % ======================================================================
         function setupImpl(obj)
             computeNmax(obj);
-            Plm_coefficients(obj);
+            if ~obj.rotTransRotFlag
+                Plm_coefficients(obj);
+            end
         end
 
         % ======================================================================

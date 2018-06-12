@@ -74,14 +74,15 @@ __device__ void wignerD(int const m, int const m_prime,
 			maxm = (float) abs(m+m_prime);
 			minm = (float) abs(m-m_prime);
 		}
-		
+	
 		for (int s=0; s<smin; s++) real_D[s] = 0.0f;  // this line can be removed
-
 		// [Mishchenko, B.24 (page 365)]
+		
 		real_D[smin] = zeta * powf(2.0f, -smin) 
 		               * sqrtf( truncatedFactorial(2*smin, maxm+0.5f) / truncatedFactorial(minm, 1.5f) )
 					   * powf(1.0f - cosBeta, abs(m-m_prime)/2.0f) 
 					   * powf(1.0f + cosBeta, abs(m+m_prime)/2.0f);
+		
 		
 		// [Mishchenko, B.22 (page 365)]
 		if (smin < LMAX){
@@ -95,7 +96,7 @@ __device__ void wignerD(int const m, int const m_prime,
 					       / (s * sqrtf((s+1)*(s+1)-m*m) * sqrtf((s+1)*(s+1) - m_prime*m_prime));
 		}
 	}
-
+	
 	// [Doicu, B.36 (page 271)]
 	float delta = 1.0f;
 	if ((m<0) && (m % 2)) delta *= -1.0f;
@@ -105,6 +106,5 @@ __device__ void wignerD(int const m, int const m_prime,
 	for (int s=0; s<=LMAX; s++) {
 		imag_D[s] = powf(-1.0f, m+m_prime) * delta * sinf(m*alpha + m_prime*gamma) * real_D[s];
 		real_D[s] = powf(-1.0f, m+m_prime) * delta * cosf(m*alpha + m_prime*gamma) * real_D[s];
-		
 	}
 }

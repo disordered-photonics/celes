@@ -1,20 +1,19 @@
 function [Wx] = coupling_matrix_multiply_rtr(simulation,x,varargin)
 
-lmax = simulation.numerics.lmax;
 NS = simulation.input.particles.number;
 
-Wx = zeros(size(x));
+real_hTab = simulation.h3_table.real_h3;
+imag_hTab = simulation.h3_table.imag_h3;
 
-for js1 = 1:NS
-    for js2 = 1:NS
-        if js1 ~= js2
-            W = rotation_translation_rotation(...
-                simulation.input.k_medium, ...
-                simulation.input.particles.positionArray(js1, :), ...
-                simulation.input.particles.positionArray(js2, :), ...
-                lmax);
-            
-            Wx(js1, :) = Wx(js1, :) + transpose( W * transpose(x(js2, :)));
-        end
-    end
-end
+rResol = single(simulation.numerics.particleDistanceResolution) * simulation.input.k_medium;
+
+real_x = gpuArray(single(real(x)));
+imag_x = gpuArray(single(imag(x)));
+
+part_pos = gpuArray(single(transpose(simulation.input.particles.positionArray))) * simulation.input.k_medium;
+
+[real_Wx,imag_Wx] = coupling_matrix_multiply_rtr_CUDA(real_x, imag_x, ...
+                                                      real_hTab, imag_hTab, ...
+                                                      part_pos, int32(NS), rResol);
+
+Wx = real_Wx + 1i*imag_Wx;
