@@ -24,7 +24,18 @@ __device__ void legendrePolynomial(float const x, float *P)
 
 @retval n!/n2! as float
 =============================================================================*/
-__device__ float truncatedFactorial(float const n, float const n2)
+__device__ float truncatedFactorial(float n, float const n2)
+{
+	float result = 1.0f;
+	for (;n>=n2;n--){
+		result *= n;
+	}
+	return result;
+}
+
+// NOTE: the following recursive factorial leads to memory errors with lmax>2
+// ... maybe due stack size??
+__device__ float truncatedFactorial_recursive(float const n, float const n2)
 {
 	if (n < n2) return 1.0f; else return n*truncatedFactorial(n-1.0f, n2);
 }
@@ -78,8 +89,9 @@ __device__ void wignerD(int const m, int const m_prime,
 		for (int s=0; s<smin; s++) real_D[s] = 0.0f;  // this line can be removed
 		// [Mishchenko, B.24 (page 365)]
 		
-		real_D[smin] = zeta * powf(2.0f, -smin) 
-		               * sqrtf( truncatedFactorial(2*smin, maxm+0.5f) / truncatedFactorial(minm, 1.5f) )
+		real_D[smin] = zeta * powf(2.0f, -smin)
+		               * sqrtf( truncatedFactorial((float) 2*smin, maxm+0.5f) / truncatedFactorial(minm, 1.5f) )
+					   //* sqrtf( (float) 2*smin / 1.5f)
 					   * powf(1.0f - cosBeta, abs(m-m_prime)/2.0f) 
 					   * powf(1.0f + cosBeta, abs(m+m_prime)/2.0f);
 		
@@ -95,6 +107,7 @@ __device__ void wignerD(int const m, int const m_prime,
 			                - (s+1.0f) * sqrtf(s*s - m*m) * sqrtf(s*s - m_prime*m_prime) * real_D[s-1])
 					       / (s * sqrtf((s+1)*(s+1)-m*m) * sqrtf((s+1)*(s+1) - m_prime*m_prime));
 		}
+		
 	}
 	
 	// [Doicu, B.36 (page 271)]

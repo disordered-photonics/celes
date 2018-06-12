@@ -156,9 +156,11 @@ classdef celes_simulation < matlab.System
         %> @return celes_simulation object with updated translationTable
         % ======================================================================
         function obj = computeTranslationTable(obj)
-            fprintf(1,'compute translation table ...');
-            obj.tables.translationTable = translation_table_ab(obj.numerics.lmax);
-            fprintf(1,' done\n');
+            if ~obj.numerics.rotTransRotFlag
+                fprintf(1,'compute translation table ...');
+                obj.tables.translationTable = translation_table_ab(obj.numerics.lmax);
+                fprintf(1,' done\n');
+            end
         end
 
         % ======================================================================
