@@ -171,52 +171,49 @@ __device__ void axialTranslationCoefficients(const float kz,
 	float real_C_lminus2[2*LMAX+2] = {0.0f};
 	float imag_C_lminus2[2*LMAX+2] = {0.0f};
 	
+	// treat m=0, l=0 in advance
+	C00lprime(kz, jTable, yTable, rResol, real_C, imag_C);
+	copy(real_C, real_C_mminus1);
+	copy(imag_C, imag_C_mminus1);
+	
 	for (int m=0; m<=LMAX; m++){
-		// l=m
-		if (m==0) {
-			C00lprime(kz, jTable, yTable, rResol, real_C, imag_C);
-			copy(real_C, real_C_mminus1);
-			copy(imag_C, imag_C_mminus1);
-		}
-		else {
-			Cmmlprime(m, real_C_mminus1, imag_C_mminus1, real_C, imag_C);
-			copy(real_C, real_C_mminus1);
-			copy(imag_C, imag_C_mminus1);
+		for (int l=max(1, m); l<=LMAX; l++){
+			if (l==m){
+				Cmmlprime(m, real_C_mminus1, imag_C_mminus1, real_C, imag_C);
+				copy(real_C, real_C_mminus1);
+				copy(imag_C, imag_C_mminus1);
+				
+				AB(m, m, kz, real_C, imag_C, real_A, imag_A, real_B, imag_B);
+				for (int lprime=1; lprime<=LMAX; lprime++){
+					real_A_array[idx(m,m,lprime)] = real_A[lprime];
+					imag_A_array[idx(m,m,lprime)] = imag_A[lprime];
+					real_B_array[idx(m,m,lprime)] = real_B[lprime];
+					imag_B_array[idx(m,m,lprime)] = imag_B[lprime];
+				}
+				for (int lprime=0; lprime<2*LMAX+2; lprime++){
+					real_C_lminus1[lprime] = 0.0f;
+					imag_C_lminus1[lprime] = 0.0f;
+				}
 			
-			AB(m, m, kz, real_C, imag_C, real_A, imag_A, real_B, imag_B);
-			for (int lprime=1; lprime<=LMAX; lprime++){
-				real_A_array[idx(m,m,lprime)] = real_A[lprime];
-				imag_A_array[idx(m,m,lprime)] = imag_A[lprime];
-				real_B_array[idx(m,m,lprime)] = real_B[lprime];
-				imag_B_array[idx(m,m,lprime)] = imag_B[lprime];
-			}
-		}
-		
-		for (int lprime=0; lprime<2*LMAX+2; lprime++){
-			real_C_lminus1[lprime] = 0.0f;
-			imag_C_lminus1[lprime] = 0.0f;
-		}
-		
-		// l>m
-		for (int l=(m+1); l<=LMAX; l++){
-			copy(real_C_lminus1, real_C_lminus2);
-			copy(imag_C_lminus1, imag_C_lminus2);
+			} else {
+				copy(real_C_lminus1, real_C_lminus2);
+				copy(imag_C_lminus1, imag_C_lminus2);
+				copy(real_C, real_C_lminus1);
+				copy(imag_C, imag_C_lminus1);
+				
+				Cmllprime(m, l, 
+						  real_C_lminus2, imag_C_lminus2,
+						  real_C_lminus1, imag_C_lminus1, 
+						  real_C, imag_C);
 			
-			copy(real_C, real_C_lminus1);
-			copy(imag_C, imag_C_lminus1);
+				AB(m, l, kz, real_C, imag_C, real_A, imag_A, real_B, imag_B);
 			
-			Cmllprime(m, l, 
-                      real_C_lminus2, imag_C_lminus2,
-					  real_C_lminus1, imag_C_lminus1, 
-					  real_C, imag_C);
-			
-			AB(m, l, kz, real_C, imag_C, real_A, imag_A, real_B, imag_B);
-			
-			for (int lprime=1; lprime<=LMAX; lprime++){
-				real_A_array[idx(m,l,lprime)] = real_A[lprime];
-				imag_A_array[idx(m,l,lprime)] = imag_A[lprime];
-				real_B_array[idx(m,l,lprime)] = real_B[lprime];
-				imag_B_array[idx(m,l,lprime)] = imag_B[lprime];
+				for (int lprime=1; lprime<=LMAX; lprime++){
+					real_A_array[idx(m,l,lprime)] = real_A[lprime];
+					imag_A_array[idx(m,l,lprime)] = imag_A[lprime];
+					real_B_array[idx(m,l,lprime)] = real_B[lprime];
+					imag_B_array[idx(m,l,lprime)] = imag_B[lprime];
+				}
 			}
 		}
 	}
