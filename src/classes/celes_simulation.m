@@ -235,9 +235,9 @@ classdef celes_simulation < matlab.System
             pwpScat = obj.output.scatteredFieldPlaneWavePattern;
             pwpIn = initial_field_plane_wave_pattern(obj);
             for pol = 2:-1:1
-                obj.output.totalFieldPlaneWavePattern{pol} = pwpScat{pol};
+                obj.output.totalFieldPlaneWavePattern{pol} = pwpIn{pol};
                 obj.output.totalFieldPlaneWavePattern{pol} = ...
-                   obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpIn{pol});
+                   obj.output.totalFieldPlaneWavePattern{pol}.addTo(pwpScat{pol});
             end
             fprintf(1,' done\n');
         end
