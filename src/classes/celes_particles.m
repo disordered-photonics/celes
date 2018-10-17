@@ -160,22 +160,19 @@ classdef celes_particles < matlab.System
         % ======================================================================
         function compute_maximal_particle_distance(obj)
             try
-                CH = convhull(double(obj.positionArray)); % double required by convhull
-                CH = obj.positionArray(unique(CH(:)),:);  % unique vertices
-                obj.maxParticleDistance = max(pdist(CH));
-            catch % convhull throws an error if spheres are coplanar or collinear
-                try
-                    obj.maxParticleDistance = max(pdist(obj.positionArray));
-                catch % in case pdist is not available
-                    obj.maxParticleDistance = 0;
-                    for jp1 = 1:size(CH,1)
-                        diffs = CH((jp1+1):end,:)-CH(jp1,:);
-                        dists2 = sum(diffs.^2,2);
-                        if max(dists2) > obj.maxParticleDistance^2
-                            obj.maxParticleDistance = sqrt(max(dists2));
-                        end
-                    end
-                end
+                pos = convhull(double(obj.positionArray)); % double required by convhull
+                pos = obj.positionArray(unique(pos(:)),:); % unique vertices
+            catch % convhull fails if particles are coplanar or collinear
+                pos = obj.positionArray;
+            end
+            try
+                obj.maxParticleDistance = max(pdist(pos));
+            catch % in case pdist is not available
+                % drop-in replacement: a bit slower, larger memory footprint
+                % obj.maxParticleDistance = sqrt(max(max(sum(bsxfun(@minus,reshape(size(pos,[size(pos,1),1,3]),reshape(pos,[1,size(pos,1),3])).^2,3))));
+                %
+                % quick&dirty overestimate, probably OK in most (all?) cases
+                obj.maxParticleDistance = sqrt(sum((min(pos)-max(pos)).^2));
             end
         end
     end

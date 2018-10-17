@@ -13,8 +13,6 @@
 
 
 ## [Testing]
-### Fixed
-- fallback to pdist if sphere positions are coplanar or collinear
 
 ## [Unreleased]
 ### Changed
@@ -27,9 +25,12 @@
 - prefer implicit expansion over `bsxfun` (requires MATLAB >= R2016b)
 - fancier, faster plotting functions
 - use convex hull in compute_maximal_particle_distance
+- provide robust, fallback method for compute_maximal_particle_distance
 
 ### Fixed
 - don't try to compute initial power for plane waves
+- fix bug in scattered field plots
+- fix bug in computeTotalFieldPWP
 
 ## [2.1] - 2017-10-25
 ### Changed
