@@ -389,8 +389,11 @@ classdef celes_simulation < matlab.System
         function obj = run(obj,varargin)
             print_logo
             print_parameters(obj)
+            mexfilename = ['coupling_matrix_multiply_CUDA_lmax', int2str(obj.numerics.lmax)];
+            if ~(exist(mexfilename,'file')==3) % '3' means: MEX file exists
+                cuda_compile(obj.numerics.lmax);
+            end
             tcomp = tic;
-            cuda_compile(obj.numerics.lmax);
             fprintf(1,'starting simulation.\n');
             obj = obj.computeInitialFieldPower;
             obj = obj.computeMieCoefficients;

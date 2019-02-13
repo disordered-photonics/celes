@@ -36,19 +36,22 @@
 %> @param verbose (boolean): be verbose in compilation output?
 %===============================================================================
 function cuda_compile(lmax, verbose)
-fprintf(1,'compiling CUDA-code')
-
-SRC_FILE = 'coupling_matrix_multiply_CUDA.cu';
-script_dir = fileparts(mfilename('fullpath'));
-SRC_FILE = fullfile(script_dir, SRC_FILE);
 
 if exist('lmax','var') == 1
-    fprintf(1,' using lmax=%d.\n',lmax)
-    DEFINES = strcat('-DLMAX=',int2str(lmax));
+    lmaxmsg = sprintf(' with lmax=%d.\n',lmax);
 else
-    fprintf(1,' using default lmax.\n')
-    DEFINES = '';
+    lmax = 3; % default lmax
+    lmaxmsg = sprintf(' with default lmax.\n');
 end
+
+SRC_FILE = 'coupling_matrix_multiply_CUDA.cu';
+DEFINES = strcat('-DLMAX=',int2str(lmax));
+
+fprintf(1,['compiling CUDA-code',lmaxmsg])
+
+OUT_FILE = [SRC_FILE(1:end-3), '_lmax', int2str(lmax)];
+script_dir = fileparts(mfilename('fullpath'));
+SRC_FILE = fullfile(script_dir, SRC_FILE);
 
 verb_flag = '';
 
@@ -67,6 +70,6 @@ if verLessThan('matlab','8.4') % check if version is less than R2015b
     
     mex(verb_flag, DEFINES, '-outdir', script_dir, SRC_FILE)
 else
-    mexcuda(verb_flag, DEFINES, '-outdir', script_dir, SRC_FILE)
+    mexcuda(verb_flag, DEFINES, '-outdir', script_dir, '-output', OUT_FILE, SRC_FILE)
 end
 end

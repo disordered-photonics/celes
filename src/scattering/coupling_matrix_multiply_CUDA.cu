@@ -36,10 +36,6 @@
 #include <math.h>
 #include "cuda_profiler_api.h"
 
-#ifndef LMAX
-#define LMAX 3
-#endif
-
 __device__ float assocLegendreFunction(int const l, int const m, float const ct, float const st, float const *plm_coeffs)
 {
 	float Plm = 0.0f;

@@ -103,6 +103,9 @@ end
 
 coupling_timer = tic;
 
+mexfilename = ['coupling_matrix_multiply_CUDA_lmax', int2str(lmax)];
+coupling_matrix_multiply_CUDA = str2func(mexfilename);
+
 [real_Wx,imag_Wx] = coupling_matrix_multiply_CUDA(real_x, imag_x, ...
                                                   real_hTab, imag_hTab, ...
                                                   PlmCoeffTable, ...
