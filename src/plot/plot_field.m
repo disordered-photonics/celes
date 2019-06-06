@@ -64,6 +64,8 @@ switch lower(fieldType)
         E = simulation.output.initialField;
 end
 
+cmap = interp1(1:3,[0 0 1; 1 1 1; 1 0 0],linspace(1,3,256)); % define a diverging colormap
+
 switch lower(component)
     case 'real ex'
         fld = reshape(gather(E(:,1)), dims);
@@ -73,18 +75,11 @@ switch lower(component)
         fld = reshape(gather(E(:,3)), dims);
     case 'abs e'
         fld = reshape(gather(sqrt(sum(abs(E).^2,2))), dims);
+        cmap = parula(256); % use default (sequential) colormap for abs(E)
 end
 
-if exist('GIFoutputname','var')
-    t = linspace(0,2*pi,26); t(end) = []; % 25 frames
-    cmap = interp1(1:3,[0 0 1; 1 1 1; 1 0 0],linspace(1,3,256-32));
-    gifcmap = [cmap; gray(32)]; % add some grayscale colors for the gif colormap
-    caxislim = [-max(abs(fld(:))), max(abs(fld(:)))];
-else
-    t = 0;
-    cmap = parula(256);
-    caxislim = [0, max(abs(fld(:)))];
-end
+% define axis limits: lower limit should be 0 for abs(E) and -max(abs(E)) for real(Ei)
+caxislim = [-max(abs(fld(:)))*min(0, min(real(fld(:))))/min(real(fld(:))) , max(abs(fld(:)))];
 
 fldPnts = reshape([simulation.output.fieldPoints(:,1), ...
                    simulation.output.fieldPoints(:,2), ...
@@ -108,10 +103,15 @@ dist = abs(pArr(:,perpdim) - fldPnts(1,1,perpdim));% particle distances from xy 
 idx = find(dist<rArr);                          % find particles intersecting the plane
 rArr(idx) = sqrt(rArr(idx).^2 - dist(idx).^2);  % overwrite radius of the intersection circle
 
-if exist('GIFoutputname','var') % initialize imind array
+if exist('GIFoutputname','var')
+    t = linspace(0,2*pi,26); t(end) = []; % 25 frames
+    cmap = interp1(1:3,[0 0 1; 1 1 1; 1 0 0],linspace(1,3,256-32));
+    gifcmap = [cmap; gray(32)]; % tweak gif colormap to add some grayscale colors
     f = getframe(gcf);
-    imind = rgb2ind(f.cdata,gifcmap,'nodither');
+    imind = rgb2ind(f.cdata,gifcmap,'nodither'); % initialize imind array
     imind(1,1,1,numel(t)) = 0;
+else % no gif to be created
+    t = 0;
 end
 
 for ti=1:numel(t)

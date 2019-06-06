@@ -133,7 +133,6 @@ plot_spheres(gca,simul.input.particles.positionArray, ...
 % plot near field
 figure('Name','Near-field cross-cut','NumberTitle','off');
 plot_field(gca,simul,'abs E','Total field')
-colorbar
 caxis([0,2])
 
 % % export animated gif
