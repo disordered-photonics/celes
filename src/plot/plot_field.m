@@ -57,11 +57,14 @@ dims = simulation.output.fieldPointsArrayDims;
 
 switch lower(fieldType)
     case 'total field'
-        E = simulation.output.totalField;
+        E = simulation.output.totalEField;
+        H = simulation.output.totalHField;
     case 'scattered field'
-        E = simulation.output.scatteredField + simulation.output.internalField;
+        E = simulation.output.scatteredEField + simulation.output.internalEField;
+        H = simulation.output.scatteredHField + simulation.output.internalHField;
     case 'initial field'
-        E = simulation.output.initialField;
+        E = simulation.output.initialEField;
+        H = simulation.output.initialHField;
 end
 
 cmap = interp1(1:3,[0 0 1; 1 1 1; 1 0 0],linspace(1,3,256)); % define a diverging colormap
@@ -76,10 +79,19 @@ switch lower(component)
     case 'abs e'
         fld = reshape(gather(sqrt(sum(abs(E).^2,2))), dims);
         cmap = parula(256); % use default (sequential) colormap for abs(E)
+    case 'real hx'
+        fld = reshape(gather(H(:,1)), dims);
+    case 'real hy'
+        fld = reshape(gather(H(:,2)), dims);
+    case 'real hz'
+        fld = reshape(gather(H(:,3)), dims);
+    case 'abs h'
+        fld = reshape(gather(sqrt(sum(abs(H).^2,2))), dims);
+        cmap = parula(256); % use default (sequential) colormap for abs(H)
 end
 
 % define axis limits: lower limit should be 0 for abs(E) and -max(abs(E)) for real(Ei)
-caxislim = [-max(abs(fld(:)))*min(0, min(real(fld(:))))/min(real(fld(:))) , max(abs(fld(:)))];
+caxislim = [-max(abs(fld(:)))*min(0, min(real(fld(:))))/min(real(fld(:))), max(abs(fld(:)))];
 
 fldPnts = reshape([simulation.output.fieldPoints(:,1), ...
                    simulation.output.fieldPoints(:,2), ...
@@ -133,7 +145,11 @@ for ti=1:numel(t)
 
     ax.DataAspectRatio = [1,1,1];
     title([fieldType,', ',component])
-    caxis(caxislim)
+    try
+        caxis(caxislim)
+    catch
+        caxis([-1,1]) % caxislim is not valid is the fld is all zeros
+    end
     colorbar
     drawnow
 

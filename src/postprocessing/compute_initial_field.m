@@ -34,16 +34,18 @@
 %> @param   simulation (celes_simulation object): simulation for
 %>          which the initial field is to be computed
 %>
-%> @retval  E (Nx3 float array): electric field in the format [Ex;Ey;Ez]
-%>          Each column correspond to one field point specified in
-%>          simulation.output.fieldPoints
+%> @retval  E, H (Nx3 float arrays): electric and magnetic fields in the
+%>          format [Ex;Ey;Ez]. Each column correspond to one field point
+%>          specified in simulation.output.fieldPoints
 %===============================================================================
-function E = compute_initial_field(simulation)
+function [E, H] = compute_initial_field(simulation)
 
 E = zeros(size(simulation.output.fieldPoints),'single');  % Nx3
+H = zeros(size(simulation.output.fieldPoints),'single');  % Nx3
 numberOfFieldPoints = length(E(:,1));
 R = simulation.numerics.deviceArray(single(simulation.output.fieldPoints));
 k = simulation.input.k_medium;
+n = simulation.input.mediumRefractiveIndex;
 
 switch simulation.input.initialField.type
     case 'gaussian beam'
@@ -52,14 +54,17 @@ switch simulation.input.initialField.type
                     simulation.input.initialField.beamWidth
 
             if simulation.output.initialFieldUseParaxialApproximation
-                E = gaussian_beam_paraxial_approximation(simulation);
+                [E, H] = gaussian_beam_paraxial_approximation(simulation);
             else
                 pwp = initial_field_plane_wave_pattern(simulation);
                 for pol = 1:2
 
-                    axIntegrand = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
-                    ayIntegrand = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
-                    azIntegrand = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    axIntegrandE = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    ayIntegrandE = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    azIntegrandE = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    axIntegrandH = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    ayIntegrandH = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
+                    azIntegrandH = simulation.numerics.deviceArray(zeros(numberOfFieldPoints,length(pwp{pol}.azimuthalAngles),'single'));
 
                     betArr = simulation.numerics.deviceArray(transpose(single(pwp{pol}.polarAngles(:))));
                     alphArr = simulation.numerics.deviceArray(transpose(single(pwp{pol}.azimuthalAngles(:))));
@@ -67,31 +72,46 @@ switch simulation.input.initialField.type
 
                     for ja=1:length(alphArr)
                         %ja
-                        E_comps = PVWF_components(R,k,alphArr(ja),betArr,pol);
+                        [E_comps, H_comps] = PVWF_components(R,k,n,alphArr(ja),betArr,pol);
 
                         coeffs = sinBet.*pwp{pol}.expansionCoefficients(ja,:);
                         betaxIntegrand = coeffs.*E_comps{1};
                         betayIntegrand = coeffs.*E_comps{2};
                         betazIntegrand = coeffs.*E_comps{3};
 
-                        axIntegrand(:,ja) = trapz(betArr,betaxIntegrand,2);
-                        ayIntegrand(:,ja) = trapz(betArr,betayIntegrand,2);
-                        azIntegrand(:,ja) = trapz(betArr,betazIntegrand,2);
+                        axIntegrandE(:,ja) = trapz(betArr,betaxIntegrand,2);
+                        ayIntegrandE(:,ja) = trapz(betArr,betayIntegrand,2);
+                        azIntegrandE(:,ja) = trapz(betArr,betazIntegrand,2);
+
+                        betaxIntegrand = coeffs.*H_comps{1};
+                        betayIntegrand = coeffs.*H_comps{2};
+                        betazIntegrand = coeffs.*H_comps{3};
+
+                        axIntegrandH(:,ja) = trapz(betArr,betaxIntegrand,2);
+                        ayIntegrandH(:,ja) = trapz(betArr,betayIntegrand,2);
+                        azIntegrandH(:,ja) = trapz(betArr,betazIntegrand,2);
                     end
-                    E(:,1) = E(:,1) + gather(trapz(alphArr,axIntegrand,2));
-                    E(:,2) = E(:,2) + gather(trapz(alphArr,ayIntegrand,2));
-                    E(:,3) = E(:,3) + gather(trapz(alphArr,azIntegrand,2));
+                    E(:,1) = E(:,1) + gather(trapz(alphArr,axIntegrandE,2));
+                    E(:,2) = E(:,2) + gather(trapz(alphArr,ayIntegrandE,2));
+                    E(:,3) = E(:,3) + gather(trapz(alphArr,azIntegrandE,2));
+                    H(:,1) = H(:,1) + gather(trapz(alphArr,axIntegrandH,2));
+                    H(:,2) = H(:,2) + gather(trapz(alphArr,ayIntegrandH,2));
+                    H(:,3) = H(:,3) + gather(trapz(alphArr,azIntegrandH,2));
                 end
             end
-            
+
         else  % plane wave
-            E_comps = PVWF_components(R, k, ...
-                                      simulation.input.initialField.azimuthalAngle, ...
-                                      simulation.input.initialField.polarAngle, ...
-                                      simulation.input.initialField.pol);
+            [E_comps, H_comps] = PVWF_components(R, k, n, ...
+                                                simulation.input.initialField.azimuthalAngle, ...
+                                                simulation.input.initialField.polarAngle, ...
+                                                simulation.input.initialField.pol);
+
             E(:,1) = gather(E_comps{1});
             E(:,2) = gather(E_comps{2});
             E(:,3) = gather(E_comps{3});
+            H(:,1) = gather(H_comps{1});
+            H(:,2) = gather(H_comps{2});
+            H(:,3) = gather(H_comps{3});
         end
         
     otherwise
