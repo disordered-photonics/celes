@@ -40,8 +40,15 @@
 %>
 %> @param   fieldType (string): select 'Total field', 'Scattered field'
 %>          or 'Initial field'
+%>
+%> @param   scale (scalar): optional scale parameter for quiver plot. See
+%           quiver documentation
 %===============================================================================
-function plot_poynting(ax,simulation,fieldType)
+function S = plot_poynting(ax,simulation,fieldType,scale)
+
+if ~exist('scale','var')
+    scale = 3;
+end
 
 hold(ax,'on')
 
@@ -61,7 +68,7 @@ switch lower(fieldType)
         H = simulation.output.initialHField;
 end
 
-vfld = real(cross(reshape(gather(E), [dims,3]), conj(reshape(gather(H), [dims,3]))));
+S = 0.5*real(cross(reshape(gather(E), [dims,3]), conj(reshape(gather(H), [dims,3]))));
 
 fldPnts = reshape([simulation.output.fieldPoints(:,1), ...
                    simulation.output.fieldPoints(:,2), ...
@@ -85,7 +92,7 @@ dist = abs(pArr(:,perpdim) - fldPnts(1,1,perpdim));% particle distances from xy 
 idx = find(dist<rArr);                          % find particles intersecting the plane
 rArr(idx) = sqrt(rArr(idx).^2 - dist(idx).^2);  % overwrite radius of the intersection circle
 
-quiver(x,y,vfld(:,:,xy(1)),vfld(:,:,xy(2))), axis equal tight
+quiver(x,y,S(:,:,xy(1)),S(:,:,xy(2)),scale), axis equal tight
 
 for i=1:length(idx)
     rectangle(ax, ...

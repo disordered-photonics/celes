@@ -47,7 +47,7 @@
 %> @param   GIFoutputname (string): optional filename for an output
 %>          animated GIF (only for 'real Ei' components)
 %===============================================================================
-function plot_field(ax,simulation,component,fieldType,GIFoutputname)
+function fld = plot_field(ax,simulation,component,fieldType,GIFoutputname)
 
 hold(ax,'on')
 
@@ -122,13 +122,14 @@ if exist('GIFoutputname','var')
     f = getframe(gcf);
     imind = rgb2ind(f.cdata,gifcmap,'nodither'); % initialize imind array
     imind(1,1,1,numel(t)) = 0;
+    set(gcf,'color','w'); % the gif looks nicer with a neutral background
 else % no gif to be created
     t = 0;
 end
 
 for ti=1:numel(t)
     imagesc(x(1,:), y(:,1), real(fld*exp(-1i*t(ti))))% plot field on a xy plane
-    colormap(cmap)
+    colormap(gca,cmap)
     for i=1:length(idx)
         rectangle(ax, ...
                  'Position', [pArr(idx(i),xy)-rArr(idx(i)), [2,2]*rArr(idx(i))], ...
@@ -144,7 +145,7 @@ for ti=1:numel(t)
     ylabel(labels(xy(2)))
 
     ax.DataAspectRatio = [1,1,1];
-    title([fieldType,', ',component])
+    title(strjoin([fieldType,', ',component],''))
     try
         caxis(caxislim)
     catch
