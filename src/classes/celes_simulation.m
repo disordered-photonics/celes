@@ -156,17 +156,18 @@ classdef celes_simulation < matlab.System
         % ======================================================================
         function obj = computeInitialFieldCoefficients(obj)
             fprintf(1,'compute initial field coefficients ...');
-            if isfinite(obj.input.initialField.beamWidth) && obj.input.initialField.beamWidth
-                fprintf(1,' Gaussian beam ...');
-                if obj.input.initialField.normalIncidence
-                    obj.tables.initialFieldCoefficients = ...
-                        initial_field_coefficients_wavebundle_normal_incidence(obj);
-                else
-                    error('this case is not implemented')
-                end
-            else % infinite or 0 beam width
-                fprintf(1,' plane wave ...');
-                obj.tables.initialFieldCoefficients = initial_field_coefficients_planewave(obj);
+            switch lower(obj.input.initialField.type)
+                case 'plane wave'
+                    fprintf(1,' plane wave ...');
+                    obj.tables.initialFieldCoefficients = initial_field_coefficients_planewave(obj);
+                case 'gaussian beam'
+                    fprintf(1,' Gaussian beam ...');
+                    if obj.input.initialField.normalIncidence
+                        obj.tables.initialFieldCoefficients = ...
+                            initial_field_coefficients_wavebundle_normal_incidence(obj);
+                    else
+                        error('this case is not implemented')
+                    end
             end
             fprintf(1,' done\n');
         end
@@ -177,16 +178,17 @@ classdef celes_simulation < matlab.System
         %> @return celes_simulation object with updated initialFieldPower
         % ======================================================================
         function obj = computeInitialFieldPower(obj)
-            if obj.input.initialField.beamWidth==0 || obj.input.initialField.beamWidth==inf
-                obj.output.initialFieldPower = inf;  % plane wave has infinite power
-            else
-                fprintf(1,'compute initial field power ...');
-                if obj.input.initialField.normalIncidence
-                    obj.output.initialFieldPower = initial_power_wavebundle_normal_incidence(obj);
-                else
-                    error('this case is not implemented')
-                end
-                fprintf(1,' done\n');
+            switch lower(obj.input.initialField.type)
+                case 'plane wave'
+                    obj.output.initialFieldPower = inf;  % plane wave has infinite power
+                case 'gaussian beam'
+                    fprintf(1,'compute initial field power ...');
+                    if obj.input.initialField.normalIncidence
+                        obj.output.initialFieldPower = initial_power_wavebundle_normal_incidence(obj);
+                    else
+                        error('this case is not implemented')
+                    end
+                    fprintf(1,' done\n');
             end
         end
 

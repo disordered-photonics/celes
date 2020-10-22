@@ -57,7 +57,7 @@ simulation.input.particles.radiusArray = app.particleRadii;
 simulation.input.initialField.amplitude = single(app.AmplitudeEditField.Value);
 simulation.input.initialField.polarization = app.PolarizationDropDown.Value;
 simulation.input.initialField.beamWidth = single(app.InitialBeamWaistEditField.Value);
-simulation.input.initialField.focalPoint = single([app.InitialFocusXEditField.Value,app.InitialFocusYEditField.Value,app.InitialFocusZEditField.Value]);
+simulation.input.initialField.referencePoint = single([app.InitialFocusXEditField.Value,app.InitialFocusYEditField.Value,app.InitialFocusZEditField.Value]);
 
 % initialize fields of simulation.numerics object
 simulation.numerics.lmax = app.lmaxEditField.Value;

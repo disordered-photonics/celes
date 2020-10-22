@@ -41,7 +41,7 @@
 %===============================================================================
 function pwp = initial_field_plane_wave_pattern(simulation)
 
-switch simulation.input.initialField.type
+switch lower(simulation.input.initialField.type)
     case 'gaussian beam'
         if simulation.input.initialField.normalIncidence
 
@@ -50,7 +50,7 @@ switch simulation.input.initialField.type
             betaArray = simulation.numerics.polarAnglesArray;
             alphaArray = simulation.numerics.azimuthalAnglesArray;
 
-            RG = simulation.input.initialField.focalPoint;
+            RG = simulation.input.initialField.referencePoint;
             E0 = initF.amplitude;
             w = initF.beamWidth;
             k = simulation.input.k_medium;
@@ -85,6 +85,8 @@ switch simulation.input.initialField.type
         else
             error('this is not implemented')
         end
+    case 'plane wave'
+        error('The initial plane wave pattern for a plane wave is singular. Refer to the scattered plane wave pattern instead')
     otherwise
         error('this is not implemented')
 end

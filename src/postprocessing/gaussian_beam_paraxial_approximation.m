@@ -42,9 +42,9 @@
 function [E, H] = gaussian_beam_paraxial_approximation(simulation)
 
 % relative coordinates
-xG = simulation.input.initialField.focalPoint(1);
-yG = simulation.input.initialField.focalPoint(2);
-zG = simulation.input.initialField.focalPoint(3);
+xG = simulation.input.initialField.referencePoint(1);
+yG = simulation.input.initialField.referencePoint(2);
+zG = simulation.input.initialField.referencePoint(3);
 z = simulation.output.fieldPoints(:,3) - zG;
 z(z==0)=1e-30;
 rho = sqrt((simulation.output.fieldPoints(:,1)-xG).^2 + ...

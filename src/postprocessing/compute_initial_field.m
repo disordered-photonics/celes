@@ -99,21 +99,19 @@ switch simulation.input.initialField.type
                     H(:,3) = H(:,3) + gather(trapz(alphArr,azIntegrandH,2));
                 end
             end
-
-        else  % plane wave
-            [E_comps, H_comps] = PVWF_components(R, k, n, ...
-                                                simulation.input.initialField.azimuthalAngle, ...
-                                                simulation.input.initialField.polarAngle, ...
-                                                simulation.input.initialField.pol);
-
-            E(:,1) = gather(E_comps{1});
-            E(:,2) = gather(E_comps{2});
-            E(:,3) = gather(E_comps{3});
-            H(:,1) = gather(H_comps{1});
-            H(:,2) = gather(H_comps{2});
-            H(:,3) = gather(H_comps{3});
         end
+    case 'plane wave'
+        [E_comps, H_comps] = PVWF_components(R, k, n, ...
+            simulation.input.initialField.azimuthalAngle, ...
+            simulation.input.initialField.polarAngle, ...
+            simulation.input.initialField.pol);
         
+        E(:,1) = gather(E_comps{1});
+        E(:,2) = gather(E_comps{2});
+        E(:,3) = gather(E_comps{3});
+        H(:,1) = gather(H_comps{1});
+        H(:,2) = gather(H_comps{2});
+        H(:,3) = gather(H_comps{3});
     otherwise
         error('this is not implemented')
 end

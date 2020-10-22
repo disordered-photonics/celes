@@ -80,7 +80,7 @@ gaussfacSincos = gaussfac.*cb.*sb;
 [pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
-relativeParticlePositions = simulation.input.particles.positionArray - simulation.input.initialField.focalPoint;
+relativeParticlePositions = simulation.input.particles.positionArray - simulation.input.initialField.referencePoint;
 rhoGi = sqrt(relativeParticlePositions(:,1).^2+relativeParticlePositions(:,2).^2); % NS x 1
 phiGi = atan2(relativeParticlePositions(:,2),relativeParticlePositions(:,1)); % NS x 1
 zGi = relativeParticlePositions(:,3); % NS x 1

@@ -39,7 +39,7 @@ classdef celes_initialField < matlab.System
     properties
         %> specify the type of the field:
         %> currently, only 'gaussian beam' is possible
-        type  = 'gaussian beam'
+        type  = 'plane wave'
 
         %> amplitude of initial beam
         amplitude = single(1)
@@ -54,11 +54,11 @@ classdef celes_initialField < matlab.System
         %> incident beam polarization ('TE' or 'TM')
         polarization = 'TE'
 
+        %> focus of incident beam, [x,y,z]
+        referencePoint = single([0, 0, 0])
+
         %> incident beam width at focal point
         beamWidth
-
-        %> focus of incident beam, [x,y,z]
-        focalPoint
     end
 
     properties (SetAccess=private, Hidden)
@@ -120,19 +120,27 @@ classdef celes_initialField < matlab.System
             catch e, error('invalid initialField type: %s', e.message); end
             try validateattributes(obj.amplitude,{'numeric'},{'real','nonnan','finite','scalar'})
             catch e, error('invalid amplitude value: %s', e.message); end
-            if strcmpi(obj.type,'gaussian beam')
-                try validateattributes(obj.polarAngle,{'numeric'},{'real','nonnan','finite','scalar'})
-                catch e, error('invalid polarAngle value: %s', e.message); end
-                try validateattributes(obj.azimuthalAngle,{'numeric'},{'real','nonnan','finite','scalar'})
-                catch e, error('invalid azimuthalAngle value: %s', e.message); end
-                try validateattributes(obj.polarization,{'char'},{'nonempty'})
-                catch e, error('invalid polarization type: %s', e.message); end
-                try validateattributes(obj.beamWidth,{'numeric'},{'real','nonnan','scalar'})
-                catch e, error('invalid beamWidth value: %s', e.message); end
-                try validateattributes(obj.focalPoint,{'numeric'},{'real','nonnan','finite','row','numel',3})
-                catch e, error('invalid focalPoint array: %s', e.message); end
-            else
-                error('invalid initialField type')
+            switch lower(obj.type)
+                case 'gaussian beam'
+                    try validateattributes(obj.polarAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                    catch e, error('invalid polarAngle value: %s', e.message); end
+                    try validateattributes(obj.azimuthalAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                    catch e, error('invalid azimuthalAngle value: %s', e.message); end
+                    try validateattributes(obj.polarization,{'char'},{'nonempty'})
+                    catch e, error('invalid polarization type: %s', e.message); end
+                    try validateattributes(obj.beamWidth,{'numeric'},{'real','nonnan','finite','positive','scalar'})
+                    catch e, error('invalid beamWidth value: %s', e.message); end
+                    try validateattributes(obj.referencePoint,{'numeric'},{'real','nonnan','finite','row','numel',3})
+                    catch e, error('invalid referencePoint array: %s', e.message); end
+                case 'plane wave'
+                    try validateattributes(obj.polarAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                    catch e, error('invalid polarAngle value: %s', e.message); end
+                    try validateattributes(obj.azimuthalAngle,{'numeric'},{'real','nonnan','finite','scalar'})
+                    catch e, error('invalid azimuthalAngle value: %s', e.message); end
+                    try validateattributes(obj.polarization,{'char'},{'nonempty'})
+                    catch e, error('invalid polarization type: %s', e.message); end
+                otherwise
+                    error('invalid initialField type')
             end
         end
     end

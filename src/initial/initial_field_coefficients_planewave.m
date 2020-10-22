@@ -53,7 +53,7 @@ alpha = simulation.input.initialField.azimuthalAngle;
 [pilm,taulm] = spherical_functions_trigon(cb,sb,lmax);  % Nk x 1
 
 % cylindrical coordinates for relative particle positions
-relativeParticlePositions = simulation.input.particles.positionArray - simulation.input.initialField.focalPoint;
+relativeParticlePositions = simulation.input.particles.positionArray - simulation.input.initialField.referencePoint;
 kvec = k*[sb*cos(alpha);sb*sin(alpha);cb];
 eikr = exp(1i*relativeParticlePositions*kvec);
 
