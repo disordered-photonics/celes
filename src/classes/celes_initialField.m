@@ -118,7 +118,7 @@ classdef celes_initialField < matlab.System
         function validatePropertiesImpl(obj)
             try validateattributes(obj.type,{'char'},{'nonempty'})
             catch e, error('invalid initialField type: %s', e.message); end
-            try validateattributes(obj.amplitude,{'numeric'},{'real','nonnan','finite','scalar'})
+            try validateattributes(obj.amplitude,{'numeric'},{'nonnan','finite','scalar'})
             catch e, error('invalid amplitude value: %s', e.message); end
             switch lower(obj.type)
                 case 'gaussian beam'

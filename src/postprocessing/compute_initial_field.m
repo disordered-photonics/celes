@@ -43,7 +43,8 @@ function [E, H] = compute_initial_field(simulation)
 E = zeros(size(simulation.output.fieldPoints),'single');  % Nx3
 H = zeros(size(simulation.output.fieldPoints),'single');  % Nx3
 numberOfFieldPoints = length(E(:,1));
-R = simulation.numerics.deviceArray(single(simulation.output.fieldPoints));
+R = simulation.numerics.deviceArray(single(simulation.output.fieldPoints)) - ...
+    simulation.input.initialField.referencePoint;
 k = simulation.input.k_medium;
 n = simulation.input.mediumRefractiveIndex;
 
