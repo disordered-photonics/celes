@@ -49,8 +49,6 @@
 %===============================================================================
 function fld = plot_field(ax,simulation,component,fieldType,GIFoutputname)
 
-hold(ax,'on')
-
 pArr = simulation.input.particles.positionArray;
 rArr = simulation.input.particles.radiusArray;
 dims = simulation.output.fieldPointsArrayDims;
@@ -129,6 +127,7 @@ end
 
 for ti=1:numel(t)
     imagesc(x(1,:), y(:,1), real(fld*exp(-1i*t(ti))))% plot field on a xy plane
+    axis equal tight
     colormap(gca,cmap)
     for i=1:length(idx)
         rectangle(ax, ...
@@ -138,29 +137,26 @@ for ti=1:numel(t)
                  'EdgeColor', [0,0,0], ...
                  'LineWidth', 0.75)
     end
-    axis([min(x(:)),max(x(:)),min(y(:)),max(y(:))]) % set axis tight to fldPoints
 
     labels = ['x'; 'y'; 'z'];
     xlabel(labels(xy(1)))
     ylabel(labels(xy(2)))
 
-    ax.DataAspectRatio = [1,1,1];
-    title(strjoin([fieldType,', ',component],''))
+    title(strjoin({fieldType,', ',component},''))
     try
         caxis(caxislim)
     catch
         caxis([-1,1]) % caxislim is not valid is the fld is all zeros
     end
-    colorbar
+%     colorbar
     drawnow
+    set(ax, 'YDir','normal')
 
     if exist('GIFoutputname','var')
         f = getframe(gcf);
         imind(:,:,1,ti) = rgb2ind(f.cdata,gifcmap,'nodither');
     end
 end
-
-hold(ax,'off')
 
 if exist('GIFoutputname','var')
     imwrite(imind,gifcmap,GIFoutputname,'DelayTime',0,'Loopcount',inf)

@@ -42,7 +42,7 @@
 %> @param       fieldType (string): select 'Total field', 'Scattered field'
 %>              or 'Initial field'
 %===============================================================================
-function plot_intensity(simulation,direction,polarization,fieldType)
+function g2 = plot_intensity(simulation,direction,polarization,fieldType)
 
 switch lower(fieldType)
     case 'total field'
@@ -66,14 +66,14 @@ end
 switch lower(direction)
     case 'forward intensity'
         forward_idcs = (cos(pwp{1}.polarAngles)>=0);
-        g2 = g2(:,forward_idcs);
+        g2 = g2(:,forward_idcs).';
     case 'backward intensity'
         backward_idcs = (cos(pwp{1}.polarAngles)<=0);
         g2 = g2(:,backward_idcs);
-        g2 = g2(:,end:-1:1);
+        g2 = g2(:,end:-1:1).';
 end
 
-polarplot3d(double(g2).');
+polarplot3d(double(g2));
 view([0,90])
 set(gca,'DataAspectRatio',[1,1,1])
 end

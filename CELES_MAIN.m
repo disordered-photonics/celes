@@ -16,8 +16,7 @@ data = dlmread('examples/sphere_parameters.txt');
 %   - radiusArray:          Nx1 array (float) of sphere radii
 particles = celes_particles('positionArray',        data(:,2:4), ...
                             'refractiveIndexArray', data(:,5)+1i*data(:,6), ...
-                            'radiusArray',          data(:,1) ...
-                            );
+                            'radiusArray',          data(:,1));
 
 % initialize initial field class instance
 %   - polarAngle:           scalar (float) polar angle of incoming beam/wave,
@@ -35,8 +34,7 @@ initialField = celes_initialField('type',           'gaussian beam', ...
                                   'azimuthalAngle', 0, ...
                                   'polarization',   'TE', ...
                                   'beamWidth',      2000, ...
-                                  'referencePoint', [0,0,0] ...
-                                  );
+                                  'referencePoint', [0,0,0]);
 
 % initialize input class instance
 %   - wavelength:           scalar (float) vacuum wavelength, same unit as
@@ -47,8 +45,7 @@ initialField = celes_initialField('type',           'gaussian beam', ...
 input = celes_input('wavelength',                   550, ...
                     'mediumRefractiveIndex',        1, ...
                     'particles',                    particles, ...
-                    'initialField',                 initialField ...
-                    );
+                    'initialField',                 initialField);
 
 % initialize preconditioner class instance
 %   - type:                 string (char) type of preconditioner (currently
@@ -56,8 +53,7 @@ input = celes_input('wavelength',                   550, ...
 %   - partitionEdgeSizes    1x3 array (float) edge size of partitioning cuboids
 %                           (applies to 'blockdiagonal' type only)
 precnd = celes_preconditioner('type',               'blockdiagonal', ...
-                              'partitionEdgeSizes', [1200,1200,1200] ...
-                              );
+                              'partitionEdgeSizes', [1200,1200,1200]);
 
 % initialize solver class instance
 %   - type:                 string (char) solver type (currently 'BiCGStab' or
@@ -88,7 +84,7 @@ solver = celes_solver('type',                       'GMRES', ...
 %   - solver:               valid instance of celes_solver class
 numerics = celes_numerics('lmax',                   3, ...
                           'polarAnglesArray',       0:pi/5e3:pi, ...
-                          'azimuthalAnglesArray',   0:pi/1e2:2*pi, ...
+                          'azimuthalAnglesArray',   0:pi/2e2:2*pi, ...
                           'gpuFlag',                true, ...
                           'particleDistanceResolution', 1, ...
                           'solver',                 solver);
@@ -114,7 +110,7 @@ simul = celes_simulation('input',                   input, ...
 %% run simulation
 simul.run;
 
-% evaluate transmitted and reflected power
+% evaluate transmitted and reflected power (only for gaussian beam sources)
 simul.evaluatePower;
 fprintf('transmitted power: \t%.4f %%\n', ...
     simul.output.totalFieldForwardPower/simul.output.initialFieldPower*100)
@@ -132,16 +128,30 @@ plot_spheres(gca,simul.input.particles.positionArray, ...
                  simul.input.particles.refractiveIndexArray)
 
 % plot near field
-comp = ["real Ex", "real Ey", "real Ez", "abs E", "real Hx", "real Hy", "real Hz", "abs H"];
+comp = {'real Ex', 'real Ey', 'real Ez', 'abs E', ...
+        'real Hx', 'real Hy', 'real Hz', 'abs H'};
 fieldtype = 'total field';
 
 figure('Name','Near-field cross-cut','NumberTitle','off');
 for sp = 1:numel(comp)
     subplot(2,4,sp)
-    plot_field(gca, simul, comp(sp), fieldtype);
-    caxis([-2*contains(comp(sp),'real'), 2])
+    plot_field(gca, simul, comp{sp}, fieldtype);
+    caxis([-2*contains(comp{sp},'real'), 2])
 end
 linkaxes(findall(gcf,'type','axes'))
+
+% plot far-field pattern
+figure('Name','Scattered far-field pattern','NumberTitle','off');
+subplot(1,2,1)
+plot_intensity(simul, 'backward intensity', 'TE+TM', 'scattered field');
+title('backward intensity, TE+TM')
+caxis([0 5])
+colorbar
+subplot(1,2,2)
+plot_intensity(simul, 'forward intensity', 'TE+TM', 'scattered field');
+title('forward intensity, TE+TM')
+caxis([0 5])
+colorbar
 
 % plot Poynting vector
 figure('Name','Pynting vector cross-cut','NumberTitle','off');
@@ -150,4 +160,4 @@ axis([min(x(:)), max(x(:)), min(z(:)), max(z(:))])
 
 % % export animated gif
 % figure('Name','Animated near-field cross-cut','NumberTitle','off');
-% plot_field(gca,simul,'real Ey','Total field','Ey_total.gif')
+% plot_field(gca, simul, 'real Ey', 'Total field', 'Ey_total.gif');
