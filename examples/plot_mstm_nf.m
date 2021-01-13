@@ -6,7 +6,7 @@ if exist('mstm_benchmark_nf.mat', 'file') == 2
     load('mstm_benchmark_nf.mat');
 else
     % get the number of lines to skip (# spheres cut by the near-field plane)
-    filename = 'mstm_benchmark_0deg_nf.dat';
+    filename = 'mstm_benchmark_tiltedPW_0deg_nf.dat';
     fileID = fopen(filename,'r');
     formatSpec = '%f%[^\n\r]';
     dataArray = textscan(fileID, formatSpec, 1, 'HeaderLines', 1);
@@ -31,7 +31,7 @@ else
     H0 = single(H0);
     
     % read near-field data for 90 deg polarization
-    filename = 'mstm_benchmark_90deg_nf.dat';
+    filename = 'mstm_benchmark_tiltedPW_90deg_nf.dat';
     mstmOutput = dlmread(filename,'',cutspheres+2,0);
     E90= cat(3, rot90(reshape(mstmOutput(:,3) + 1i*mstmOutput(:,4), [length(zvec), length(xvec)]),0), ...
                 rot90(reshape(mstmOutput(:,5) + 1i*mstmOutput(:,6), [length(zvec), length(xvec)]),0), ...

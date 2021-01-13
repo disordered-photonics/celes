@@ -83,7 +83,7 @@ solver = celes_solver('type',                       'GMRES', ...
 %                           spherical Hankel function (same unit as wavelength)
 %   - solver:               valid instance of celes_solver class
 numerics = celes_numerics('lmax',                   3, ...
-                          'polarAnglesArray',       0:pi/5e3:pi, ...
+                          'polarAnglesArray',       0:pi/1e3:pi, ...
                           'azimuthalAnglesArray',   0:pi/2e2:2*pi, ...
                           'gpuFlag',                true, ...
                           'particleDistanceResolution', 1, ...
@@ -143,12 +143,12 @@ linkaxes(findall(gcf,'type','axes'))
 % plot far-field pattern
 figure('Name','Scattered far-field pattern','NumberTitle','off');
 subplot(1,2,1)
-plot_intensity(simul, 'backward intensity', 'TE+TM', 'scattered field');
+g2b = plot_intensity(simul, 'backward intensity', 'TE+TM', 'scattered field');
 title('backward intensity, TE+TM')
 caxis([0 5])
 colorbar
 subplot(1,2,2)
-plot_intensity(simul, 'forward intensity', 'TE+TM', 'scattered field');
+g2f = plot_intensity(simul, 'forward intensity', 'TE+TM', 'scattered field');
 title('forward intensity, TE+TM')
 caxis([0 5])
 colorbar
