@@ -14,7 +14,21 @@
 
 ## [Testing]
 
+### Added
+- H field calculation
+- Poynting vector plotting
+- benchmark simulation script and data for MSTM
+- dedicated `initialField.type` for plane waves (previously a Gaussian beam with infinite waist)
+
+### Changed
+- naming of output methods are now specific for E and H fields
+- the `focalPoint` parameter of `initialField` renamed to `referencePoint`
+
+
 ## [Unreleased]
+
+
+## [2.2] - 2021-04-13
 ### Changed
 - subclass celes classes from `matlab.System`
 - implement `setProperties` methods for name-value style initialization
@@ -26,11 +40,11 @@
 - fancier, faster plotting functions
 - use convex hull in compute_maximal_particle_distance
 - provide robust, fallback method for compute_maximal_particle_distance
+- avoid recompiling .mex files if already available
 
 ### Fixed
 - don't try to compute initial power for plane waves
 - fix bug in scattered field plots
-- fix bug in computeTotalFieldPWP
 
 ## [2.1] - 2017-10-25
 ### Changed
@@ -63,7 +77,8 @@
 
 ## 1.0 - 2017-02-24
 
-[Testing]: https://github.com/disordered-photonics/celes/compare/HEAD...develop
-[Unreleased]: https://github.com/disordered-photonics/celes/compare/v2.1...HEAD
+[Testing]: https://github.com/disordered-photonics/celes/compare/HEAD...tiltedPWs
+[Unreleased]: https://github.com/disordered-photonics/celes/compare/v2.2...HEAD
+[2.2]: https://github.com/disordered-photonics/celes/compare/v2.1...v2.2
 [2.1]: https://github.com/disordered-photonics/celes/compare/v2.0...v2.1
 [2.0]: https://github.com/disordered-photonics/celes/compare/v1.0...v2.0
