@@ -35,11 +35,11 @@
 %> @param     simulation (celes_simulation object): the Gaussian beam
 %>            parameters are taken from simulation.input.initialField
 %>
-%> @retval    E (Nx3 float array): electric field in the format [Ex;Ey;Ez]
-%>            Each column correspond to one field point specified in
-%>            simulation.output.fieldPoints
+%> @retval    E, H (Nx3 float arrays): electric and magnetic fields in the
+%>            format [Ex;Ey;Ez]. Each column correspond to one field point
+%>            specified in simulation.output.fieldPoints
 %===============================================================================
-function E = gaussian_beam_paraxial_approximation(simulation)
+function [E, H] = gaussian_beam_paraxial_approximation(simulation)
 
 % relative coordinates
 xG = simulation.input.initialField.focalPoint(1);
@@ -62,6 +62,9 @@ switch lower(simulation.input.initialField.polarization)
 end
 E0 = simulation.input.initialField.amplitude * ... % complex beam amplitude
     [-sin(alphaG), cos(alphaG),0];
+H0 = simulation.input.initialField.amplitude * ...
+    simulation.input.mediumRefractiveIndex * ...
+    [-cos(alphaG), -sin(alphaG), 0];
 w0 = simulation.input.initialField.beamWidth; % beam waist
 zR = pi*w0^2/wl; % Rayleigh range
 wz = w0 * sqrt(1+(z/zR).^2); % spot size parameter
@@ -70,5 +73,8 @@ psiz = atan(z/zR); % Gouy phase
 
 E = sign(cos(simulation.input.initialField.polarAngle))* ...
     E0 * w0./wz .* exp(-rho.^2./wz.^2).* ...
+    exp(1i*(k*z + k*rho.^2./(2*Rz) - psiz));
+H = sign(cos(simulation.input.initialField.polarAngle))* ... % to check ...
+    H0 * w0./wz .* exp(-rho.^2./wz.^2).* ...
     exp(1i*(k*z + k*rho.^2./(2*Rz) - psiz));
 end

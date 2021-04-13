@@ -14,9 +14,9 @@ data = dlmread('examples/sphere_parameters.txt');
 %   - positionArray:        Nx3 array (float) in [x,y,z] format
 %   - refractiveIndexArray: Nx1 array (complex) of complex refractive indices
 %   - radiusArray:          Nx1 array (float) of sphere radii
-particles = celes_particles('positionArray',        data(:,1:3), ...
+particles = celes_particles('positionArray',        data(:,2:4), ...
                             'refractiveIndexArray', data(:,5)+1i*data(:,6), ...
-                            'radiusArray',          data(:,4) ...
+                            'radiusArray',          data(:,1) ...
                             );
 
 % initialize initial field class instance
@@ -93,7 +93,7 @@ numerics = celes_numerics('lmax',                   3, ...
                           'solver',                 solver);
 
 % define a grid of points where the field will be evaulated
-[x,z] = meshgrid(-4000:50:4000, -3000:50:5000); y = zeros(size(x));
+[x,z] = meshgrid(-4000:40:4000, -3000:40:5000); y = zeros(size(x));
 % initialize output class instance
 %   - fieldPoints:          Nx3 array (float) points where to evaluate the
 %                           electric near field
@@ -131,9 +131,21 @@ plot_spheres(gca,simul.input.particles.positionArray, ...
                  simul.input.particles.refractiveIndexArray)
 
 % plot near field
+comp = ["real Ex", "real Ey", "real Ez", "abs E", "real Hx", "real Hy", "real Hz", "abs H"];
+fieldtype = 'total field';
+
 figure('Name','Near-field cross-cut','NumberTitle','off');
-plot_field(gca,simul,'abs E','Total field')
-caxis([0,2])
+for sp = 1:numel(comp)
+    subplot(2,4,sp)
+    plot_field(gca, simul, comp(sp), fieldtype);
+    caxis([-2*contains(comp(sp),'real'), 2])
+end
+linkaxes(findall(gcf,'type','axes'))
+
+% plot Poynting vector
+figure('Name','Pynting vector cross-cut','NumberTitle','off');
+S = plot_poynting(gca,simul,'Total field');
+ylim([min(z(:)), max(z(:))])
 
 % % export animated gif
 % figure('Name','Animated near-field cross-cut','NumberTitle','off');

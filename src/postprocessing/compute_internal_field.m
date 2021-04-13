@@ -35,19 +35,21 @@
 %> @param   simulation (celes_simulation object): simulation for
 %>          which the scattered field is to be computed
 %>
-%> @retval  E (Nx3 float array): electric field in the format [Ex;Ey;Ez]
-%>          Each column correspond to one field point specified in
-%>          simulation.output.fieldPoints
+%> @retval  E, H (Nx3 float arrays): electric and magnetic fields in the
+%>          format [Ex;Ey;Ez]. Each column correspond to one field point
+%>          specified in simulation.output.fieldPoints
 %===============================================================================
-function [E,internal_indices] = compute_internal_field(simulation)
+function [E,H,internal_indices] = compute_internal_field(simulation)
 
 msg='';
 
 % initialize field
 E = zeros(size(simulation.output.fieldPoints),'single');
+H = zeros(size(simulation.output.fieldPoints),'single');
 internal_indices = [];
 
 kM = simulation.input.k_medium;
+omega = simulation.input.omega;
 
 for jS=1:simulation.input.particles.number
     fprintf(1,repmat('\b',1,length(msg)));
@@ -64,15 +66,22 @@ for jS=1:simulation.input.particles.number
 
     for l = 1:simulation.numerics.lmax
         for m = -l:l
-            for tau = 1:2
-                n = multi2single_index(1,tau,l,m,simulation.numerics.lmax);
-                N = SVWF(kS,Rint,nu,tau,l,m);
-                b_to_c = T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'internal')/...
-                         T_entry(tau,l,kM,kS,simulation.input.particles.radiusArray(jS),'scattered');
-                E(intidx,:) = ...
-                    E(intidx,:)+ ...
-                    simulation.tables.scatteredFieldCoefficients(jS,n) * b_to_c * N;
-            end
+            [M, N] = SVWF(kS,Rint,nu,l,m); % not using interpolation ...
+
+            n1 = multi2single_index(1,1,l,m,simulation.numerics.lmax);
+            n2 = multi2single_index(1,2,l,m,simulation.numerics.lmax);
+
+            b_to_c = T_entry(1,l,kM,kS,simulation.input.particles.radiusArray(jS),'internal')/...
+                     T_entry(1,l,kM,kS,simulation.input.particles.radiusArray(jS),'scattered');
+            a_to_d = T_entry(2,l,kM,kS,simulation.input.particles.radiusArray(jS),'internal')/...
+                     T_entry(2,l,kM,kS,simulation.input.particles.radiusArray(jS),'scattered');
+
+            E(intidx,:) = E(intidx,:) + ...
+                simulation.tables.scatteredFieldCoefficients(jS,n1) * b_to_c * M + ...
+                simulation.tables.scatteredFieldCoefficients(jS,n2) * a_to_d * N;
+            H(intidx,:) = H(intidx,:) -1i*kS/omega *( ...
+                simulation.tables.scatteredFieldCoefficients(jS,n1) * b_to_c * N + ...
+                simulation.tables.scatteredFieldCoefficients(jS,n2) * a_to_d * M);
         end
     end
     internal_indices = [internal_indices; intidx];
