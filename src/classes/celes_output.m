@@ -144,7 +144,7 @@ classdef celes_output < matlab.System
         function validatePropertiesImpl(obj)
             try validateattributes(obj.fieldPoints,{'numeric'},{'real','nonnan','finite','2d','ncols',3})
             catch e, error('invalid fieldPoints array: %s', e.message); end
-            try validateattributes(obj.fieldPointsArrayDims,{'numeric'},{'integer','finite','nonnan','numel',2})
+            try validateattributes(obj.fieldPointsArrayDims,{'numeric'},{'integer','finite','nonnan'})
             catch e, error('invalid fieldPointsArrayDims values: %s', e.message); end
         end
     end
