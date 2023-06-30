@@ -53,7 +53,8 @@ classdef celes_output < matlab.System
 
         %> electric (near) field values of the initial field at the points
         %> specified in fieldPoints
-        initialField
+        initialEField
+        initialHField
 
         %> if true, the paraxial approximation is used for the electric
         %> field evaluation of the initial field, otherwise compute initial
@@ -62,11 +63,13 @@ classdef celes_output < matlab.System
 
         %> electric (near) field values of the scattered field at the points
         %> specified in fieldPoints
-        scatteredField
+        scatteredEField
+        scatteredHField
 
         %> electric (near) field values of the internal field at the points
         %> specified in fieldPoints
-        internalField
+        internalEField
+        internalHField
 
         %> indices that correspond to field points that are inside some
         %> sphere
@@ -109,7 +112,8 @@ classdef celes_output < matlab.System
     properties (Dependent)
         %> electric (near) field values of the total field at the points
         %> specified in fieldPoints
-        totalField
+        totalEField
+        totalHField
     end
 
     methods
@@ -126,13 +130,22 @@ classdef celes_output < matlab.System
         % ======================================================================
         %> @brief Get method for totalField
         % ======================================================================
-        function E = get.totalField(obj)
+        function E = get.totalEField(obj)
             try
-                E = obj.initialField + obj.scatteredField;
+                E = obj.initialEField + obj.scatteredEField;
                 E(obj.internalIndices,:) = ...
-                                       obj.internalField(obj.internalIndices,:);
+                                       obj.internalEField(obj.internalIndices,:);
             catch
                 E = [];
+            end
+        end
+        function H = get.totalHField(obj)
+            try
+                H = obj.initialHField + obj.scatteredHField;
+                H(obj.internalIndices,:) = ...
+                                       obj.internalHField(obj.internalIndices,:);
+            catch
+                H = [];
             end
         end
     end

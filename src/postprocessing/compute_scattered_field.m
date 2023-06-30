@@ -34,11 +34,11 @@
 %> @param   simulation (celes_simulation object): simulation for
 %>          which the scattered field is to be computed
 %>
-%> @retval  E (Nx3 float array): electric field in the format [Ex;Ey;Ez]
-%>          Each column correspond to one field point specified in
-%>          simulation.output.fieldPoints
+%> @retval  E, H (Nx3 float arrays): electric and magnetic fields in the
+%>          format [Ex;Ey;Ez]. Each column correspond to one field point
+%>          specified in simulation.output.fieldPoints
 %===============================================================================
-function E = compute_scattered_field(simulation)
+function [E, H] = compute_scattered_field(simulation)
 
 msg='';
 
@@ -56,8 +56,11 @@ for l = 1:simulation.numerics.lmax
 end
 ri = simulation.numerics.deviceArray(single(ri));
 
+nM = simulation.input.mediumRefractiveIndex;
+
 % initialize field
 E = simulation.numerics.deviceArray(zeros(size(simulation.output.fieldPoints),'single'));
+H = simulation.numerics.deviceArray(zeros(size(simulation.output.fieldPoints),'single'));
 
 for jS = 1:simulation.input.particles.number
     fprintf(1,repmat('\b',1,length(msg)));
@@ -104,23 +107,18 @@ for jS = 1:simulation.input.particles.number
             pi_lm = pi_all{l+1,abs(m)+1};
             tau_lm = tau_all{l+1,abs(m)+1};
             eimphi = exp(1i*m*phi);
-            for tau = 1:2
-                n = multi2single_index(1,tau,l,m,simulation.numerics.lmax);
-                % SVWFs
-                if tau == 1  %select M
-                    fac1 = 1/sqrt(2*l*(l+1)) * z .* eimphi;
-                    fac2 = (1i*m*pi_lm).*e_theta - tau_lm.*e_phi;
-                    N = fac1.*fac2;
-                else %select N
-                    fac1 = 1/sqrt(2*l*(l+1)) * eimphi;
-                    term1 = (l*(l+1)*z./kr.*P_lm).*e_r;
-                    term22 = tau_lm.*e_theta;
-                    term23 = (1i*m*pi_lm).*e_phi;
-                    term2 = (dxxz./kr).*(term22+term23);
-                    N = fac1.*(term1+term2);
-                end
-                E = E + simulation.tables.scatteredFieldCoefficients(jS,n) * N;
-            end
+
+            n1 = multi2single_index(1,1,l,m,simulation.numerics.lmax);
+            n2 = multi2single_index(1,2,l,m,simulation.numerics.lmax);
+
+            % SVWFs (using interpolated z and dxxz)
+            M = 1/sqrt(2*l*(l+1))*z.*((1i*m*pi_lm).*e_theta - tau_lm.*e_phi) .* eimphi;
+            N = 1/sqrt(2*l*(l+1)) .* ((l*(l+1)*z./kr.*P_lm).*e_r + (dxxz./kr).*(tau_lm.*e_theta + (1i*m*pi_lm).*e_phi)) .* eimphi;
+
+            E = E + simulation.tables.scatteredFieldCoefficients(jS,n1) * M + ...
+                    simulation.tables.scatteredFieldCoefficients(jS,n2) * N;
+            H = H -1i*nM*(simulation.tables.scatteredFieldCoefficients(jS,n1) * N + ...
+                          simulation.tables.scatteredFieldCoefficients(jS,n2) * M);
         end
     end
 end

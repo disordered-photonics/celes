@@ -37,25 +37,33 @@
 %> @param beta (float): polar angle of propagation direction
 %> @param pol (int): polarization (1=TE, 2=TM)
 %>
-%> @retval E_components (cell array): {Ex,Ey,Ez}
+%> @retval E_components, H_components (cell arrays): {Ex,Ey,Ez}, {Hx,Hy,Hz}
 %===============================================================================
-function [E_components] = PVWF_components(R,k,alpha,beta,pol)
+function [E_components, H_components] = PVWF_components(R,k,n,alpha,beta,pol)
 % alpha, beta need to be row vectors
 % R need to be Nx3
 
 kvec = k*[sin(beta).*cos(alpha);sin(beta).*sin(alpha);cos(beta)];
 E = exp(1i*R*kvec);
+H = -1i*n.*E;
 if pol==1  % TE
     % E_alpha = [-sin(alpha);cos(alpha);0];
     Ex = -sin(alpha).*E;
     Ey = cos(alpha).*E;
     Ez = zeros(size(E),'like',E);
+    Hx = 1i*(-cos(alpha).*cos(beta)).*H;    % to check
+    Hy = 1i*(-sin(alpha).*cos(beta)).*H;    % to check
+    Hz = 1i*sin(beta).*H;                   % to check
 else
     % E_beta = [cos(alpha)*kz/k;sin(alpha)*kz/k;-kpar/k];
     Ex = (cos(alpha).*cos(beta)).*E;
     Ey = (sin(alpha).*cos(beta)).*E;
     Ez = -sin(beta).*E;
+    Hx = 1i*(-sin(alpha)).*H;               % to check
+    Hy = 1i*cos(alpha).*H;                  % to check
+    Hz = zeros(size(H),'like',H);           % to check
 end
 
 E_components = {Ex,Ey,Ez};
+H_components = {Hx,Hy,Hz};
 end

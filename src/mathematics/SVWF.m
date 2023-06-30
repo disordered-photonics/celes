@@ -50,7 +50,7 @@
 %> @retval N (float array): field components in format
 %>         [Ex1,...,Exn; Ey1,...,Eyn; Ez1,...,Ezn]
 %===============================================================================
-function N = SVWF(k,R,nu,tau,l,m)
+function [M, N] = SVWF(k,R,nu,l,m)
 % R in the format [x1,...,xn; y1,...,yn; z1,...,zn]
 
 % spherical coordinates
@@ -83,10 +83,7 @@ eimphi=exp(1i*m*phi);
 kr = k*r;
 
 % SVWFs
-if tau == 1 %select M
-    N = 1/sqrt(2*l*(l+1)) * z .* (1i*m*pi_lm.*e_theta-tau_lm.*e_phi) .* eimphi;
-else %select N
-    N = 1/sqrt(2*l*(l+1)) * (l*(l+1)*z./kr.*P_lm.*e_r+ ...
+M = 1/sqrt(2*l*(l+1)) * z .* (1i*m*pi_lm.*e_theta-tau_lm.*e_phi) .* eimphi;
+N = 1/sqrt(2*l*(l+1)) * (l*(l+1)*z./kr.*P_lm.*e_r+ ...
         dxxz./kr.* (tau_lm.*e_theta + 1i*m*pi_lm.*e_phi)) .* eimphi;
-end
 end

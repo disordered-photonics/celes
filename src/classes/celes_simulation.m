@@ -287,7 +287,7 @@ classdef celes_simulation < matlab.System
         % ======================================================================
         function obj = evaluateInitialField(obj)
             fprintf(1,'evaluate initial field ...');
-            obj.output.initialField = compute_initial_field(obj);
+            [obj.output.initialEField,obj.output.initialHField] = compute_initial_field(obj);
             fprintf(1,' done\n');
         end
 
@@ -299,7 +299,7 @@ classdef celes_simulation < matlab.System
         % ======================================================================
         function obj = evaluateScatteredField(obj)
             fprintf(1,'evaluate scattered field ...');
-            obj.output.scatteredField = compute_scattered_field(obj);
+            [obj.output.scatteredEField,obj.output.scatteredHField] = compute_scattered_field(obj);
             fprintf(1,' done\n');
         end
 
@@ -311,7 +311,8 @@ classdef celes_simulation < matlab.System
         % ======================================================================
         function obj = evaluateInternalField(obj)
             fprintf(1,'evaluate internal field ...');
-            [obj.output.internalField,obj.output.internalIndices] = compute_internal_field(obj);
+            [obj.output.internalEField,obj.output.internalHField,obj.output.internalIndices] = ...
+                compute_internal_field(obj);
             fprintf(1,' done\n');
         end
 
